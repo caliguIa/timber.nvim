@@ -147,6 +147,8 @@ The configuration does two things:
 
 After the log results are captured, a snippet of the log result will be displayed inline next to the log statement. You can also see the full log content inside a floating window using `require("timber.buffers").open_float()`
 
+![Screenshot 2024-11-12 at 22 01 34](https://github.com/user-attachments/assets/844cec52-3ecf-4b7b-ac67-b7280f882f73)
+
 See [`:h timber.nvim-watchers`](https://github.com/Goose97/timber.nvim/blob/main/doc/timber.nvim.txt) for more information.
 
 ## Configuration
