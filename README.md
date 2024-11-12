@@ -124,11 +124,19 @@ require("timber").setup({
                 path = "/tmp/debug.log",
             },
             {
+                -- Test runner
                 type = "neotest",
                 name = "Neotest",
             },
         },
     }
+})
+
+-- Configure neotest consumer if source neotest is used
+require("neotest").setup({
+    consumers = {
+        timber = require("timber.watcher.sources.neotest").consumer,
+    },
 })
 ```
 

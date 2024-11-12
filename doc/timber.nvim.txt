@@ -308,6 +308,14 @@ the watcher to monitor. `timber.nvim` supports the following sources:
     {name}     (string)  The name of the source. This will be displayed in
 			 the log results viewer.
 
+  Users need to configure `neotest` consumer to use this source:
+>lua
+  require("neotest").setup({
+    consumers = {
+      timber = require("timber.watcher.sources.neotest").consumer,
+    },
+  })
+<
 ------------------------------------------------------------------------------
 3.3. Markers                                    *timber.nvim-watchers.markers*
 
