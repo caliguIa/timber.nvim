@@ -2,12 +2,16 @@
 ---Sources are data sources that can output log result. Supported sources are:
 ---  1. Filesystem
 
----@alias Timber.Watcher.SourceSpecs Timber.Watcher.Sources.FilesystemSpec[]
----
+---@alias Timber.Watcher.SourceSpecs (Timber.Watcher.Sources.FilesystemSpec | Timber.Watcher.Sources.NeotestSpec)[]
+
 ---@class Timber.Watcher.Sources.FilesystemSpec
 ---@field name string
 ---@field path string
 ---@field type "filesystem"
+
+---@class Timber.Watcher.Sources.NeotestSpec
+---@field name string
+---@field type "neotest"
 
 ---@class Timber.Watcher.Sources.Opts
 ---@field sources Timber.Watcher.SourceSpecs
