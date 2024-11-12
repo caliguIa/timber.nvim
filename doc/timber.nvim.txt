@@ -13,11 +13,16 @@ CONTENTS                                                *timber.nvim-contents*
     2.2. Insert batch log statements .. |timber.nvim-actions.insert-batch-log|
     2.3. Insert log operators ................ |timber.nvim-actions.operators|
     2.4. API ....................................... |timber.nvim-actions.api|
-  3. Configuration ...................................... |timber.nvim-config|
-    3.1. Default configuration .................. |timber.nvim-config.default|
-    3.2. Log templates .................... |timber.nvim-config.log-templates|
-    3.3. Keymaps ................................ |timber.nvim-config.keymaps|
-    3.4. Highlight ............................ |timber.nvim-config.highlight|
+  3. Watchers ......................................... |timber.nvim-watchers|
+    3.1. How it works ....................... |timber.nvim-watchers.algorithm|
+    3.2. Sources .............................. |timber.nvim-watchers.sources|
+    3.3. Markers .............................. |timber.nvim-watchers.markers|
+  4. Buffers ........................................... |timber.nvim-buffers|
+  5. Configuration ...................................... |timber.nvim-config|
+    5.1. Default configuration .................. |timber.nvim-config.default|
+    5.2. Log templates .................... |timber.nvim-config.log-templates|
+    5.3. Keymaps ................................ |timber.nvim-config.keymaps|
+    5.4. Highlight ............................ |timber.nvim-config.highlight|
 
 ==============================================================================
 1. Introduction                                     *timber.nvim-introduction*
@@ -54,7 +59,7 @@ placement of the log statement. The default keymaps are:
 
 Each operation requires a log template to be provided, and the log template
 must supports the current filetype. The filetype is determined via
-`vim.bo.filtype`. |timber.nvim| provides some templates out of the box, which
+`vim.bo.filetype`. |timber.nvim| provides some templates out of the box, which
 has a special template called `default`. The `default` template is used when no
 template is provided.
 
@@ -232,11 +237,123 @@ actions.clear_batch({opts})                     *timber.actions.clear_batch()*
   Clear all log targets in the batch.
 
 ==============================================================================
-3. Configuration                                          *timber.nvim-config*
+3. Watchers                                             *timber.nvim-watchers*
+
+|timber.nvim| can capture the log results and display them inside Neovim. To
+do this, users must configure a list of sources to watch:
+>lua
+  {
+    log_watcher = {
+      enabled = true,
+      sources = {
+	{
+	  name = "Log file",
+	  type = "filesystem",
+	  path = "/tmp/debug.log",
+	},
+	{
+	  name = "Neotest",
+	  type = "neotest",
+	},
+      },
+    }
+  }
+<
+------------------------------------------------------------------------------
+3.1. How it works                             *timber.nvim-watchers.algorithm*
+
+The job of the watcher is to monitor the sources and capture the log results.
+To do that, we mark the log results with special markers which can be extracted
+by the watcher. Users can use the placeholder `%watcher_marker_start` and
+`%watcher_marker_end` to mark the start and end of the log results. See
+`timber.nvim-watchers.markers`.
+
+For example, this log template:
+>lua
+  [[print("%watcher_marker_start" .. %identifier .. "%watcher_marker_end")]]
+<
+Will be expanded to:
+>lua
+  [[print("🪵ZGH|" .. foo .. "|ZGH")]]
+<
+And later on printed to stdout as:
+>
+  🪵ZGH|<log_content>|ZGH
+<
+During scanning the sources, the watcher recognizes these markers by the `🪵` prefix
+and the marker ID. This ID is generated randomly for each log statement and acts
+as an unique identifier. This allows us to know which log result belong to which
+log statement.
+
+------------------------------------------------------------------------------
+3.2. Sources                                    *timber.nvim-watchers.sources*
+
+The `sources` field in the `log_watcher` configuration is a list of sources for
+the watcher to monitor. `timber.nvim` supports the following sources:
+
+- filesystem: A file on the filesystem.
+
+  Spec: ~
+
+    {type}     (string)  The type of the source. Must be `filesystem`.
+    {name}     (string)  The name of the source. This will be displayed in
+			 the log results viewer.
+    {path}     (string)  Absolute path of the file.
+
+- neotest: Test output from neotest.
+
+  Spec: ~
+
+    {type}     (string)  The type of the source. Must be `neotest`.
+    {name}     (string)  The name of the source. This will be displayed in
+			 the log results viewer.
+
+------------------------------------------------------------------------------
+3.3. Markers                                    *timber.nvim-watchers.markers*
+
+`timber.nvim` supports quickly insert markers to log statements with `%watcher_marker_start`
+and `%watcher_marker_end` placeholders. Remember, these markers denote the
+start end end of the log content. Normally, your log content should be wrapped
+between these two markers.
+>lua
+  require("timber").setup({
+    log_templates = {
+      default = {
+	lua = [[print("%watcher_marker_start" .. %identifier .. "%watcher_marker_end")]]
+      }
+    }
+  })
+
+==============================================================================
+4. Buffers                                               *timber.nvim-buffers*
+
+`timber.buffers` module provides API to interact with the captured log results
+in the buffers.
+
+buffers.open_float({opts})                       *timber.buffers.open_float()*
+
+  Open a floating window showing the captured log results.
+
+  Parameters: ~
+    {opts} (table)  options to pass to the action
+
+  Options: ~
+    {silent}            (boolean)             Whether to silent the notification
+                                              if no log placeholder is found.
+                                              Default: false
+
+buffers.clear_logs()                             *timber.buffers.clear_logs()*
+
+  Clear all captured log results.
+
+==============================================================================
+5. Configuration                                          *timber.nvim-config*
 
 |timber.nvim| is highly configurable. The configuration is broke down into multiple
 parts which are laid out in the following sections. It also provides a default
-configuration.
+configuration. See |timber.nvim-config.default|.
+
+To use a custom configuration, pass it to the *timber.setup* function.
 
 timber.setup({opts})                                          *timber.setup()*
 
@@ -262,7 +379,7 @@ timber.setup({opts})                                          *timber.setup()*
     |timber.nvim-config.highlight|
 
 ------------------------------------------------------------------------------
-3.1. Default configuration                        *timber.nvim-config.default*
+5.1. Default configuration                        *timber.nvim-config.default*
 >lua
   {
     log_templates = {
@@ -307,7 +424,7 @@ timber.setup({opts})                                          *timber.setup()*
   }
 <
 ------------------------------------------------------------------------------
-3.2. Log templates                          *timber.nvim-config.log-templates*
+5.2. Log templates                          *timber.nvim-config.log-templates*
 
 `log_templates` determines the content of the log statements. The format is as
 follows: `{ [template_name]: { [language]: string } }`. `batch_log_templates` is
@@ -351,7 +468,7 @@ all placeholders supported by `log_templates`, plus:
 See the default configuration for some examples of template.
 
 ------------------------------------------------------------------------------
-3.3. Keymaps                                      *timber.nvim-config.keymaps*
+5.3. Keymaps                                      *timber.nvim-config.keymaps*
 
 |timber.nvim| provides default keymaps for common actions:
 
@@ -416,7 +533,7 @@ Log template string supports special placeholders that will be expanded during
  will disable the default `insert_log_below` and `insert_log_above` keymaps.
 
 ------------------------------------------------------------------------------
-3.4. Highlight					*timber.nvim-config.highlight*
+5.4. Highlight					*timber.nvim-config.highlight*
 
 Control highlight behaviors when insert log statements or add log targets to
 batch. |timber.nvim| uses the following highlight groups:

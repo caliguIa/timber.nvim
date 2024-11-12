@@ -68,7 +68,11 @@ See [Wiki](https://github.com/Goose97/timber.nvim/wiki/Example-mappings) for mor
 
 ## Usage
 
-The core operation of `timber.nvim` inserting log statements. There are two kinds of log statements:
+`timber.nvim` has two core operations: inserting log statements and capturing log results.
+
+### Insert log statements
+
+There are two kinds of log statements:
 
 1. Single log statements: log statements that may or may not capture single log target
 2. Batch log statements: log statements that capture multiple log targets
@@ -97,6 +101,45 @@ The content of the log statement is specified via templates. See [`:h timber.nvi
     local foo = 1
     print("LOG 1 foo", foo)
 ```
+
+### Capture log results
+
+`timber.nvim` can monitor multiple sources and capture the log results. For example, a common use case is to capture the log results from a test runner or from a log file.
+
+Here's an example configuration:
+
+```lua
+require("timber").setup({
+    log_templates = {
+        default = {
+            lua = [[print("%watcher_marker_start" .. %identifier .. "%watcher_marker_end")]],
+        },
+    },
+    log_watcher = {
+        enabled = true,
+        sources = {
+            {
+                type = "filesystem",
+                name = "Log file",
+                path = "/tmp/debug.log",
+            },
+            {
+                type = "neotest",
+                name = "Neotest",
+            },
+        },
+    }
+})
+```
+
+The configuration does two things:
+
+1. It adds the watcher marker placeholders to the log template. These markers help us extract the log results from the sources. For example, the log statement can print to stdout something like this: `🪵ZGH|Hello World|ZGH`. Notice the log content `Hello World` flanked by two markers.
+2. It enables the log watcher and configures the log watcher to monitor two sources: a file and the [neotest](https://github.com/nvim-neotest/neotest) test run output.
+
+After the log results are captured, a snippet of the log result will be displayed inline next to the log statement. You can also see the full log content inside a floating window using `require("timber.buffers").open_float()`
+
+See [`:h timber.nvim-watchers`](https://github.com/Goose97/timber.nvim/blob/main/doc/timber.nvim.txt) for more information.
 
 ## Configuration
 

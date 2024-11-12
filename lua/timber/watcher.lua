@@ -32,10 +32,6 @@ function M.generate_marker_pairs()
   return start, end_, id
 end
 
-function M.stop()
-  sources.stop()
-end
-
 ---@param source_specs Timber.Watcher.SourceSpecs
 function M.setup(source_specs)
   math.randomseed(os.time())
