@@ -104,7 +104,6 @@ describe("lua single log", function()
         ]],
       })
 
-      -- TODO: figure out why indentation is off with the closing parenthesis
       helper.assert_scenario({
         input = [[
           local function foo(
@@ -410,75 +409,75 @@ describe("lua single log", function()
     it("supports table constructor", function()
       helper.assert_scenario({
         input = [[
-        local foo = { bar = b|ar }
-      ]],
+          local foo = { bar = b|ar }
+        ]],
         filetype = "lua",
         action = function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-        local foo = { bar = bar }
-        print("bar", bar)
-      ]],
+          local foo = { bar = bar }
+          print("bar", bar)
+        ]],
       })
 
       helper.assert_scenario({
         input = [[
-        local foo = { b|ar = bar }
-      ]],
+          local foo = { b|ar = bar }
+        ]],
         filetype = "lua",
         action = function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-        local foo = { bar = bar }
-      ]],
+          local foo = { bar = bar }
+        ]],
       })
     end)
 
     it("supports function invocations", function()
       helper.assert_scenario({
         input = [[
-        foo(ba|r, baz)
-      ]],
+          foo(ba|r, baz)
+        ]],
         filetype = "lua",
         action = function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-        foo(bar, baz)
-        print("bar", bar)
-      ]],
+          foo(bar, baz)
+          print("bar", bar)
+        ]],
       })
 
       helper.assert_scenario({
         input = [[
-        foo(ba|r, baz)
-      ]],
+          foo(ba|r, baz)
+        ]],
         filetype = "lua",
         action = function()
           actions.insert_log({ position = "above" })
         end,
         expected = [[
-        print("bar", bar)
-        foo(bar, baz)
-      ]],
+          print("bar", bar)
+          foo(bar, baz)
+        ]],
       })
 
       helper.assert_scenario({
         input = [[
-        foo(ba|r, baz)
-      ]],
+          foo(ba|r, baz)
+        ]],
         filetype = "lua",
         action = function()
           vim.cmd("normal! V")
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-        foo(bar, baz)
-        print("bar", bar)
-        print("baz", baz)
-      ]],
+          foo(bar, baz)
+          print("bar", bar)
+          print("baz", baz)
+        ]],
       })
     end)
   end)

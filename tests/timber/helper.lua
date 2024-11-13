@@ -28,9 +28,9 @@ end
 
 ---Trim the redundant whitespaces from the input lines.
 ---@param input string
----@param parse_cursor? boolean
+---@param cursor_char? string|boolean
 ---@return string[], {[1]: number, [2]: number}?
-local function parse_input(input, parse_cursor)
+local function parse_input(input, cursor_char)
   -- Remove trailing whitespaces
   input = input:gsub("%s+$", "")
   local lines = vim.split(input, "\n", { trimempty = true })
@@ -50,8 +50,9 @@ local function parse_input(input, parse_cursor)
   for i, line in ipairs(lines) do
     line = line:sub(smallest_indent + 1)
 
-    if parse_cursor then
-      local start_index = line:find("|")
+    if cursor_char then
+      ---@cast cursor_char string
+      local start_index = line:find(cursor_char)
       if start_index then
         cursor = { i, start_index - 2 }
         line = line:sub(1, cursor[2] + 1) .. line:sub(cursor[2] + 3)
@@ -66,7 +67,7 @@ end
 
 ---@class Scenario
 ---@field input string
----@field input_cursor? boolean
+---@field input_cursor? string|boolean
 ---@field filetype string
 ---@field action function?
 ---@field expected string | function
@@ -79,10 +80,9 @@ end
 ---  const bar = "baz"
 ---@param scenario Scenario
 function M.assert_scenario(scenario)
-  scenario = vim.tbl_extend("force", { input_cursor = true }, scenario)
+  scenario = vim.tbl_extend("force", { input_cursor = "|" }, scenario)
 
   local input_lines, cursor = parse_input(scenario.input, scenario.input_cursor)
-  local utils = require("timber.utils")
   setup_buffer(input_lines, cursor, scenario.filetype)
 
   if scenario.action then

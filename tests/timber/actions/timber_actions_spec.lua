@@ -398,7 +398,7 @@ describe("timber.actions.insert_log", function()
         end,
         expected = function()
           assert.spy(notify_spy).was_called(1)
-          assert.spy(notify_spy).was_called_with("Treesitter cannot determine language for current buffer", "error")
+          assert.spy(notify_spy).was_called_with("Treesitter parser for unknown language is not found", "error")
           notify_spy:clear()
         end,
       })
@@ -998,7 +998,7 @@ describe("timber.actions.insert_batch_log", function()
         end,
         expected = function()
           assert.spy(notify_spy).was_called(1)
-          assert.spy(notify_spy).was_called_with("Treesitter cannot determine language for current buffer", "error")
+          assert.spy(notify_spy).was_called_with("Treesitter parser for unknown language is not found", "error")
           notify_spy:clear()
         end,
       })
@@ -1184,7 +1184,7 @@ describe("timber.actions.add_log_targets_to_batch", function()
         end,
         expected = function()
           assert.spy(notify_spy).was_called(1)
-          assert.spy(notify_spy).was_called_with("Treesitter cannot determine language for current buffer", "error")
+          assert.spy(notify_spy).was_called_with("Treesitter parser for unknown language is not found", "error")
           notify_spy:clear()
         end,
       })

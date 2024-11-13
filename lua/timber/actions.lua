@@ -659,7 +659,7 @@ function M.__add_log_targets_to_batch(motion_type)
 
   local lang = utils.get_lang(vim.bo.filetype)
   if not lang then
-    utils.notify("Treesitter cannot determine language for current buffer", "error")
+    utils.notify(string.format("Treesitter parser for %s language is not found", vim.bo.filetype), "error")
     return
   end
 

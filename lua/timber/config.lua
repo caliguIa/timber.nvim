@@ -27,6 +27,7 @@ local default_config = {
       jsx = [[console.log("%identifier", %identifier)]],
       tsx = [[console.log("%identifier", %identifier)]],
       lua = [[print("%identifier", %identifier)]],
+      ruby = [[puts("%identifier #{%identifier}")]],
     },
   },
   batch_log_templates = {
@@ -36,6 +37,7 @@ local default_config = {
       jsx = [[console.log({ %repeat<"%identifier": %identifier><, > })]],
       tsx = [[console.log({ %repeat<"%identifier": %identifier><, > })]],
       lua = [[print(string.format("%repeat<%identifier=%s><, >", %repeat<%identifier><, >))]],
+      ruby = [[puts("%repeat<%identifier: #{%identifier}><, >")]],
     },
   },
   highlight = {
@@ -71,7 +73,7 @@ local M = {}
 function M.get_lang_log_template(template_set, kind)
   local lang = utils.get_lang(vim.bo.filetype)
   if not lang then
-    utils.notify("Treesitter cannot determine language for current buffer", "error")
+    utils.notify(string.format("Treesitter parser for %s language is not found", vim.bo.filetype), "error")
     return
   end
 
