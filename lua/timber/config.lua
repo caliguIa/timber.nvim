@@ -28,6 +28,7 @@ local default_config = {
       tsx = [[console.log("%identifier", %identifier)]],
       lua = [[print("%identifier", %identifier)]],
       ruby = [[puts("%identifier #{%identifier}")]],
+      elixir = [[IO.inspect(%identifier, label: "%identifier")]],
     },
   },
   batch_log_templates = {
@@ -38,6 +39,7 @@ local default_config = {
       tsx = [[console.log({ %repeat<"%identifier": %identifier><, > })]],
       lua = [[print(string.format("%repeat<%identifier=%s><, >", %repeat<%identifier><, >))]],
       ruby = [[puts("%repeat<%identifier: #{%identifier}><, >")]],
+      elixir = [[IO.inspect({ %repeat<%identifier><, > })]],
     },
   },
   highlight = {
