@@ -29,6 +29,7 @@ local default_config = {
       lua = [[print("%identifier", %identifier)]],
       ruby = [[puts("%identifier #{%identifier}")]],
       elixir = [[IO.inspect(%identifier, label: "%identifier")]],
+      go = [[log.Printf("%identifier: %v\n", %identifier)]],
     },
   },
   batch_log_templates = {
@@ -40,6 +41,7 @@ local default_config = {
       lua = [[print(string.format("%repeat<%identifier=%s><, >", %repeat<%identifier><, >))]],
       ruby = [[puts("%repeat<%identifier: #{%identifier}><, >")]],
       elixir = [[IO.inspect({ %repeat<%identifier><, > })]],
+      go = [[log.Printf("%repeat<%identifier: %v><, >\n", %repeat<%identifier><, >)]],
     },
   },
   highlight = {
