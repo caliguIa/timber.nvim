@@ -30,6 +30,7 @@ local default_config = {
       ruby = [[puts("%identifier #{%identifier}")]],
       elixir = [[IO.inspect(%identifier, label: "%identifier")]],
       go = [[log.Printf("%identifier: %v\n", %identifier)]],
+      rust = [[println!("%identifier: {:#?}", %identifier);]],
     },
   },
   batch_log_templates = {
@@ -42,6 +43,7 @@ local default_config = {
       ruby = [[puts("%repeat<%identifier: #{%identifier}><, >")]],
       elixir = [[IO.inspect({ %repeat<%identifier><, > })]],
       go = [[log.Printf("%repeat<%identifier: %v><, >\n", %repeat<%identifier><, >)]],
+      rust = [[println!("%repeat<%identifier: {:#?}><, >", %repeat<%identifier><, >);]],
     },
   },
   highlight = {
