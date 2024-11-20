@@ -22,7 +22,7 @@ end
 ---@alias logable_range {[1]: number, [2]: number}
 ---@param lang string
 ---@param range {[1]: number, [2]: number, [3]: number, [4]: number}
----@return {container: TSNode, logable_range: logable_range?}[]
+---@return {container: TSNode, logable_ranges: logable_range[]}[]
 function M.query_log_target_container(lang, range)
   local bufnr = vim.api.nvim_get_current_buf()
   local parser = vim.treesitter.get_parser(bufnr, lang)
@@ -47,27 +47,10 @@ function M.query_log_target_container(lang, range)
     end
 
     if log_container and utils.ranges_intersect(utils.get_ts_node_range(log_container), range) then
-      ---@type TSNode?
-      local logable_range = match[utils.get_key_by_value(query.captures, "logable_range")]
-
-      -- Breaking changes: https://github.com/neovim/neovim/pull/30193
-      if vim.fn.has("nvim-0.11") == 1 then
-        logable_range = logable_range and logable_range[1]
-      end
-
-      local logable_range_col_range
-
-      -- adjusted_logable_range is set by the adjust-range! directive
-      if metadata.adjusted_logable_range then
-        logable_range_col_range = {
-          metadata.adjusted_logable_range[1],
-          metadata.adjusted_logable_range[3],
-        }
-      elseif logable_range then
-        logable_range_col_range = { logable_range:start(), logable_range:end_() }
-      end
-
-      table.insert(containers, { container = log_container, logable_range = logable_range_col_range })
+      table.insert(containers, {
+        container = log_container,
+        logable_ranges = metadata.logable_ranges or {},
+      })
     end
   end
 
@@ -167,26 +150,37 @@ local function is_node_field_of_ancestor(node, ancestor_type, field_name)
 end
 
 function M.setup()
-  -- Adjust the range of the node
-  vim.treesitter.query.add_directive("adjust-range!", function(match, _, _, predicate, metadata)
+  vim.treesitter.query.add_directive("make-logable-range!", function(match, _, _, predicate, metadata)
     local capture_id = predicate[2]
+    local range_type = predicate[3]
 
     ---@type TSNode
     local node = match[capture_id]
 
     -- Get the adjustment values from the predicate arguments
-    local start_adjust = tonumber(predicate[3]) or 0
-    local end_adjust = tonumber(predicate[4]) or 0
+    local start_adjust = tonumber(predicate[4]) or 0
+    local end_adjust = tonumber(predicate[5]) or 0
 
     -- Get the original range
-    local start_row, start_col, end_row, end_col = node:range()
+    local start_row, _, end_row, _ = node:range()
 
     -- Adjust the range
     local adjusted_start_row = math.max(0, start_row + start_adjust) -- Ensure we don't go below 0
-    local adjusted_end_row = math.max(adjusted_start_row, end_row + end_adjust) -- Ensure end is not before start
+    local adjusted_end_row = math.max(adjusted_start_row, end_row + 1 + end_adjust) -- Ensure end is not before start
 
-    -- Store the adjusted range in metadata
-    metadata.adjusted_logable_range = { adjusted_start_row, start_col, adjusted_end_row, end_col }
+    local logable_ranges = metadata.logable_ranges or {}
+    if range_type == "outer" then
+      table.insert(logable_ranges, { 0, adjusted_start_row })
+      table.insert(logable_ranges, { adjusted_end_row, math.huge })
+    elseif range_type == "inner" then
+      table.insert(logable_ranges, { adjusted_start_row, adjusted_end_row })
+    elseif range_type == "before" then
+      table.insert(logable_ranges, { 0, adjusted_start_row })
+    elseif range_type == "after" then
+      table.insert(logable_ranges, { adjusted_end_row, math.huge })
+    end
+
+    metadata.logable_ranges = logable_ranges
   end, { force = true })
 
   ---@return TSNode

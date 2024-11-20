@@ -119,8 +119,6 @@ describe("lua single log", function()
           actions.insert_log({ position = "above" })
         end,
         expected = [[
-          print("bar", bar)
-          print("baz", baz)
           local function foo(
             bar,
             baz,
@@ -325,10 +323,12 @@ describe("lua single log", function()
       ]],
       filetype = "lua",
       action = function()
+        actions.insert_log({ position = "above" })
         vim.cmd("normal! V")
         actions.insert_log({ position = "below" })
       end,
       expected = [[
+        print("foo", foo)
         while foo > 1 and bar < baz do
           print("foo", foo)
           print("bar", bar)
@@ -348,16 +348,18 @@ describe("lua single log", function()
       ]],
       filetype = "lua",
       action = function()
+        actions.insert_log({ position = "below" })
         vim.cmd("normal! V")
         actions.insert_log({ position = "above" })
       end,
       expected = [[
         repeat
+          return nil
           print("foo", foo)
           print("bar", bar)
           print("baz", baz)
-          return nil
         until foo > 1 and bar < baz
+        print("foo", foo)
       ]],
     })
   end)

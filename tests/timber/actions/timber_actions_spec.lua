@@ -450,6 +450,34 @@ describe("timber.actions.insert_log", function()
         end,
       })
     end)
+
+    it("notifies when no logable ranges is found", function()
+      timber.setup({
+        log_templates = {
+          default = {
+            javascript = [[console.log("%identifier", %identifier)]],
+          },
+        },
+      })
+      local notify_spy = spy.on(utils, "notify")
+
+      helper.assert_scenario({
+        input = [[
+          function foo(ba|r, baz) {
+            return null
+          }
+        ]],
+        filetype = "javascript",
+        action = function()
+          actions.insert_log({ position = "above" })
+        end,
+        expected = function()
+          assert.spy(notify_spy).was_called(1)
+          assert.spy(notify_spy).was_called_with("No logable ranges above the log target", "warn")
+          notify_spy:clear()
+        end,
+      })
+    end)
   end)
 
   describe("preserves the cursor position after inserting", function()

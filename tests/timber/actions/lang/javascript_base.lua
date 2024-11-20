@@ -131,7 +131,6 @@ local run = function(language)
         ]]
 
         expected = [[
-          console.log("baz", baz)
           function foo(bar, baz) {
             return null
           }
@@ -227,7 +226,6 @@ local run = function(language)
         ]]
 
         expected = [[
-          console.log("baz", baz)
           const foo = function (bar, baz) {
             return null
           }
@@ -323,7 +321,6 @@ local run = function(language)
         ]]
 
         expected = [[
-          console.log("baz", baz)
           const foo = (bar, baz) => {
             return null
           }
@@ -423,7 +420,6 @@ local run = function(language)
         end,
         expected = [[
           const foo = {
-            console.log("baz", baz)
             bar(baz) {
               return null
             }
@@ -465,7 +461,6 @@ local run = function(language)
         end,
         expected = [[
           const foo = {
-            console.log("baz", baz)
             bar({ baz: baz }) {
               return null
             }
@@ -507,7 +502,6 @@ local run = function(language)
         end,
         expected = [[
           const foo = {
-            console.log("baz", baz)
             bar({ baz }) {
               return null
             }
@@ -738,9 +732,6 @@ local run = function(language)
           actions.insert_log({ position = "above" })
         end,
         expected = [[
-          console.log("foo", foo)
-          console.log("bar", bar)
-          console.log("baz", baz)
           if (foo > 1 && bar < baz) {
             return null
           }
@@ -1132,9 +1123,9 @@ local run = function(language)
         end,
         expected = [[
           do {
+            foo -= 1
             console.log("foo", foo)
             console.log("bar", bar)
-            foo -= 1
           } while (foo > bar)
         ]],
       })

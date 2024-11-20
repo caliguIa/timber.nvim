@@ -337,7 +337,7 @@ end
 
 ---@param lang string
 ---@param selection_range range
----@return {log_container: TSNode, logable_range: logable_range?, log_target: TSNode}[]
+---@return {log_container: TSNode, logable_ranges: logable_range[], log_target: TSNode}[]
 local function capture_log_targets(lang, selection_range)
   local log_containers = treesitter.query_log_target_container(lang, selection_range)
 
@@ -366,7 +366,7 @@ local function capture_log_targets(lang, selection_range)
       utils.array_map(_log_targets, function(node)
         return {
           log_container = log_container.container,
-          logable_range = log_container.logable_range,
+          logable_ranges = log_container.logable_ranges,
           log_target = node,
         }
       end)
@@ -377,21 +377,30 @@ local function capture_log_targets(lang, selection_range)
 end
 
 ---@param log_target TSNode
----@param log_container TSNode
----@param logable_range logable_range?
+---@param logable_ranges logable_range[]
 ---@param position Timber.Actions.LogPosition
----@return integer
-local function get_insert_row(log_target, log_container, logable_range, position)
-  if not logable_range then
-    return position == "above" and log_container:start() or log_container:end_() + 1
-  end
+---@return integer?
+local function get_insert_row(log_target, logable_ranges, position)
+  table.sort(logable_ranges, function(a, b)
+    return a[1] < b[1]
+  end)
 
-  local srow = log_target:start()
+  local target_row = log_target:start()
 
-  if srow <= logable_range[1] then
-    return position == "above" and log_container:start() or logable_range[1]
-  else
-    return position == "above" and logable_range[1] or log_container:end_() + 1
+  if position == "above" then
+    for i = #logable_ranges, 1, -1 do
+      local range = logable_ranges[i]
+      if range[2] <= target_row then
+        return range[2]
+      end
+    end
+  elseif position == "below" then
+    for i = 1, #logable_ranges, 1 do
+      local range = logable_ranges[i]
+      if range[1] > target_row then
+        return range[1]
+      end
+    end
   end
 end
 
@@ -405,8 +414,7 @@ local function build_capture_log_statements(log_template, lang, position, select
 
   for _, entry in ipairs(capture_log_targets(lang, selection_range)) do
     local log_target = entry.log_target
-    local log_container = entry.log_container
-    local logable_range = entry.logable_range
+    local logable_ranges = entry.logable_ranges
 
     local content, placeholder_id = resolve_template_placeholders(log_template, {
       identifier = function()
@@ -418,15 +426,19 @@ local function build_capture_log_statements(log_template, lang, position, select
       end,
     })
 
-    local insert_row = get_insert_row(log_target, log_container, logable_range, position)
+    local insert_row = get_insert_row(log_target, logable_ranges, position)
 
-    table.insert(to_insert, {
-      content = content,
-      row = insert_row,
-      insert_cursor_offset = nil,
-      log_target = log_target,
-      placeholder_id = placeholder_id,
-    })
+    if insert_row then
+      table.insert(to_insert, {
+        content = content,
+        row = insert_row,
+        insert_cursor_offset = nil,
+        log_target = log_target,
+        placeholder_id = placeholder_id,
+      })
+    else
+      utils.notify(string.format("No logable ranges %s the log target", position), "warn")
+    end
   end
 
   return to_insert

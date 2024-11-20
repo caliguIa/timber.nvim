@@ -541,7 +541,6 @@ describe("ruby single log", function()
           actions.insert_log({ position = "above" })
         end,
         expected = [[
-          puts("name #{name}")
           Proc.new { |name|
             puts("name #{name}")
             puts "Hello, #{name}!"
@@ -564,7 +563,6 @@ describe("ruby single log", function()
           actions.insert_log({ position = "above" })
         end,
         expected = [[
-          puts("name #{name}")
           proc { |name|
             puts("name #{name}")
             puts "Hello, #{name}!"
@@ -588,7 +586,6 @@ describe("ruby single log", function()
           actions.insert_log({ position = "above" })
         end,
         expected = [[
-          puts("name #{name}")
           ->(name) {
             puts("name #{name}")
             puts "Hello, #{name}!"
@@ -611,7 +608,6 @@ describe("ruby single log", function()
           actions.insert_log({ position = "above" })
         end,
         expected = [[
-          puts("name #{name}")
           lambda { |name|
             puts("name #{name}")
             puts "Hello, #{name}!"

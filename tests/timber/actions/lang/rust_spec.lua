@@ -442,7 +442,7 @@ describe("rust single log", function()
       action = function()
         vim.cmd("normal! V")
         actions.insert_log({ position = "above" })
-        vim.cmd("normal! jvG")
+        vim.cmd("normal! vG")
         actions.insert_log({ position = "below" })
       end,
       expected = [[
@@ -458,6 +458,8 @@ describe("rust single log", function()
           },
           _ => println!("Other")
         }
+        println!("foo: {:#?}", foo);
+        println!("bar: {:#?}", bar);
       ]],
     })
 

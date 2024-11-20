@@ -353,7 +353,6 @@ describe("go single log", function()
       expected = [[
         log.Printf("foo: %v\n", foo)
         switch foo {
-        log.Printf("foo: %v\n", foo)
         case a, b:
           return foo + 1
         case c:
@@ -361,6 +360,7 @@ describe("go single log", function()
         default:
           return foo + 3
         }
+        log.Printf("foo: %v\n", foo)
       ]],
     })
 
