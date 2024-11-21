@@ -11,7 +11,14 @@ https://github.com/user-attachments/assets/6bbcb1ab-45a0-45f3-a03a-1d0780219362
   - Customizable log templates
 - Support batch log statements (multiple log target statements)
 - Dot-repeat actions
-- Support various languages: Javascript, Typescript, Lua, ...
+- Support various languages:
+  - Javascript (include JSX)
+  - Typescript (include JSX)
+  - Lua
+  - Ruby
+  - Elixir
+  - Golang
+  - Rust
 
 ## Requirements
 
@@ -156,3 +163,30 @@ See [`:h timber.nvim-watchers`](https://github.com/Goose97/timber.nvim/blob/main
 The default configuration is found [here](https://github.com/Goose97/timber.nvim/blob/main/doc/timber.nvim.txt). To initialize the plugin, call `require("timber").setup` with the desired options.
 
 See [`:h timber.nvim-config`](https://github.com/Goose97/timber.nvim/blob/main/doc/timber.nvim.txt) for more information.
+
+## Tips
+
+It's common for languages to have syntax to access fields from an object/instance. For example, in Lua, we have `foo.bar`
+or `foo["bar"]`. It introduces a problem: we have more than one potential log targets. Consider this case (`|` denotes
+the cursor position):
+
+  ```
+  local foo = ba|r.baz["baf"]
+  ```
+
+`bar`, `bar.baz`, and `bar.baz["baf"]` are all sensible choices here, what should we choose? `timber.nvim` applies some
+[heuristic](https://github.com/Goose97/timber.nvim/blob/main/doc/HOW-IT-WORKS.md#Heuristic) to choose the target.
+
+A good rule of thumb is placing your cursor in last part of the field access chain if you want to log it.
+
+```
+local foo = ba|r.baz.baf --> print("bar", bar)
+local foo = bar.ba|z.baf --> print("bar.baz", bar.baz)
+local foo = bar.baz.ba|f --> print("bar.baz.baf", bar.baz.baf)
+```
+
+## Contributing
+
+Any contributions are highly welcome. If you want to support new languages or extend functionalities of existing languages,
+please read [this documentation](https://github.com/Goose97/timber.nvim/blob/main/doc/HOW-IT-WORKS.md) about the internal of
+`timber.nvim` first. For bug reports, feature requests, or discussions, please file a [Github issue](https://github.com/Goose97/timber.nvim/issues).

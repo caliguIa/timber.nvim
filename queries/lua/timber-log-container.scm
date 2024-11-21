@@ -1,6 +1,6 @@
 (
- (variable_declaration) @log_container
- (#make-logable-range! @log_container "outer")
+  (variable_declaration) @log_container
+  (#make-logable-range! @log_container "outer")
 )
 
 ; Assignment without variable declaration
