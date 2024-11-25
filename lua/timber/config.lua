@@ -126,13 +126,13 @@ local function setup_keymaps()
     require("timber.actions").insert_log({
       position = "below",
     })
-  end, { mode = { "n", "v" } })
+  end, { mode = { "n", "v" }, desc = "Insert log statement below" })
 
   setup_keymap("insert_log_above", function()
     require("timber.actions").insert_log({
       position = "above",
     })
-  end, { mode = { "n", "v" } })
+  end, { mode = { "n", "v" }, desc = "Insert log statement above" })
 
   setup_keymap("insert_batch_log", function()
     require("timber.actions").insert_batch_log()
@@ -140,37 +140,37 @@ local function setup_keymaps()
 
   setup_keymap("insert_batch_log", function()
     require("timber.actions").insert_batch_log({ auto_add = true })
-  end, { mode = "v" })
+  end, { mode = "v", desc = "Insert batch log statement below" })
 
   setup_keymap("add_log_targets_to_batch", function()
     require("timber.actions").add_log_targets_to_batch()
-  end, { mode = { "n", "v" } })
+  end, { mode = { "n", "v" }, desc = "Add log targets to batch" })
 
   setup_keymap("insert_log_below_operator", function()
     return require("timber.actions").insert_log({
       position = "below",
       operator = true,
     })
-  end, { mode = "n", expr = true })
+  end, { mode = "n", expr = true, desc = "Insert log statement below operator" })
 
   setup_keymap("insert_log_above_operator", function()
     return require("timber.actions").insert_log({
       position = "above",
       operator = true,
     })
-  end, { mode = "n", expr = true })
+  end, { mode = "n", expr = true, desc = "Insert log statement above operator" })
 
   setup_keymap("insert_batch_log_operator", function()
     return require("timber.actions").insert_batch_log({
       operator = true,
     })
-  end, { mode = "n", expr = true })
+  end, { mode = "n", expr = true, desc = "Insert batch log statement below operator" })
 
   setup_keymap("add_log_targets_to_batch_operator", function()
     return require("timber.actions").insert_batch_log({
       operator = true,
     })
-  end, { mode = "n", expr = true })
+  end, { mode = "n", expr = true, desc = "Add log targets to batch operator" })
 end
 
 -- This function is used during testing
