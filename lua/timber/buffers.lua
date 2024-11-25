@@ -471,8 +471,9 @@ function M.get_log_statement_lines(bufnr)
   end
 end
 
-function M.clear_logs()
-  for _, log_placeholder in pairs(M.log_placeholders) do
+---Clear all captured log results in all buffers
+function M.clear_captured_logs()
+  for _, log_placeholder in pairs(M.log_placeholders.placeholders) do
     log_placeholder.entries = {}
     remove_placeholder_snippet(log_placeholder)
   end

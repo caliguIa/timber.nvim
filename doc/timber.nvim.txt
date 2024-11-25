@@ -371,7 +371,7 @@ buffers.open_float({opts})                       *timber.buffers.open_float()*
                                               if no log placeholder is found.
                                               Default: false
 
-buffers.clear_logs()                             *timber.buffers.clear_logs()*
+buffers.clear_captured_logs()           *timber.buffers.clear_captured_logs()*
 
   Clear all captured log results.
 

@@ -601,3 +601,58 @@ describe("timber.buffers.open_float", function()
     end)
   end)
 end)
+
+describe("timber.buffers.clear_captured_logs", function()
+  before_each(function()
+    buffers.setup()
+  end)
+
+  it("clears all the entries", function()
+    local id = watcher.generate_unique_id()
+    local notify_spy = spy.on(utils, "notify")
+
+    helper.assert_scenario({
+      input = string.format(
+        [[
+          const foo = "bar"
+          console.log("%s%s|")
+          const bar = "foo"
+        ]],
+        watcher.MARKER,
+        id
+      ),
+      input_cursor = false,
+      filetype = "typescript",
+      action = function()
+        helper.wait(20)
+        buffers.receive_log_entry({
+          log_placeholder_id = id,
+          payload = "foo",
+          source_name = "Test",
+          timestamp = os.time(),
+        })
+        -- Open the float window, and focus to it
+        vim.cmd("normal! 2G")
+        buffers.open_float()
+      end,
+      expected = function()
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+        local content = table.concat(lines, "")
+
+        assert.is_not.Nil(string.match(content, "foo"))
+      end,
+    })
+
+    -- Close the float window
+    vim.cmd("q!")
+
+    -- Clear the captured log. Next time we'll open the float window, it should show a warning
+    buffers.clear_captured_logs()
+    vim.cmd("normal! 2G")
+    buffers.open_float()
+
+    assert.spy(notify_spy).was_called(1)
+    assert.spy(notify_spy).was_called_with("Log placeholder has no content", "warn")
+    notify_spy:clear()
+  end)
+end)
