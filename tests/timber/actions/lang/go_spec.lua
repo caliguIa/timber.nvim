@@ -7,7 +7,7 @@ describe("go single log", function()
     timber.setup({
       log_templates = {
         default = {
-          go = [[log.Printf("%identifier: %v\n", %identifier)]],
+          go = [[log.Printf("%log_target: %v\n", %log_target)]],
         },
       },
     })
@@ -620,7 +620,7 @@ describe("go batch log", function()
     timber.setup({
       batch_log_templates = {
         default = {
-          go = [[log.Printf("%repeat<%identifier: %v><, >\n", %repeat<%identifier><, >)]],
+          go = [[log.Printf("%repeat<%log_target: %v><, >\n", %repeat<%log_target><, >)]],
         },
       },
     })

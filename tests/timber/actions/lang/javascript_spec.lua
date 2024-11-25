@@ -7,7 +7,7 @@ describe("javascript single log", function()
     timber.setup({
       log_templates = {
         default = {
-          javascript = [[console.log("%identifier", %identifier)]],
+          javascript = [[console.log("%log_target", %log_target)]],
         },
       },
     })
@@ -25,7 +25,7 @@ describe("javascript batch log", function()
     timber.setup({
       batch_log_templates = {
         default = {
-          javascript = [[console.log("Testing %line_number", { %repeat<"%identifier": %identifier><, > })]],
+          javascript = [[console.log("Testing %line_number", { %repeat<"%log_target": %log_target><, > })]],
         },
       },
     })

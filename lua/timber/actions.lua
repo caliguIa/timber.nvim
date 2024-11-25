@@ -73,7 +73,7 @@ local function get_current_indent(insert_line)
 end
 
 --- Build the log statement from template. Support special placeholers:
----   %identifier: the identifier text
+---   %log_target: the identifier text
 ---   %line_number: the line_number number
 ---   %insert_cursor: after inserting the log statement, go to insert mode and place the cursor here.
 ---     If there's multiple log statements, choose the first one
@@ -97,9 +97,9 @@ local function resolve_template_placeholders(log_template, handlers)
     end
   end
 
-  if string.find(log_template, "%%identifier") then
+  if string.find(log_template, "%%log_target") then
     local replacement = invoke_handler("identifier")
-    log_template = string.gsub(log_template, "%%identifier", replacement)
+    log_template = string.gsub(log_template, "%%log_target", replacement)
   end
 
   if string.find(log_template, "%%line_number") then
@@ -500,8 +500,8 @@ local function build_batch_log_statement(log_template, batch, insert_line)
   -- Then resolve the rest
   local content, placeholder_id = resolve_template_placeholders(result, {
     identifier = function()
-      utils.notify("Cannot use %identifier placeholder outside %repeat placeholder", "error")
-      return "%identifier"
+      utils.notify("Cannot use %log_target placeholder outside %repeat placeholder", "error")
+      return "%log_target"
     end,
     line_number = tostring(insert_line + 1),
   })
@@ -536,11 +536,11 @@ function M.__insert_log(motion_type)
     end
 
     -- There are two kinds of log statements:
-    --   1. Capture log statements: log statements that contain %identifier placeholder
+    --   1. Capture log statements: log statements that contain %log_target placeholder
     --     We need to capture the log target in the selection range and replace it
-    --   2. Non-capture log statements: log statements that don't contain %identifier placeholder
+    --   2. Non-capture log statements: log statements that don't contain %log_target placeholder
     --     We simply replace the placeholder text
-    return log_template_lang:find("%%identifier")
+    return log_template_lang:find("%%log_target")
         and build_capture_log_statements(log_template_lang, lang, position, selection_range)
       or { build_non_capture_log_statement(log_template_lang, position) }
   end

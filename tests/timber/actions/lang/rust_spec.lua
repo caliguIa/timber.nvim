@@ -7,7 +7,7 @@ describe("rust single log", function()
     timber.setup({
       log_templates = {
         default = {
-          rust = [[println!("%identifier: {:#?}", %identifier);]],
+          rust = [[println!("%log_target: {:#?}", %log_target);]],
         },
       },
     })
@@ -701,7 +701,7 @@ describe("rust batch log", function()
     timber.setup({
       batch_log_templates = {
         default = {
-          rust = [[println!("%repeat<%identifier: {:#?}><, >", %repeat<%identifier><, >);]],
+          rust = [[println!("%repeat<%log_target: {:#?}><, >", %repeat<%log_target><, >);]],
         },
       },
     })

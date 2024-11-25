@@ -7,7 +7,7 @@ describe("typescriptreact", function()
     timber.setup({
       log_templates = {
         default = {
-          tsx = [[console.log("%identifier", %identifier)]],
+          tsx = [[console.log("%log_target", %log_target)]],
         },
       },
     })

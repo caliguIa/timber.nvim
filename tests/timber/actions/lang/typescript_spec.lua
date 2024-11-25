@@ -7,7 +7,7 @@ describe("typescript single log", function()
     timber.setup({
       log_templates = {
         default = {
-          typescript = [[console.log("%identifier", %identifier)]],
+          typescript = [[console.log("%log_target", %log_target)]],
         },
       },
     })
@@ -25,7 +25,7 @@ describe("typescript batch log", function()
     timber.setup({
       batch_log_templates = {
         default = {
-          typescript = [[console.log("Testing %line_number", { %repeat<"%identifier": %identifier><, > })]],
+          typescript = [[console.log("Testing %line_number", { %repeat<"%log_target": %log_target><, > })]],
         },
       },
     })

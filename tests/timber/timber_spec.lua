@@ -44,12 +44,12 @@ describe("timber", function()
       timber.setup({
         log_templates = {
           default = {
-            typescript = [[console.log("%identifier", %identifier)]],
+            typescript = [[console.log("%log_target", %log_target)]],
           },
         },
         batch_log_templates = {
           default = {
-            typescript = [[console.log({ %repeat<"%identifier": %identifier><, > })]],
+            typescript = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
           },
         },
       })
@@ -78,12 +78,12 @@ describe("timber", function()
       timber.setup({
         log_templates = {
           default = {
-            typescript = [[console.log("%identifier", %identifier)]],
+            typescript = [[console.log("%log_target", %log_target)]],
           },
         },
         batch_log_templates = {
           default = {
-            typescript = [[console.log({ %repeat<"%identifier": %identifier><, > })]],
+            typescript = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
           },
         },
         default_keymaps_enabled = true,
@@ -113,12 +113,12 @@ describe("timber", function()
       timber.setup({
         log_templates = {
           default = {
-            typescript = [[console.log("%identifier", %identifier)]],
+            typescript = [[console.log("%log_target", %log_target)]],
           },
         },
         batch_log_templates = {
           default = {
-            typescript = [[console.log({ %repeat<"%identifier": %identifier><, > })]],
+            typescript = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
           },
         },
         default_keymaps_enabled = false,
@@ -147,12 +147,12 @@ describe("timber", function()
       timber.setup({
         log_templates = {
           default = {
-            typescript = [[console.log("%identifier", %identifier)]],
+            typescript = [[console.log("%log_target", %log_target)]],
           },
         },
         batch_log_templates = {
           default = {
-            typescript = [[console.log({ %repeat<"%identifier": %identifier><, > })]],
+            typescript = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
           },
         },
         keymaps = {
@@ -204,7 +204,7 @@ describe("timber", function()
   it("allows configure multiple log templates", function()
     timber.setup({
       log_templates = {
-        with_bar_123 = { typescript = [[console.log("%identifier bar 123", %identifier)]] },
+        with_bar_123 = { typescript = [[console.log("%log_target bar 123", %log_target)]] },
       },
     })
 

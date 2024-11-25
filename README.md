@@ -104,7 +104,7 @@ The log statements can be inserted via APIs. See [`:h timber.nvim-actions.api`](
 The content of the log statement is specified via templates. See [`:h timber.nvim-config.log-templates`](https://github.com/Goose97/timber.nvim/blob/main/doc/timber.nvim.txt) for more information.
 
 ```lua
-    -- Template: [[print("LOG %line_number %identifier", %identifier)]]
+    -- Template: [[print("LOG %line_number %log_target", %log_target)]]
     local foo = 1
     print("LOG 1 foo", foo)
 ```
@@ -119,7 +119,7 @@ Here's an example configuration:
 require("timber").setup({
     log_templates = {
         default = {
-            lua = [[print("%watcher_marker_start" .. %identifier .. "%watcher_marker_end")]],
+            lua = [[print("%watcher_marker_start" .. %log_target .. "%watcher_marker_end")]],
         },
     },
     log_watcher = {

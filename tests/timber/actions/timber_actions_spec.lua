@@ -11,11 +11,11 @@ describe("timber.actions.insert_log", function()
     timber.setup()
   end)
 
-  it("supports %identifier in log template", function()
+  it("supports %log_target in log template", function()
     timber.setup({
       log_templates = {
         testing = {
-          javascript = [[console.log("%identifier", %identifier)]],
+          javascript = [[console.log("%log_target", %log_target)]],
         },
       },
     })
@@ -41,7 +41,7 @@ describe("timber.actions.insert_log", function()
     timber.setup({
       log_templates = {
         testing = {
-          javascript = [[console.log("%line_number", %identifier)]],
+          javascript = [[console.log("%line_number", %log_target)]],
         },
       },
     })
@@ -69,7 +69,7 @@ describe("timber.actions.insert_log", function()
         timber.setup({
           log_templates = {
             testing = {
-              javascript = [[console.log("%identifier %insert_cursor", %identifier)]],
+              javascript = [[console.log("%log_target %insert_cursor", %log_target)]],
             },
           },
         })
@@ -117,7 +117,7 @@ describe("timber.actions.insert_log", function()
             testing = {
               javascript = [[
                 // Comment above
-                console.log("%identifier %insert_cursor", %identifier)
+                console.log("%log_target %insert_cursor", %log_target)
                 // Comment below
               ]],
             },
@@ -168,7 +168,7 @@ describe("timber.actions.insert_log", function()
       timber.setup({
         log_templates = {
           testing = {
-            javascript = [[console.log("%identifier %insert_cursor", %identifier)]],
+            javascript = [[console.log("%log_target %insert_cursor", %log_target)]],
           },
         },
       })
@@ -212,7 +212,7 @@ describe("timber.actions.insert_log", function()
     end)
   end)
 
-  describe("supports log template that doesn't contain %identifier", function()
+  describe("supports log template that doesn't contain %log_target", function()
     it("inserts the log statement at the above line if position is 'above'", function()
       timber.setup({
         log_templates = {
@@ -270,7 +270,7 @@ describe("timber.actions.insert_log", function()
       timber.setup({
         log_templates = {
           testing = {
-            javascript = [[console.log("Testing", %identifier)]],
+            javascript = [[console.log("Testing", %log_target)]],
           },
         },
       })
@@ -455,7 +455,7 @@ describe("timber.actions.insert_log", function()
       timber.setup({
         log_templates = {
           default = {
-            javascript = [[console.log("%identifier", %identifier)]],
+            javascript = [[console.log("%log_target", %log_target)]],
           },
         },
       })
@@ -524,7 +524,7 @@ describe("timber.actions.insert_log", function()
             javascript = [[
               console.group("Test")
               console.log("FOO")
-              console.log("%identifier", %identifier)
+              console.log("%log_target", %log_target)
               console.groupEnd()
             ]],
           },
@@ -572,7 +572,7 @@ describe("timber.actions.insert_log", function()
           javascript = [[
             console.group("Test")
             console.log("FOO")
-            console.log("%identifier", %identifier)
+            console.log("%log_target", %log_target)
             console.groupEnd()
           ]],
         },
@@ -609,7 +609,7 @@ describe("timber.actions.insert_log", function()
             javascript = [[console.log("Testing")]],
           },
           testing2 = {
-            javascript = [[console.log("%identifier", %identifier)]],
+            javascript = [[console.log("%log_target", %log_target)]],
           },
         },
       })
@@ -638,7 +638,7 @@ describe("timber.actions.insert_log", function()
       timber.setup({
         log_templates = {
           default = {
-            javascript = [[console.log("%identifier", %identifier)]],
+            javascript = [[console.log("%log_target", %log_target)]],
           },
         },
       })
@@ -799,7 +799,7 @@ describe("timber.actions.insert_batch_log", function()
     timber.setup({
       log_templates = {
         default = {
-          javascript = [[console.log("%identifier", %identifier)]],
+          javascript = [[console.log("%log_target", %log_target)]],
         },
       },
     })
@@ -947,11 +947,11 @@ describe("timber.actions.insert_batch_log", function()
     notify_spy:clear()
   end)
 
-  it("only supports %identifier inside %repeat", function()
+  it("only supports %log_target inside %repeat", function()
     timber.setup({
       batch_log_templates = {
         default = {
-          javascript = [[console.log("%identifier", { %repeat<"%identifier": %identifier><, > })]],
+          javascript = [[console.log("%log_target", { %repeat<"%log_target": %log_target><, > })]],
         },
       },
     })
@@ -976,7 +976,7 @@ describe("timber.actions.insert_batch_log", function()
         assert.spy(notify_spy).was_called(1)
         assert
           .spy(notify_spy)
-          .was_called_with("Cannot use %identifier placeholder outside %repeat placeholder", "error")
+          .was_called_with("Cannot use %log_target placeholder outside %repeat placeholder", "error")
         notify_spy:clear()
       end,
     })

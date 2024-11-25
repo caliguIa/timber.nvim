@@ -7,7 +7,7 @@ describe("ruby single log", function()
     timber.setup({
       log_templates = {
         default = {
-          ruby = [[puts("%identifier #{%identifier}")]],
+          ruby = [[puts("%log_target #{%log_target}")]],
         },
       },
     })
@@ -977,7 +977,7 @@ describe("ruby batch log", function()
     timber.setup({
       batch_log_templates = {
         default = {
-          ruby = [[puts("%repeat<%identifier: #{%identifier}><, >")]],
+          ruby = [[puts("%repeat<%log_target: #{%log_target}><, >")]],
         },
       },
     })

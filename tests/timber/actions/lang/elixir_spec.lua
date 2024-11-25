@@ -7,7 +7,7 @@ describe("elixir single log", function()
     timber.setup({
       log_templates = {
         default = {
-          elixir = [[IO.inspect(%identifier, label: "%identifier")]],
+          elixir = [[IO.inspect(%log_target, label: "%log_target")]],
         },
       },
     })
@@ -771,7 +771,7 @@ describe("elixir batch log", function()
     timber.setup({
       batch_log_templates = {
         default = {
-          elixir = [[IO.inspect({ %repeat<%identifier><, > })]],
+          elixir = [[IO.inspect({ %repeat<%log_target><, > })]],
         },
       },
     })

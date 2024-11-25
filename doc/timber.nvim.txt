@@ -156,9 +156,9 @@ actions.insert_log({opts})                       *timber.actions.insert_log()*
 
   Insert a log statement. The behavior depends on the template provided:
 
-    - If the template contains `%identifier` placeholder, capture the log
+    - If the template contains `%log_target` placeholder, capture the log
       target at the cursor position.
-    - If the template contains NO `%identifier` placeholder, insert a log
+    - If the template contains NO `%log_target` placeholder, insert a log
       statement at the below and above line, depending on the `position` option.
 
   Parameters: ~
@@ -270,7 +270,7 @@ by the watcher. Users can use the placeholder `%watcher_marker_start` and
 
 For example, this log template:
 >lua
-  [[print("%watcher_marker_start" .. %identifier .. "%watcher_marker_end")]]
+  [[print("%watcher_marker_start" .. %log_target .. "%watcher_marker_end")]]
 <
 Will be expanded to:
 >lua
@@ -327,7 +327,7 @@ between these two markers.
   require("timber").setup({
     log_templates = {
       default = {
-	lua = [[print("%watcher_marker_start" .. %identifier .. "%watcher_marker_end")]]
+	lua = [[print("%watcher_marker_start" .. %log_target .. "%watcher_marker_end")]]
       }
     }
   })
@@ -392,20 +392,20 @@ timber.setup({opts})                                          *timber.setup()*
   {
     log_templates = {
       default = {
-	javascript = [[console.log("%identifier", %identifier)]],
-	typescript = [[console.log("%identifier", %identifier)]],
-	jsx = [[console.log("%identifier", %identifier)]],
-	tsx = [[console.log("%identifier", %identifier)]],
-	lua = [[print("%identifier", %identifier)]],
+	javascript = [[console.log("%log_target", %log_target)]],
+	typescript = [[console.log("%log_target", %log_target)]],
+	jsx = [[console.log("%log_target", %log_target)]],
+	tsx = [[console.log("%log_target", %log_target)]],
+	lua = [[print("%log_target", %log_target)]],
       },
     },
     batch_log_templates = {
       default = {
-	javascript = [[console.log({ %repeat<"%identifier": %identifier><, > })]],
-	typescript = [[console.log({ %repeat<"%identifier": %identifier><, > })]],
-	jsx = [[console.log({ %repeat<"%identifier": %identifier><, > })]],
-	tsx = [[console.log({ %repeat<"%identifier": %identifier><, > })]],
-	lua = [[print(string.format("%repeat<%identifier=%s><, >", %repeat<%identifier><, >))]],
+	javascript = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
+	typescript = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
+	jsx = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
+	tsx = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
+	lua = [[print(string.format("%repeat<%log_target=%s><, >", %repeat<%log_target><, >))]],
       },
     },
     keymaps = {
@@ -448,9 +448,9 @@ Log template string supports special placeholders that will be expanded during
 runtime to provide more information about the log context. The supported
 placeholders are:
 
-  - `%identifier`: the identifier text >lua
+  - `%log_target`: the identifier text >lua
 
-      -- Template: [[print("LOG %identifier", %identifier)]]
+      -- Template: [[print("LOG %log_target", %log_target)]]
       local foo = 1
       print("LOG foo", foo)
 <
@@ -458,7 +458,7 @@ placeholders are:
     doesn't have a log target, line_number will be the current line at the
     cursor >lua
 
-      -- Template: [[print("LOG %line_number", %identifier)]]
+      -- Template: [[print("LOG %line_number", %log_target)]]
       local foo = 1
       print("LOG 1", foo)
 <
@@ -469,7 +469,7 @@ all placeholders supported by `log_templates`, plus:
     batch. The format is: `%repeat<content><separator>`. Inside `content`, you
     can use all placeholders supported by `log_templates`. >lua
 
-      -- Template: [[print(string.format("LOG %repeat<%identifier=%s><, >", %repeat<%identifier><, >))]]
+      -- Template: [[print(string.format("LOG %repeat<%log_target=%s><, >", %repeat<%log_target><, >))]]
       local foo = bar + baz
       print("LOG foo=%s, bar=%s, baz=%s", foo, bar, baz)
 <

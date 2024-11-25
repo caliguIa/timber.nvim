@@ -7,7 +7,7 @@ describe("lua single log", function()
     timber.setup({
       log_templates = {
         default = {
-          lua = [[print("%identifier", %identifier)]],
+          lua = [[print("%log_target", %log_target)]],
         },
       },
     })
@@ -717,7 +717,7 @@ describe("lua batch log", function()
     timber.setup({
       batch_log_templates = {
         default = {
-          lua = [[print(string.format("%repeat<%identifier=%s><, >", %repeat<%identifier><, >))]],
+          lua = [[print(string.format("%repeat<%log_target=%s><, >", %repeat<%log_target><, >))]],
         },
       },
     })
