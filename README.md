@@ -69,9 +69,9 @@ The default configuration comes with a set of default keymaps:
 | add_log_targets_to_batch | gla | Add a log target to the batch |
 | insert_batch_log | glb | Insert a batch log statement |
 
-Detailed information on how to configure keymaps can be found in [`:h timber.nvim-config.keymaps`](https://github.com/Goose97/timber.nvim/blob/main/doc/timber.nvim.txt).
+Detailed information on how to configure keymaps can be found in [`:h timber.nvim-config.keymaps`](https://github.com/Goose97/timber.nvim/blob/a2faec8a7525d49a2e033ce54246cd50a4fb9021/doc/timber.nvim.txt#L500).
 
-See [RECIPES](https://github.com/Goose97/timber.nvim/blob/main/doc/RECIPES.md) guide for more keymap inspiration.
+To insert plain log statements, time tracking log statements, etc, see [RECIPES](https://github.com/Goose97/timber.nvim/blob/main/doc/RECIPES.md) guide for keymap inspiration.
 
 ## Usage
 
@@ -97,9 +97,9 @@ These examples use the default configuration. The `|` denotes the cursor positio
                                                 print(string.format("foo=%s, num=%s", foo, num))
 ```
 
-The log statements can be inserted via APIs. See [`:h timber.nvim-actions.api`](https://github.com/Goose97/timber.nvim/blob/main/doc/timber.nvim.txt) for more information.
+The log statements can be inserted via APIs. See [`:h timber.nvim-actions.api`](https://github.com/Goose97/timber.nvim/blob/a2faec8a7525d49a2e033ce54246cd50a4fb9021/doc/timber.nvim.txt#L145) for more information.
 
-The content of the log statement is specified via templates. See [`:h timber.nvim-config.log-templates`](https://github.com/Goose97/timber.nvim/blob/main/doc/timber.nvim.txt) for more information.
+The content of the log statement is specified via templates. See [`:h timber.nvim-config.log-templates`](https://github.com/Goose97/timber.nvim/blob/a2faec8a7525d49a2e033ce54246cd50a4fb9021/doc/timber.nvim.txt#L456) for more information.
 
 ```lua
     -- Template: [[print("LOG %line_number %log_target", %log_target)]]
@@ -121,7 +121,7 @@ or from all buffers:
     require("timber.actions").clear_log_statements({ global = true })
 ```
 
-Be aware of [potential limitations](https://github.com/Goose97/timber.nvim/blob/main/doc/timber.nvim.txt).
+Be aware of [potential limitations](https://github.com/Goose97/timber.nvim/blob/a2faec8a7525d49a2e033ce54246cd50a4fb9021/doc/timber.nvim.txt#L245-L250).
 
 ### Capture log results
 
@@ -170,13 +170,13 @@ After the log results are captured, a snippet of the log result will be displaye
 
 ![Screenshot 2024-11-12 at 22 01 34](https://github.com/user-attachments/assets/844cec52-3ecf-4b7b-ac67-b7280f882f73)
 
-See [`:h timber.nvim-watchers`](https://github.com/Goose97/timber.nvim/blob/main/doc/timber.nvim.txt) for more information.
+See [`:h timber.nvim-watchers`](https://github.com/Goose97/timber.nvim/blob/a2faec8a7525d49a2e033ce54246cd50a4fb9021/doc/timber.nvim.txt#L261) for more information.
 
 ## Configuration
 
 The default configuration is found [here](https://github.com/Goose97/timber.nvim/blob/main/doc/timber.nvim.txt). To initialize the plugin, call `require("timber").setup` with the desired options.
 
-See [`:h timber.nvim-config`](https://github.com/Goose97/timber.nvim/blob/main/doc/timber.nvim.txt) for more information.
+See [`:h timber.nvim-config`](https://github.com/Goose97/timber.nvim/blob/a2faec8a7525d49a2e033ce54246cd50a4fb9021/doc/timber.nvim.txt#L379) for more information.
 
 ## Tips
 
