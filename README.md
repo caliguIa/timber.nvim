@@ -99,13 +99,28 @@ These examples use the default configuration. The `|` denotes the cursor positio
 
 The log statements can be inserted via APIs. See [`:h timber.nvim-actions.api`](https://github.com/Goose97/timber.nvim/blob/a2faec8a7525d49a2e033ce54246cd50a4fb9021/doc/timber.nvim.txt#L145) for more information.
 
-The content of the log statement is specified via templates. See [`:h timber.nvim-config.log-templates`](https://github.com/Goose97/timber.nvim/blob/a2faec8a7525d49a2e033ce54246cd50a4fb9021/doc/timber.nvim.txt#L456) for more information.
+#### Customize log statements
+
+The content of the log statement can be customized via templates. `timber.nvim` supports some special placeholders which will be replaced after inserting:
+
+- `%log_target`: the log target text
+- `%line_number`: the line number of the log target.
+
+See [`:h timber.nvim-config.log-templates`](https://github.com/Goose97/timber.nvim/blob/a2faec8a7525d49a2e033ce54246cd50a4fb9021/doc/timber.nvim.txt#L456) for more information.
 
 ```lua
-    -- Template: [[print("LOG %line_number %log_target", %log_target)]]
-    local foo = 1
-    print("LOG 1 foo", foo)
+local opts = {
+    log_templates = {
+        default = {
+            lua = [[print("LOG %log_target ON LINE %line_number", %log_target)]],
+        },
+    },
+}
+
+require("timber").setup(opts)
 ```
+
+Out of the box, timber.nvim provides [default templates](https://github.com/Goose97/timber.nvim/blob/main/lua/timber/config.lua) for all supported languages.
 
 ### Clear log statements
 
@@ -174,7 +189,7 @@ See [`:h timber.nvim-watchers`](https://github.com/Goose97/timber.nvim/blob/a2fa
 
 ## Configuration
 
-The default configuration is found [here](https://github.com/Goose97/timber.nvim/blob/main/doc/timber.nvim.txt). To initialize the plugin, call `require("timber").setup` with the desired options.
+The default configuration is found [here](https://github.com/Goose97/timber.nvim/blob/main/lua/timber/config.lua). To initialize the plugin, call `require("timber").setup` with the desired options.
 
 See [`:h timber.nvim-config`](https://github.com/Goose97/timber.nvim/blob/a2faec8a7525d49a2e033ce54246cd50a4fb9021/doc/timber.nvim.txt#L379) for more information.
 

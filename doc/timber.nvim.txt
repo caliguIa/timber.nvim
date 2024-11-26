@@ -469,7 +469,7 @@ Log template string supports special placeholders that will be expanded during
 runtime to provide more information about the log context. The supported
 placeholders are:
 
-  - `%log_target`: the identifier text >lua
+  - `%log_target`: the log target text >lua
 
       -- Template: [[print("LOG %log_target", %log_target)]]
       local foo = 1
