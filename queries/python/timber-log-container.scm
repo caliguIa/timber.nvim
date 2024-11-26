@@ -1,0 +1,74 @@
+(
+  (expression_statement) @log_container
+  (#make-logable-range! @log_container "outer")
+)
+
+(function_definition
+  parameters: (parameters) @log_container
+  body: (block) @a
+  (#make-logable-range! @a "inner")
+)
+
+(lambda
+  parameters: (lambda_parameters) @log_container
+  body: (parenthesized_expression) @a
+  (#make-logable-range! @a "inner" 1 -1)
+)
+
+(if_statement
+  condition: (_) @log_container
+  consequence: (block) @a
+  (#make-logable-range! @a "inner")
+)
+
+(elif_clause
+  condition: (_) @log_container
+  consequence: (block) @a
+  (#make-logable-range! @a "inner")
+)
+
+(for_statement
+  left: (_) @log_container
+  body: (block) @a
+  (#make-logable-range! @a "inner")
+)
+
+(for_statement
+  right: (_) @log_container
+  body: (block) @a
+  (#make-logable-range! @a "inner")
+)
+
+(with_statement
+  (with_clause) @log_container
+  body: (block) @a
+  (#make-logable-range! @a "inner")
+)
+
+(while_statement
+  condition: (_) @log_container
+  body: (block) @a
+  (#make-logable-range! @a "inner")
+)
+
+(
+ (call
+   arguments: (argument_list) @log_container
+  ) @a
+  (#make-logable-range! @a "outer")
+)
+
+(
+ (match_statement
+   subject: (_) @log_container
+  ) @a
+ (#make-logable-range! @a "outer")
+)
+
+(
+ (case_clause
+   (case_pattern) @log_container
+   consequence: (block) @a
+  ) @a
+ (#make-logable-range! @a "inner")
+)

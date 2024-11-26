@@ -31,6 +31,7 @@ local default_config = {
       elixir = [[IO.inspect(%log_target, label: "%log_target")]],
       go = [[log.Printf("%log_target: %v\n", %log_target)]],
       rust = [[println!("%log_target: {:#?}", %log_target);]],
+      python = [[print("%log_target", %log_target)]],
     },
   },
   batch_log_templates = {
@@ -44,6 +45,7 @@ local default_config = {
       elixir = [[IO.inspect({ %repeat<%log_target><, > })]],
       go = [[log.Printf("%repeat<%log_target: %v><, >\n", %repeat<%log_target><, >)]],
       rust = [[println!("%repeat<%log_target: {:#?}><, >", %repeat<%log_target><, >);]],
+      python = [[print(%repeat<"%log_target", %log_target><, >)]],
     },
   },
   highlight = {

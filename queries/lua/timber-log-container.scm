@@ -10,9 +10,8 @@
   (#make-logable-range! @log_container "outer")
 )
 
-(
-  (function_call
-    arguments: (arguments) @log_container)
+(function_call
+  arguments: (arguments) @log_container
   (#make-logable-range! @log_container "outer")
 )
 
