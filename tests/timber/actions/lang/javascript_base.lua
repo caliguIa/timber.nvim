@@ -732,6 +732,9 @@ local run = function(language)
           actions.insert_log({ position = "above" })
         end,
         expected = [[
+          console.log("foo", foo)
+          console.log("bar", bar)
+          console.log("baz", baz)
           if (foo > 1 && bar < baz) {
             return null
           }
@@ -784,40 +787,18 @@ local run = function(language)
 
   describe("supports switch statement", function()
     it("supports switch head", function()
-      local input = [[
-        switch (fo|o) {
-          case bar:
-            break
-          case "baz":
-            break
-        }
-      ]]
-
-      -- This is invalid syntax but it's a delibarate choice
-      -- We want the switch statement log contaienr to be more granular
-      -- So instead of matching the whole switch statement, we match against switch head
-      -- and individual clauses
       helper.assert_scenario({
-        input = input,
-        filetype = language,
-        action = function()
-          actions.insert_log({ position = "below" })
-        end,
-        expected = [[
-          switch (foo) {
-            console.log("foo", foo)
+        input = [[
+          switch (fo|o) {
             case bar:
               break
             case "baz":
               break
           }
         ]],
-      })
-
-      helper.assert_scenario({
-        input = input,
         filetype = language,
         action = function()
+          actions.insert_log({ position = "below" })
           actions.insert_log({ position = "above" })
         end,
         expected = [[
@@ -828,6 +809,7 @@ local run = function(language)
             case "baz":
               break
           }
+          console.log("foo", foo)
         ]],
       })
     end)
@@ -845,6 +827,7 @@ local run = function(language)
         filetype = language,
         action = function()
           actions.insert_log({ position = "below" })
+          actions.insert_log({ position = "above" })
         end,
         expected = [[
           switch (foo) {
@@ -873,7 +856,6 @@ local run = function(language)
           vim.cmd("normal! vi{V")
           actions.insert_log({ position = "below" })
         end,
-        -- Again, don't know why indentation is off
         expected = [[
           switch (foo) {
             case (bar + baz): {
@@ -1079,10 +1061,12 @@ local run = function(language)
         ]],
         filetype = language,
         action = function()
+          actions.insert_log({ position = "above" })
           vim.cmd("normal! vi(")
           actions.insert_log({ position = "below" })
         end,
         expected = [[
+          console.log("foo", foo)
           while (foo > 1 && bar < baz) {
             console.log("foo", foo)
             console.log("bar", bar)

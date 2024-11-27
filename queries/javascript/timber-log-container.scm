@@ -46,7 +46,7 @@
     consequence: (statement_block) @body
     (#make-logable-range! @body "inner" 1 -1)
   ) @a
-  (#make-logable-range! @a "after")
+  (#make-logable-range! @a "before")
 )
 
 ; if statement with single statement body
@@ -58,9 +58,11 @@
   (#make-logable-range! @a "outer")
 )
 
-(switch_statement
-  value: (parenthesized_expression) @log_container
-  (#make-logable-range! @log_container "outer")
+(
+  (switch_statement
+    value: (parenthesized_expression) @log_container
+  ) @a
+  (#make-logable-range! @a "outer")
 )
 
 (switch_statement
@@ -108,10 +110,13 @@
   (#make-logable-range! @body "inner" 1 -1)
 )
 
-(while_statement
-  condition: (_) @log_container
-  body: (statement_block) @body
-  (#make-logable-range! @body "inner" 1 -1)
+(
+  (while_statement
+    condition: (_) @log_container
+    body: (statement_block) @body
+    (#make-logable-range! @body "inner" 1 -1)
+  ) @a
+  (#make-logable-range! @a "before")
 )
 
 (do_statement
