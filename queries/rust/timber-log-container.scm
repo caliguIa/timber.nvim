@@ -21,10 +21,13 @@
   (#make-logable-range! @block "inner" 1 -1)
 )
 
-(if_expression
-  condition: (_) @log_container
-  consequence: (block) @block
-  (#make-logable-range! @block "inner" 1 -1)
+(
+  (if_expression
+    condition: (_) @log_container
+    consequence: (block) @block
+    (#make-logable-range! @block "inner" 1 -1)
+  ) @a
+  (#make-logable-range! @a "before")
 )
 
 (
@@ -54,10 +57,13 @@
   (#make-logable-range! @block "inner" 1 -1)
 )
 
-(while_expression
-  condition: (_) @log_container
-  body: (block) @block
-  (#make-logable-range! @block "inner" 1 -1)
+(
+  (while_expression
+    condition: (_) @log_container
+    body: (block) @block
+    (#make-logable-range! @block "inner" 1 -1)
+  ) @a
+  (#make-logable-range! @a "before")
 )
 
 (

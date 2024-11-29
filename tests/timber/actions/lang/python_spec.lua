@@ -208,6 +208,29 @@ describe("python single log", function()
             return None
       ]],
     })
+
+    helper.assert_scenario({
+      input = [[
+        if fo|o > 1 and bar < baz:
+            return None
+        elif bar:
+            return None
+      ]],
+      filetype = "python",
+      action = function()
+        vim.cmd("normal! vap")
+        actions.insert_log({ position = "above" })
+      end,
+      expected = [[
+        print("foo", foo)
+        print("bar", bar)
+        print("baz", baz)
+        if foo > 1 and bar < baz:
+            return None
+        elif bar:
+            return None
+      ]],
+    })
   end)
 
   it("supports match statement", function()
@@ -239,6 +262,24 @@ describe("python single log", function()
             case _:
                 print("Other")
                 print("foo", foo)
+      ]],
+    })
+
+    helper.assert_scenario({
+      input = [[
+        match fo|o:
+            case _:
+                return None
+      ]],
+      filetype = "python",
+      action = function()
+        actions.insert_log({ position = "above" })
+      end,
+      expected = [[
+        print("foo", foo)
+        match foo:
+            case _:
+                return None
       ]],
     })
   end)
@@ -290,15 +331,17 @@ describe("python single log", function()
   it("supports for in loop statement", function()
     helper.assert_scenario({
       input = [[
-        for ite|m in items:
+        for item in ite|ms:
             pass
       ]],
       filetype = "python",
       action = function()
+        actions.insert_log({ position = "above" })
         vim.cmd("normal! V")
         actions.insert_log({ position = "below" })
       end,
       expected = [[
+        print("items", items)
         for item in items:
             print("item", item)
             print("items", items)
@@ -313,6 +356,7 @@ describe("python single log", function()
       ]],
       filetype = "python",
       action = function()
+        actions.insert_log({ position = "above" })
         vim.cmd("normal! V")
         actions.insert_log({ position = "below" })
       end,
@@ -424,10 +468,12 @@ describe("python single log", function()
       ]],
       filetype = "python",
       action = function()
+        actions.insert_log({ position = "above" })
         actions.insert_log({ position = "below" })
       end,
       expected = [[
         foo = 0
+        print("foo", foo)
         while foo < 5:
             print("foo", foo)
             foo += 1

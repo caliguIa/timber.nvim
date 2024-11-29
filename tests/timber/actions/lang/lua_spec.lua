@@ -244,6 +244,30 @@ describe("lua single log", function()
         end
       ]],
     })
+
+    helper.assert_scenario({
+      input = [[
+        if fo|o > 1 then
+          return nil
+        elseif bar then
+          return nil
+        end
+      ]],
+      filetype = "lua",
+      action = function()
+        vim.cmd("normal! vap")
+        actions.insert_log({ position = "above" })
+      end,
+      expected = [[
+        print("foo", foo)
+        print("bar", bar)
+        if foo > 1 then
+          return nil
+        elseif bar then
+          return nil
+        end
+      ]],
+    })
   end)
 
   describe("supports for loop statement", function()

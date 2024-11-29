@@ -648,6 +648,36 @@ describe("ruby single log", function()
         end
       ]],
     })
+
+    helper.assert_scenario({
+      input = [[
+        if not fo|o > 1 and bar < baz
+          return nil
+        elsif bar then
+          return nil
+        else
+          return nil
+        end
+      ]],
+      filetype = "ruby",
+      action = function()
+        vim.cmd("normal! vap")
+        actions.insert_log({ position = "above" })
+      end,
+      expected = [[
+        puts("foo #{foo}")
+        puts("bar #{bar}")
+        puts("baz #{baz}")
+        puts("bar #{bar}")
+        if not foo > 1 and bar < baz
+          return nil
+        elsif bar then
+          return nil
+        else
+          return nil
+        end
+      ]],
+    })
   end)
 
   it("supports if modifier", function()
@@ -687,6 +717,31 @@ describe("ruby single log", function()
           puts("foo #{foo}")
           puts("bar #{bar}")
           puts("baz #{baz}")
+          return nil
+        else
+          return nil
+        end
+      ]],
+    })
+
+    helper.assert_scenario({
+      input = [[
+        unless not fo|o > 1 and bar < baz
+          return nil
+        else
+          return nil
+        end
+      ]],
+      filetype = "ruby",
+      action = function()
+        vim.cmd("normal! vap")
+        actions.insert_log({ position = "above" })
+      end,
+      expected = [[
+        puts("foo #{foo}")
+        puts("bar #{bar}")
+        puts("baz #{baz}")
+        unless not foo > 1 and bar < baz
           return nil
         else
           return nil

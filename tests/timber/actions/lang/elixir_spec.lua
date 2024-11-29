@@ -326,6 +326,31 @@ describe("elixir single log", function()
         end
       ]],
     })
+
+    helper.assert_scenario({
+      input = [[
+        if not fo|o > 1 and bar < baz do
+          foo + bar
+        else
+          foo - baz
+        end
+      ]],
+      filetype = "elixir",
+      action = function()
+        vim.cmd("normal! V")
+        actions.insert_log({ position = "above" })
+      end,
+      expected = [[
+        IO.inspect(foo, label: "foo")
+        IO.inspect(bar, label: "bar")
+        IO.inspect(baz, label: "baz")
+        if not foo > 1 and bar < baz do
+          foo + bar
+        else
+          foo - baz
+        end
+      ]],
+    })
   end)
 
   it("supports unless expression", function()
@@ -357,6 +382,31 @@ describe("elixir single log", function()
         end
       ]],
     })
+
+    helper.assert_scenario({
+      input = [[
+        unless not fo|o > 1 and bar < baz do
+          foo + bar
+        else
+          foo - baz
+        end
+      ]],
+      filetype = "elixir",
+      action = function()
+        vim.cmd("normal! V")
+        actions.insert_log({ position = "above" })
+      end,
+      expected = [[
+        IO.inspect(foo, label: "foo")
+        IO.inspect(bar, label: "bar")
+        IO.inspect(baz, label: "baz")
+        unless not foo > 1 and bar < baz do
+          foo + bar
+        else
+          foo - baz
+        end
+      ]],
+    })
   end)
 
   it("supports case expression", function()
@@ -371,10 +421,12 @@ describe("elixir single log", function()
       ]],
       filetype = "elixir",
       action = function()
+        actions.insert_log({ position = "above" })
         vim.cmd("normal! vap")
         actions.insert_log({ position = "below" })
       end,
       expected = [[
+        IO.inspect(foo, label: "foo")
         case foo do
           ^bar ->
             IO.inspect(bar, label: "bar")
@@ -402,10 +454,12 @@ describe("elixir single log", function()
       ]],
       filetype = "elixir",
       action = function()
+        actions.insert_log({ position = "above" })
         vim.cmd("normal! vap")
         actions.insert_log({ position = "below" })
       end,
       expected = [[
+        IO.inspect(foo, label: "foo")
         cond foo do
           bar > 1 ->
             IO.inspect(bar, label: "bar")
@@ -425,7 +479,7 @@ describe("elixir single log", function()
     helper.assert_scenario({
       input = [[
         with (
-          %{bar: b|ar} <- foo,
+          %{bar: bar} <- fo|o,
           %{baz: baz} <- bar
         ) do
           nil
@@ -436,10 +490,12 @@ describe("elixir single log", function()
       ]],
       filetype = "elixir",
       action = function()
+        actions.insert_log({ position = "above" })
         vim.cmd("normal! vap")
         actions.insert_log({ position = "below" })
       end,
       expected = [[
+        IO.inspect(foo, label: "foo")
         with (
           %{bar: bar} <- foo,
           %{baz: baz} <- bar
@@ -468,10 +524,12 @@ describe("elixir single log", function()
         ]],
         filetype = "elixir",
         action = function()
+          actions.insert_log({ position = "above" })
           vim.cmd("normal! V")
           actions.insert_log({ position = "below" })
         end,
         expected = [[
+          IO.inspect(foo, label: "foo")
           for foo <- 1..5, bar <- 1..3, foo > 3 do
             IO.inspect(foo, label: "foo")
             IO.inspect(bar, label: "bar")

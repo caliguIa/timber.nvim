@@ -331,6 +331,32 @@ describe("go single log", function()
         }
       ]],
     })
+
+    helper.assert_scenario({
+      input = [[
+        if fo|o < 0 {
+          fmt.Println("Number is negative")
+        } else if foo == 0 {
+          fmt.Println("Number is zero")
+        } else {
+          fmt.Println("Number is positive")
+        }
+      ]],
+      filetype = "go",
+      action = function()
+        actions.insert_log({ position = "above" })
+      end,
+      expected = [[
+        log.Printf("foo: %v\n", foo)
+        if foo < 0 {
+          fmt.Println("Number is negative")
+        } else if foo == 0 {
+          fmt.Println("Number is zero")
+        } else {
+          fmt.Println("Number is positive")
+        }
+      ]],
+    })
   end)
 
   it("supports switch statement", function()

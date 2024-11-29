@@ -41,10 +41,13 @@
   (#make-logable-range! @block "inner" 1 -1)
 )
 
-(if_statement
-  condition: (_) @log_container
-  consequence: (block) @block
-  (#make-logable-range! @block "inner" 1 -1)
+(
+  (if_statement
+    condition: (_) @log_container
+    consequence: (block) @block
+    (#make-logable-range! @block "inner" 1 -1)
+  ) @a
+  (#make-logable-range! @a "before")
 )
 
 (for_statement

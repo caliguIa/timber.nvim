@@ -44,24 +44,33 @@
   (#make-logable-range! @a "inner")
 )
 
-(if
-  condition: (_) @log_container
-  consequence: (then) @a
-  (#make-logable-range! @a "inner")
-)
-
-(if
-  alternative: (elsif
+(
+  (if
     condition: (_) @log_container
     consequence: (then) @a
-    (#make-logable-range! @a "inner" 1 -1)
-  )
+    (#make-logable-range! @a "inner")
+  ) @b
+  (#make-logable-range! @b "before")
 )
 
-(unless
-  condition: (_) @log_container
-  consequence: (then) @a
-  (#make-logable-range! @a "inner")
+(
+  (if
+    alternative: (elsif
+      condition: (_) @log_container
+      consequence: (then) @a
+      (#make-logable-range! @a "inner" 1 -1)
+    )
+  ) @b
+  (#make-logable-range! @b "before")
+)
+
+(
+  (unless
+    condition: (_) @log_container
+    consequence: (then) @a
+    (#make-logable-range! @a "inner")
+  ) @b
+  (#make-logable-range! @b "before")
 )
 
 (for
@@ -70,23 +79,22 @@
   (#make-logable-range! @a "inner" 1 -1)
 )
 
-(for
-  value: (_) @log_container
-  body: (do) @a
-  (#make-logable-range! @a "inner")
-  (#make-logable-range! @a "inner" 1 -1)
+(
+  (while
+    condition: (_) @log_container
+    body: (do) @a
+    (#make-logable-range! @a "inner")
+  ) @b
+  (#make-logable-range! @b "before")
 )
 
-(while
-  condition: (_) @log_container
-  body: (do) @a
-  (#make-logable-range! @a "inner")
-)
-
-(until
-  condition: (_) @log_container
-  body: (do) @a
-  (#make-logable-range! @a "inner")
+(
+  (until
+    condition: (_) @log_container
+    body: (do) @a
+    (#make-logable-range! @a "inner")
+  ) @b
+  (#make-logable-range! @b "before")
 )
 
 (call

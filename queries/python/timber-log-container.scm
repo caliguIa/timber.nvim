@@ -15,10 +15,13 @@
   (#make-logable-range! @a "inner" 1 -1)
 )
 
-(if_statement
-  condition: (_) @log_container
-  consequence: (block) @a
-  (#make-logable-range! @a "inner")
+(
+  (if_statement
+    condition: (_) @log_container
+    consequence: (block) @a
+    (#make-logable-range! @a "inner")
+  ) @b
+  (#make-logable-range! @b "before")
 )
 
 (elif_clause
@@ -33,10 +36,13 @@
   (#make-logable-range! @a "inner")
 )
 
-(for_statement
-  right: (_) @log_container
-  body: (block) @a
-  (#make-logable-range! @a "inner")
+(
+  (for_statement
+    right: (_) @log_container
+    body: (block) @a
+    (#make-logable-range! @a "inner")
+  ) @b
+  (#make-logable-range! @b "before")
 )
 
 (with_statement
@@ -45,10 +51,13 @@
   (#make-logable-range! @a "inner")
 )
 
-(while_statement
-  condition: (_) @log_container
-  body: (block) @a
-  (#make-logable-range! @a "inner")
+(
+  (while_statement
+    condition: (_) @log_container
+    body: (block) @a
+    (#make-logable-range! @a "inner")
+  ) @b
+  (#make-logable-range! @b "before")
 )
 
 (

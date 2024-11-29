@@ -2,8 +2,19 @@
   target: (identifier) @function_name
   (arguments) @log_container
   (do_block) @block
-  (#any-of? @function_name "def" "defp" "defmacro" "if" "unless" "for" "with")
+  (#any-of? @function_name "def" "defp" "defmacro")
   (#make-logable-range! @block "inner" 1 - 1)
+)
+
+(
+  (call
+    target: (identifier) @function_name
+    (arguments) @log_container
+    (do_block) @block
+    (#any-of? @function_name "if" "unless" "for" "with")
+    (#make-logable-range! @block "inner" 1 - 1)
+  ) @a
+  (#make-logable-range! @a "before")
 )
 
 (

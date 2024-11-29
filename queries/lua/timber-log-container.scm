@@ -27,18 +27,24 @@
   (#make-logable-range! @a "inner")
 )
 
-(if_statement
-  condition: (_) @log_container
-  consequence: (block) @a
-  (#make-logable-range! @a "inner")
-)
-
-(if_statement
-  alternative: (elseif_statement
+(
+  (if_statement
     condition: (_) @log_container
     consequence: (block) @a
     (#make-logable-range! @a "inner")
-  )
+  ) @b
+  (#make-logable-range! @b "before")
+)
+
+(
+  (if_statement
+    alternative: (elseif_statement
+      condition: (_) @log_container
+      consequence: (block) @a
+      (#make-logable-range! @a "inner")
+    )
+  ) @b
+  (#make-logable-range! @b "before")
 )
 
 (for_statement

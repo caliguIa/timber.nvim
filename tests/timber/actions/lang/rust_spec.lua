@@ -424,6 +424,32 @@ describe("rust single log", function()
         }
       ]],
     })
+
+    helper.assert_scenario({
+      input = [[
+        if fo|o > 0 {
+          println!("Positive");
+        } else if foo < 0 {
+          println!("Negative");
+        } else {
+          println!("Zero");
+        }
+      ]],
+      filetype = "rust",
+      action = function()
+        actions.insert_log({ position = "above" })
+      end,
+      expected = [[
+        println!("foo: {:#?}", foo);
+        if foo > 0 {
+          println!("Positive");
+        } else if foo < 0 {
+          println!("Negative");
+        } else {
+          println!("Zero");
+        }
+      ]],
+    })
   end)
 
   it("supports switch statement", function()
@@ -499,6 +525,7 @@ describe("rust single log", function()
       ]],
       filetype = "rust",
       action = function()
+        actions.insert_log({ position = "above" })
         actions.insert_log({ position = "below" })
       end,
       expected = [[
@@ -517,6 +544,7 @@ describe("rust single log", function()
       ]],
       filetype = "rust",
       action = function()
+        actions.insert_log({ position = "above" })
         vim.cmd("normal! V")
         actions.insert_log({ position = "below" })
       end,
@@ -540,10 +568,11 @@ describe("rust single log", function()
       ]],
       filetype = "rust",
       action = function()
-        vim.cmd("normal! V")
+        actions.insert_log({ position = "above" })
         actions.insert_log({ position = "below" })
       end,
       expected = [[
+        println!("i: {:#?}", i);
         while i < 5 {
           println!("i: {:#?}", i);
           i += 1;
