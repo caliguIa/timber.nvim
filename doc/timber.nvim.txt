@@ -572,5 +572,7 @@ batch. |timber.nvim| uses the following highlight groups:
   Timber.Insert         Search          Flash highlight for inserted log statements
   ------------------------------------------------------------------------------------
   Timber.AddToBatch     Search          Flash highlight for log targets added to batch
+  ------------------------------------------------------------------------------------
+  Timber.LogStatement   -               Log statements line
 
 vim:tw=78:ts=8:noet:ft=help:norl:

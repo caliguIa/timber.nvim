@@ -56,12 +56,24 @@ function M.highlight_insert(start_line_number, end_line_number)
   )
 end
 
+function M.highlight_log_statement(line_number)
+  vim.highlight.range(
+    0,
+    M.hl_log_statement,
+    "Timber.LogStatement",
+    { line_number, 0 },
+    { line_number, 0 },
+    { regtype = "V", inclusive = false }
+  )
+end
+
 ---@param opts Timber.Highlight.Config
 function M.setup()
   M.config = require("timber.config").config.highlight
 
   M.hl_insert = vim.api.nvim_create_namespace("timber.insert_log")
   M.hl_add_to_batch = vim.api.nvim_create_namespace("timber.add_to_batch")
+  M.hl_log_statement = vim.api.nvim_create_namespace("timber.log_statement")
   M.insert_hl_timer = vim.uv.new_timer()
   M.add_to_batch_hl_timer = vim.uv.new_timer()
 
