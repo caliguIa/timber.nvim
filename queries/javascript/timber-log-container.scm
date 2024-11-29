@@ -26,9 +26,11 @@
   (#make-logable-range! @body "inner" 1 -1)
 )
 
-(call_expression
-  function: (identifier)
-  arguments: (arguments) @log_container
+(expression_statement
+  (call_expression
+    function: (identifier)
+    arguments: (arguments) @log_container
+  ) @a
   (#make-logable-range! @log_container "outer")
 )
 
