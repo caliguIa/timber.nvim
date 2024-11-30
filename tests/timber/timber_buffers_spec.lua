@@ -489,7 +489,6 @@ describe("timber.buffers.open_float", function()
             local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
             local content = table.concat(lines, "")
 
-            assert.is_not.Nil(string.match(content, "2 entries"))
             assert.is_not.Nil(string.match(content, "foo_1"))
             assert.is_not.Nil(string.match(content, "foo_2"))
           end,

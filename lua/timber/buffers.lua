@@ -331,8 +331,9 @@ end
 ---@param entries Timber.Buffers.LogPlaceholderEntries[]
 ---@return string[] lines
 ---@return integer[] separators 0-indexed line numbers of separator lines
----@return boolean has_total_entries
-local function prepare_floating_window_content(entries)
+---@return string title
+---@return string footer
+local function make_floating_window_content(entries)
   local entry_lines = {}
   for _, content in ipairs(entries) do
     table.insert(entry_lines, vim.split(content.body, "\n"))
@@ -346,31 +347,145 @@ local function prepare_floating_window_content(entries)
     end
   end
 
-  local has_total_entries = #entries > 1
   local buf_content = {}
   local separators = {}
   local line_count = 0
-
-  local total_entries_line
-  if has_total_entries then
-    total_entries_line = utils.string_left_pad(string.format("%d entries", #entries), max_width)
-    table.insert(buf_content, total_entries_line)
-    line_count = line_count + 1
-  end
 
   for i, lines in ipairs(entry_lines) do
     vim.list_extend(buf_content, lines)
     line_count = line_count + #lines
 
     if i < #entries then
-      local separator_width = math.max(max_width, #total_entries_line)
-      table.insert(buf_content, string.rep("─", separator_width))
+      table.insert(buf_content, string.rep("─", max_width))
       table.insert(separators, line_count)
       line_count = line_count + 1
     end
   end
 
-  return buf_content, separators, has_total_entries
+  -- TODO: handle multiple sources
+  local title = entries[1].source_name
+  local footer = #entries > 1 and string.format("%d entries", #entries) or ""
+
+  return buf_content, separators, title, footer
+end
+
+local function close_preview_window(winnr, bufnrs)
+  vim.schedule(function()
+    -- exit if we are in one of ignored buffers
+    if bufnrs and vim.list_contains(bufnrs, vim.api.nvim_get_current_buf()) then
+      return
+    end
+
+    local augroup = "preview_window_" .. winnr
+    pcall(vim.api.nvim_del_augroup_by_name, augroup)
+    pcall(vim.api.nvim_win_close, winnr, true)
+  end)
+end
+
+local function floating_win_sizes(lines)
+  local screen_width = vim.api.nvim_win_get_width(0)
+  local screen_height = vim.api.nvim_win_get_width(0)
+  local max_width = math.floor(screen_width * 0.8)
+  local max_height = math.floor(screen_height * 0.8)
+
+  local width = 0
+  for _, line in ipairs(lines) do
+    local line_width = vim.api.nvim_strwidth(line)
+    width = math.max(width, line_width)
+  end
+
+  local height = math.min(#lines, max_height)
+  width = math.min(width, max_width)
+
+  return width, height
+end
+
+local function floating_win_options(width, height)
+  local anchor = ""
+  local row, col
+
+  local lines_above = vim.fn.winline() - 1
+  local lines_below = vim.fn.winheight(0) - lines_above
+
+  local anchor_below = lines_below > lines_above
+
+  local border_height = 1
+  if anchor_below then
+    anchor = anchor .. "N"
+    height = math.max(math.min(lines_below - border_height, height), 0)
+    row = 1
+  else
+    anchor = anchor .. "S"
+    height = math.max(math.min(lines_above - border_height, height), 0)
+    row = 0
+  end
+
+  local wincol = vim.fn.wincol()
+
+  if wincol + width <= vim.o.columns then
+    anchor = anchor .. "W"
+    col = 0
+  else
+    anchor = anchor .. "E"
+    col = 1
+  end
+
+  return {
+    anchor = anchor,
+    row = row,
+    col = col,
+    width = width,
+    height = height,
+    focusable = true,
+    relative = "cursor",
+    style = "minimal",
+    border = "single",
+    zindex = 50,
+  }
+end
+
+---@param lines string[]
+---@param window_opts table
+---@return integer floating_winnr
+---@return integer floating_bufnr
+local function open_floating_window(lines, window_opts)
+  -- Create buffer for main content
+  local floating_bufnr = vim.api.nvim_create_buf(false, true)
+  local floating_winnr = vim.api.nvim_open_win(floating_bufnr, false, window_opts)
+  vim.api.nvim_buf_set_lines(floating_bufnr, 0, -1, true, lines)
+
+  -- q to close the floating window
+  vim.api.nvim_buf_set_keymap(
+    floating_bufnr,
+    "n",
+    "q",
+    "<cmd>bdelete<cr>",
+    { silent = true, noremap = true, nowait = true }
+  )
+
+  local augroup = vim.api.nvim_create_augroup("preview_window_" .. floating_winnr, {
+    clear = true,
+  })
+
+  -- close the preview window when entered a buffer that is not
+  -- the floating window buffer or the buffer that spawned it
+  local current_bufnr = vim.api.nvim_get_current_buf()
+  vim.api.nvim_create_autocmd("BufEnter", {
+    group = augroup,
+    callback = function()
+      close_preview_window(floating_bufnr, { current_bufnr, floating_bufnr })
+    end,
+  })
+
+  vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI", "InsertCharPre" }, {
+    group = augroup,
+    buffer = current_bufnr,
+    callback = function()
+      close_preview_window(floating_winnr)
+    end,
+  })
+
+  return floating_bufnr, floating_winnr
 end
 
 ---Render a floating window showing placeholder content
@@ -387,27 +502,21 @@ local function show_placeholder_full_content(placeholder, opts)
     return
   end
 
-  local lines, separators, has_total_entries = prepare_floating_window_content(placeholder.entries)
+  local lines, separators, title, footer = make_floating_window_content(placeholder.entries)
+  local width, height = floating_win_sizes(lines)
+  local window_opts = floating_win_options(width, height)
+  window_opts = vim.tbl_extend("force", window_opts, {
+    title = title,
+    title_pos = "center",
+    footer = footer,
+    footer_pos = "right",
+  })
 
-  local window_config = {
-    relative = "cursor",
-    anchor = "SW",
-    row = 0,
-    col = 0,
-    focusable = true,
-    style = "minimal",
-    border = "single",
-    title = placeholder.entries[1].source_name,
-  }
-
-  local bufnr = vim.lsp.util.open_floating_preview(lines, "plaintext", window_config)
-
-  if has_total_entries then
-    vim.api.nvim_buf_add_highlight(bufnr, M.log_placeholder_ns, "Timber.LogPlaceholderTotalEntries", 0, 0, -1)
-  end
+  local bufnr, winnr = open_floating_window(lines, window_opts)
+  vim.api.nvim_win_set_hl_ns(winnr, M.log_placeholder_ns)
 
   for _, i in ipairs(separators) do
-    vim.api.nvim_buf_add_highlight(bufnr, M.log_placeholder_ns, "Timber.LogPlaceholderSeparator", i, 0, -1)
+    vim.api.nvim_buf_add_highlight(bufnr, M.log_placeholder_ns, "Timber.FloatingWindowEntrySeparator", i, 0, -1)
   end
 end
 
@@ -480,12 +589,16 @@ function M.clear_captured_logs()
 end
 
 function M.setup()
-  vim.api.nvim_set_hl(0, "Timber.LogPlaceholderSnippet", { link = "DiagnosticVirtualTextInfo", default = true })
-  vim.api.nvim_set_hl(0, "Timber.LogPlaceholderTime", { italic = true })
-  vim.api.nvim_set_hl(0, "Timber.LogPlaceholderTotalEntries", { link = "CursorLineNr" })
-  vim.api.nvim_set_hl(0, "Timber.LogPlaceholderSeparator", { link = "FloatBorder" })
-
   M.log_placeholder_ns = vim.api.nvim_create_namespace("timber.log_placeholder")
+
+  vim.api.nvim_set_hl(
+    M.log_placeholder_ns,
+    "Timber.LogPlaceholderSnippet",
+    { link = "DiagnosticVirtualTextInfo", default = true }
+  )
+  vim.api.nvim_set_hl(0, "Timber.LogPlaceholderTime", { italic = true })
+  vim.api.nvim_set_hl(M.log_placeholder_ns, "FloatFooter", { link = "CursorLineNr", force = true })
+  vim.api.nvim_set_hl(M.log_placeholder_ns, "Timber.FloatingWindowEntrySeparator", { link = "FloatBorder" })
 
   vim.api.nvim_create_autocmd("BufRead", {
     callback = function(args)
