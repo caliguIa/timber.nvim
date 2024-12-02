@@ -384,7 +384,7 @@ end
 
 local function floating_win_sizes(lines)
   local screen_width = vim.api.nvim_win_get_width(0)
-  local screen_height = vim.api.nvim_win_get_width(0)
+  local screen_height = vim.api.nvim_win_get_height(0)
   local max_width = math.floor(screen_width * 0.8)
   local max_height = math.floor(screen_height * 0.8)
 
