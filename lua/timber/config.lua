@@ -32,6 +32,7 @@ local default_config = {
       go = [[log.Printf("%log_target: %v\n", %log_target)]],
       rust = [[println!("%log_target: {:#?}", %log_target);]],
       python = [[print("%log_target", %log_target)]],
+      c = [[printf("%log_target: %s\n", %log_target);]],
     },
   },
   batch_log_templates = {
@@ -46,6 +47,7 @@ local default_config = {
       go = [[log.Printf("%repeat<%log_target: %v><, >\n", %repeat<%log_target><, >)]],
       rust = [[println!("%repeat<%log_target: {:#?}><, >", %repeat<%log_target><, >);]],
       python = [[print(%repeat<"%log_target", %log_target><, >)]],
+      c = [[printf("%repeat<%log_target: %s><, >\n", %repeat<%log_target><, >);]],
     },
   },
   highlight = {
