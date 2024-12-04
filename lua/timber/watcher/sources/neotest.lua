@@ -4,7 +4,6 @@ local utils = require("timber.utils")
 local M = {}
 
 ---@class Timber.Watcher.Sources.Neotest
----@field name string Name of the source
 ---@field on_log_capture function Callback when receiving log result
 local SourceNeotest = {}
 
@@ -30,7 +29,6 @@ end
 ---@param on_log_capture fun(log_entry: Timber.Watcher.LogEntry)
 function M.new(source_spec, on_log_capture)
   local o = {
-    name = source_spec.name,
     on_log_capture = on_log_capture,
   }
 

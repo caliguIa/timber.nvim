@@ -17,20 +17,20 @@
 ---@field type "neotest"
 
 ---@class Timber.Watcher.Sources.Opts
----@field sources Timber.Watcher.SourceSpec[]
+---@field sources table<string, Timber.Watcher.SourceSpec>
 ---@field on_log_capture fun(log_entry: Timber.Watcher.LogEntry)
 
 local M = { sources = {} }
 
 ---@param opts Timber.Watcher.Sources.Opts
 function M.setup(opts)
-  for _, source in ipairs(opts.sources) do
+  for source_id, source in pairs(opts.sources) do
     local source_module = require("timber.watcher.sources." .. source.type)
     local source_instance = source_module.new(source, function(placeholder_id, payload)
       opts.on_log_capture({
         log_placeholder_id = placeholder_id,
         payload = payload,
-        source_name = source.name,
+        source_id = source_id,
         timestamp = os.time(),
       })
     end)

@@ -153,13 +153,14 @@ require("timber").setup({
     },
     log_watcher = {
         enabled = true,
+        -- A table of source id and source configuration
         sources = {
-            {
+            log_file = {
                 type = "filesystem",
                 name = "Log file",
                 path = "/tmp/debug.log",
             },
-            {
+            neotest = {
                 -- Test runner
                 type = "neotest",
                 name = "Neotest",

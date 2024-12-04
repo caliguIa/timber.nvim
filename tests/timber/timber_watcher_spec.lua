@@ -40,7 +40,7 @@ describe("timber.watcher.sources.setup", function()
     it("supports single line log", function()
       local file_path = create_temp_file()
       local specs = {
-        {
+        timber_test = {
           name = "Test log file",
           type = "filesystem",
           path = file_path,
@@ -70,13 +70,13 @@ describe("timber.watcher.sources.setup", function()
       ---@cast received_log_entry -nil
       assert.equals(marker_id, received_log_entry.log_placeholder_id)
       assert.equals("Hello World", received_log_entry.payload)
-      assert.equals("Test log file", received_log_entry.source_name)
+      assert.equals("timber_test", received_log_entry.source_id)
     end)
 
     it("supports multi line log", function()
       local file_path = create_temp_file()
       local specs = {
-        {
+        timber_test = {
           name = "Test log file",
           type = "filesystem",
           path = file_path,
@@ -109,7 +109,7 @@ describe("timber.watcher.sources.setup", function()
         { "Hello World", "This is the second line", "Goodbye World" },
         vim.split(received_log_entry.payload, "\n")
       )
-      assert.equals("Test log file", received_log_entry.source_name)
+      assert.equals("timber_test", received_log_entry.source_id)
     end)
   end)
 
@@ -120,7 +120,7 @@ describe("timber.watcher.sources.setup", function()
 
     it("supports single line log", function()
       local specs = {
-        {
+        timber_test = {
           name = "Test neotest",
           type = "neotest",
         },
@@ -157,16 +157,16 @@ describe("timber.watcher.sources.setup", function()
 
       assert.equals(received_log_entries[1].log_placeholder_id, marker_id_1)
       assert.are.same({ "Hello World" }, vim.split(received_log_entries[1].payload, "\n"))
-      assert.equals("Test neotest", received_log_entries[1].source_name)
+      assert.equals("timber_test", received_log_entries[1].source_id)
 
       assert.equals(received_log_entries[2].log_placeholder_id, marker_id_2)
       assert.are.same({ "Hello World again" }, vim.split(received_log_entries[2].payload, "\n"))
-      assert.equals("Test neotest", received_log_entries[2].source_name)
+      assert.equals("timber_test", received_log_entries[2].source_id)
     end)
 
     it("supports multi line log", function()
       local specs = {
-        {
+        timber_test = {
           name = "Test neotest",
           type = "neotest",
         },
@@ -212,14 +212,14 @@ describe("timber.watcher.sources.setup", function()
         { "Hello World", "This is the second line", "Goodbye World" },
         vim.split(received_log_entries[1].payload, "\n")
       )
-      assert.equals("Test neotest", received_log_entries[1].source_name)
+      assert.equals("timber_test", received_log_entries[1].source_id)
 
       assert.equals(marker_id_2, received_log_entries[2].log_placeholder_id)
       assert.are.same(
         { "Hello World", "This is the second line again", "Goodbye World" },
         vim.split(received_log_entries[2].payload, "\n")
       )
-      assert.equals("Test neotest", received_log_entries[2].source_name)
+      assert.equals("timber_test", received_log_entries[2].source_id)
     end)
 
     it("notifies when neotest source is not specified", function()

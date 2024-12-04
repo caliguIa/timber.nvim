@@ -1,8 +1,9 @@
+local watcher = require("timber.watcher")
 local utils = require("timber.utils")
 
 ---@class Timber.Buffers.LogPlaceholderEntries
 ---@field body string
----@field source_name string
+---@field source_id string
 ---@field timestamp integer
 
 ---@class Timber.Buffers.LogPlaceholder
@@ -64,6 +65,10 @@ function LogPlaceholderRegistry:remove(id)
   self.placeholders = utils.array_filter(self.placeholders, function(placeholder)
     return placeholder.id ~= id
   end)
+end
+
+function LogPlaceholderRegistry:clear()
+  self.placeholders = {}
 end
 
 ---Remove a log placeholder by extmark id. The extmark id is unique to a buffer so we need to pass in bufnr as well
@@ -291,7 +296,7 @@ function M.receive_log_entry(entry)
   if log_placeholder then
     table.insert(
       log_placeholder.entries,
-      { body = entry.payload, source_name = entry.source_name, timestamp = entry.timestamp }
+      { body = entry.payload, source_id = entry.source_id, timestamp = entry.timestamp }
     )
 
     vim.schedule(function()
@@ -363,7 +368,11 @@ local function make_floating_window_content(entries)
   end
 
   -- TODO: handle multiple sources
-  local title = entries[1].source_name
+  local source_id = entries[1].source_id
+  local source = watcher.get_source(source_id)
+  assert(source, string.format("Unrecognized watcher source '%s'", source_id))
+
+  local title = source.name
   local footer = #entries > 1 and string.format("%d entries", #entries) or ""
 
   return buf_content, separators, title, footer
@@ -524,13 +533,9 @@ local function show_placeholder_full_content(placeholder, opts)
   })
 
   -- TODO: handle multiple sources
-  local source_name = placeholder.entries[1].source_name
-  local source = require("timber.watcher").get_source(source_name)
-
-  if not source then
-    utils.notify(string.format("Unrecognized watcher source '%s'", source_name), "warn")
-    return
-  end
+  local source_id = placeholder.entries[1].source_id
+  local source = require("timber.watcher").get_source(source_id)
+  assert(source, string.format("Unrecognized watcher source '%s'", source_id))
 
   local bufnr, winnr = open_floating_window(lines, window_opts, source.buffer)
   vim.api.nvim_win_set_hl_ns(winnr, M.log_placeholder_ns)

@@ -4,7 +4,6 @@ local watcher = require("timber.watcher")
 local M = {}
 
 ---@class Timber.Watcher.Sources.Filesystem
----@field name string Name of the source
 ---@field source string File path
 ---@field on_log_capture function Callback when receiving log result
 ---@field pid function File watcher process PID
@@ -74,7 +73,6 @@ end
 ---@param on_log_capture fun(log_entry: Timber.Watcher.LogEntry)
 function M.new(source_spec, on_log_capture)
   local o = {
-    name = source_spec.name,
     source = source_spec.path,
     on_log_capture = on_log_capture,
   }

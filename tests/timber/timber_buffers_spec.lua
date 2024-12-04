@@ -26,7 +26,21 @@ end
 
 describe("timber.buffers autocmd", function()
   before_each(function()
+    watcher.setup({
+      timber_test = {
+        type = "neotest",
+        name = "Test",
+        buffer = {
+          filetype = "timbertest",
+        },
+      },
+    })
+
     buffers.setup()
+  end)
+
+  after_each(function()
+    buffers.log_placeholders:clear()
   end)
 
   describe("BufRead", function()
@@ -60,7 +74,9 @@ describe("timber.buffers autocmd", function()
     describe("given the buffer has some placeholders", function()
       it("attaches to the buffer and deletes the placeholder when the log statement is deleted", function()
         local id1 = watcher.generate_unique_id()
+        utils.log("🪵V5R| 72 id1 " .. utils.dump(id1) .. "|V5R")
         local id2 = watcher.generate_unique_id()
+        utils.log("🪵5P9| 74 id2 " .. utils.dump(id2) .. "|5P9")
 
         helper.assert_scenario({
           input = string.format(
@@ -127,7 +143,9 @@ describe("timber.buffers autocmd", function()
 
       it("attaches to the buffer and adds the placeholder when the log statement is inserted", function()
         local id1 = watcher.generate_unique_id()
+        utils.log("🪵75R| 139 id1 " .. utils.dump(id1) .. "|75R")
         local id2 = watcher.generate_unique_id()
+        utils.log("🪵XHR| 141 id2 " .. utils.dump(id2) .. "|XHR")
 
         helper.assert_scenario({
           input = string.format(
@@ -240,7 +258,21 @@ end)
 
 describe("timber.buffers.new_log_placeholder", function()
   before_each(function()
+    watcher.setup({
+      timber_test = {
+        type = "neotest",
+        name = "Test",
+        buffer = {
+          filetype = "timbertest",
+        },
+      },
+    })
+
     buffers.setup()
+  end)
+
+  after_each(function()
+    buffers.log_placeholders:clear()
   end)
 
   it("adds the placeholder to the registry", function()
@@ -276,7 +308,21 @@ end)
 
 describe("timber.buffers.receive_log_entry", function()
   before_each(function()
+    watcher.setup({
+      timber_test = {
+        type = "neotest",
+        name = "Test",
+        buffer = {
+          filetype = "timbertest",
+        },
+      },
+    })
+
     buffers.setup()
+  end)
+
+  after_each(function()
+    buffers.log_placeholders:clear()
   end)
 
   describe("given the log entry has a corresponding placeholder", function()
@@ -301,7 +347,7 @@ describe("timber.buffers.receive_log_entry", function()
           buffers.receive_log_entry({
             log_placeholder_id = id,
             payload = "foo",
-            source_name = "Test",
+            source_id = "timber_test",
             timestamp = os.time(),
           })
           helper.wait(20)
@@ -339,14 +385,14 @@ describe("timber.buffers.receive_log_entry", function()
           buffers.receive_log_entry({
             log_placeholder_id = id,
             payload = "foo",
-            source_name = "Test",
+            source_id = "timber_test",
             timestamp = os.time(),
           })
           helper.wait(20)
           buffers.receive_log_entry({
             log_placeholder_id = id,
             payload = "bar",
-            source_name = "Test",
+            source_id = "timber_test",
             timestamp = os.time(),
           })
           helper.wait(20)
@@ -390,7 +436,7 @@ describe("timber.buffers.receive_log_entry", function()
             buffers.receive_log_entry({
               log_placeholder_id = id,
               payload = "foo_123456789_123456890",
-              source_name = "Test",
+              source_id = "timber_test",
               timestamp = os.time(),
             })
             helper.wait(20)
@@ -414,7 +460,7 @@ describe("timber.buffers.receive_log_entry", function()
       buffers.receive_log_entry({
         log_placeholder_id = id,
         payload = "foo",
-        source_name = "Test",
+        source_id = "timber_test",
         timestamp = os.time(),
       })
 
@@ -446,7 +492,21 @@ end)
 
 describe("timber.buffers.open_float", function()
   before_each(function()
+    watcher.setup({
+      timber_test = {
+        type = "neotest",
+        name = "Test",
+        buffer = {
+          filetype = "timbertest",
+        },
+      },
+    })
+
     buffers.setup()
+  end)
+
+  after_each(function()
+    buffers.log_placeholders:clear()
   end)
 
   describe("given the current line has a log placeholder", function()
@@ -471,13 +531,13 @@ describe("timber.buffers.open_float", function()
             buffers.receive_log_entry({
               log_placeholder_id = id,
               payload = "foo_1",
-              source_name = "Test",
+              source_id = "timber_test",
               timestamp = os.time(),
             })
             buffers.receive_log_entry({
               log_placeholder_id = id,
               payload = "foo_2",
-              source_name = "Test",
+              source_id = "timber_test",
               timestamp = os.time(),
             })
             -- Open the float window, and focus to it
@@ -518,7 +578,7 @@ describe("timber.buffers.open_float", function()
             buffers.receive_log_entry({
               log_placeholder_id = id,
               payload = "foo_123456789_123456890",
-              source_name = "Test",
+              source_id = "timber_test",
               timestamp = os.time(),
             })
             -- Open the float window, and focus to it
@@ -536,16 +596,6 @@ describe("timber.buffers.open_float", function()
       end)
 
       it("sets the buffer options from source config with defaults", function()
-        watcher.setup({
-          {
-            type = "neotest",
-            name = "Test",
-            buffer = {
-              filetype = "timbertest",
-            },
-          },
-        })
-
         local id = watcher.generate_unique_id()
 
         helper.assert_scenario({
@@ -565,7 +615,7 @@ describe("timber.buffers.open_float", function()
             buffers.receive_log_entry({
               log_placeholder_id = id,
               payload = "foo_123456789_123456890",
-              source_name = "Test",
+              source_id = "timber_test",
               timestamp = os.time(),
             })
             -- Open the float window, and focus to it
@@ -657,7 +707,21 @@ end)
 
 describe("timber.buffers.clear_captured_logs", function()
   before_each(function()
+    watcher.setup({
+      timber_test = {
+        type = "neotest",
+        name = "Test",
+        buffer = {
+          filetype = "timbertest",
+        },
+      },
+    })
+
     buffers.setup()
+  end)
+
+  after_each(function()
+    buffers.log_placeholders:clear()
   end)
 
   it("clears all the entries", function()
@@ -681,7 +745,7 @@ describe("timber.buffers.clear_captured_logs", function()
         buffers.receive_log_entry({
           log_placeholder_id = id,
           payload = "foo",
-          source_name = "Test",
+          source_id = "timber_test",
           timestamp = os.time(),
         })
         -- Open the float window, and focus to it

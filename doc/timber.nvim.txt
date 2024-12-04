@@ -266,13 +266,14 @@ do this, users must configure a list of sources to watch:
   {
     log_watcher = {
       enabled = true,
+      -- A table of source id and source configuration
       sources = {
-	{
+	log_file = {
 	  name = "Log file",
 	  type = "filesystem",
 	  path = "/tmp/debug.log",
 	},
-	{
+	neotest = {
 	  name = "Neotest",
 	  type = "neotest",
 	},

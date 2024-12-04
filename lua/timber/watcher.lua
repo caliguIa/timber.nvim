@@ -1,14 +1,12 @@
 ---@class Timber.Watcher.LogEntry
 ---@field log_placeholder_id string
 ---@field payload string
----@field source_name string
+---@field source_id string
 ---@field timestamp integer
 
 ---@alias Timber.Watcher.LogPlaceholderId string
 
 local sources = require("timber.watcher.sources")
-local buffers = require("timber.buffers")
-local utils = require("timber.utils")
 
 local M = { MARKER = "🪵", ID_LENGTH = 3, sources = {} }
 
@@ -33,7 +31,7 @@ function M.generate_marker_pairs()
   return start, end_, id
 end
 
----@param source_specs Timber.Watcher.SourceSpec[]
+---@param source_specs table<string, Timber.Watcher.SourceSpec>
 function M.setup(source_specs)
   math.randomseed(os.time())
 
@@ -41,18 +39,16 @@ function M.setup(source_specs)
   sources.setup({
     sources = source_specs,
     on_log_capture = function(log_entry)
-      buffers.receive_log_entry(log_entry)
+      require("timber.buffers").receive_log_entry(log_entry)
     end,
   })
 end
 
 ---Get a source by name
----@param name string
+---@param id string
 ---@return Timber.Watcher.SourceSpec? source
-function M.get_source(name)
-  return utils.array_find(M.sources, function(source)
-    return source.name == name
-  end)
+function M.get_source(id)
+  return M.sources[id]
 end
 
 return M

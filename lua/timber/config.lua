@@ -7,7 +7,7 @@ local utils = require("timber.utils")
 
 ---@class Timber.Watcher.Config
 ---@field enabled? boolean Whether to enable log watcher. Defaults to `false`
----@field sources Timber.Watcher.SourceSpecs The sources to watch
+---@field sources table<string, Timber.Watcher.SourceSpec> The sources to watch
 ---@field preview_snippet_length? integer The length of the preview snippet display as extmarks. Defaults to `32`
 
 ---@class Timber.Config
