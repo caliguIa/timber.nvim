@@ -1,20 +1,23 @@
 ---Manage sources for watcher
 ---Sources are data sources that can output log result. Supported sources are:
 ---  1. Filesystem
+---  2. Neotest
 
----@alias Timber.Watcher.SourceSpecs (Timber.Watcher.Sources.FilesystemSpec | Timber.Watcher.Sources.NeotestSpec)[]
+---@alias Timber.Watcher.SourceSpec (Timber.Watcher.Sources.FilesystemSpec | Timber.Watcher.Sources.NeotestSpec)
 
 ---@class Timber.Watcher.Sources.FilesystemSpec
 ---@field name string
 ---@field path string
+---@field buffer table<string, any>? A table of buffer options to apply to the float buffer.
 ---@field type "filesystem"
 
 ---@class Timber.Watcher.Sources.NeotestSpec
 ---@field name string
+---@field buffer table<string, any>? A table of buffer options to apply to the float buffer.
 ---@field type "neotest"
 
 ---@class Timber.Watcher.Sources.Opts
----@field sources Timber.Watcher.SourceSpecs
+---@field sources Timber.Watcher.SourceSpec[]
 ---@field on_log_capture fun(log_entry: Timber.Watcher.LogEntry)
 
 local M = { sources = {} }

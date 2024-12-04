@@ -8,8 +8,9 @@
 
 local sources = require("timber.watcher.sources")
 local buffers = require("timber.buffers")
+local utils = require("timber.utils")
 
-local M = { MARKER = "🪵", ID_LENGTH = 3 }
+local M = { MARKER = "🪵", ID_LENGTH = 3, sources = {} }
 
 function M.generate_unique_id()
   local chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -32,16 +33,26 @@ function M.generate_marker_pairs()
   return start, end_, id
 end
 
----@param source_specs Timber.Watcher.SourceSpecs
+---@param source_specs Timber.Watcher.SourceSpec[]
 function M.setup(source_specs)
   math.randomseed(os.time())
 
+  M.sources = source_specs
   sources.setup({
     sources = source_specs,
     on_log_capture = function(log_entry)
       buffers.receive_log_entry(log_entry)
     end,
   })
+end
+
+---Get a source by name
+---@param name string
+---@return Timber.Watcher.SourceSpec? source
+function M.get_source(name)
+  return utils.array_find(M.sources, function(source)
+    return source.name == name
+  end)
 end
 
 return M

@@ -446,13 +446,24 @@ end
 
 ---@param lines string[]
 ---@param window_opts table
+---@param buffer_opts table?
 ---@return integer floating_winnr
 ---@return integer floating_bufnr
-local function open_floating_window(lines, window_opts)
+local function open_floating_window(lines, window_opts, buffer_opts)
+  buffer_opts = vim.tbl_extend(
+    "force",
+    { modifiable = false, readonly = true, bufhidden = "delete", swapfile = false },
+    buffer_opts or {}
+  )
+
   -- Create buffer for main content
   local floating_bufnr = vim.api.nvim_create_buf(false, true)
   local floating_winnr = vim.api.nvim_open_win(floating_bufnr, false, window_opts)
   vim.api.nvim_buf_set_lines(floating_bufnr, 0, -1, true, lines)
+
+  for option, value in pairs(buffer_opts) do
+    vim.api.nvim_set_option_value(option, value, { buf = floating_bufnr })
+  end
 
   -- q to close the floating window
   vim.api.nvim_buf_set_keymap(
@@ -512,7 +523,16 @@ local function show_placeholder_full_content(placeholder, opts)
     footer_pos = "right",
   })
 
-  local bufnr, winnr = open_floating_window(lines, window_opts)
+  -- TODO: handle multiple sources
+  local source_name = placeholder.entries[1].source_name
+  local source = require("timber.watcher").get_source(source_name)
+
+  if not source then
+    utils.notify(string.format("Unrecognized watcher source '%s'", source_name), "warn")
+    return
+  end
+
+  local bufnr, winnr = open_floating_window(lines, window_opts, source.buffer)
   vim.api.nvim_win_set_hl_ns(winnr, M.log_placeholder_ns)
 
   for _, i in ipairs(separators) do

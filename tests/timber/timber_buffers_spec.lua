@@ -534,6 +534,60 @@ describe("timber.buffers.open_float", function()
           end,
         })
       end)
+
+      it("sets the buffer options from source config with defaults", function()
+        watcher.setup({
+          {
+            type = "neotest",
+            name = "Test",
+            buffer = {
+              filetype = "timbertest",
+            },
+          },
+        })
+
+        local id = watcher.generate_unique_id()
+
+        helper.assert_scenario({
+          input = string.format(
+            [[
+              const foo = "bar"
+              console.log("%s%s|")
+              const bar = "foo"
+            ]],
+            watcher.MARKER,
+            id
+          ),
+          input_cursor = false,
+          filetype = "typescript",
+          action = function()
+            helper.wait(20)
+            buffers.receive_log_entry({
+              log_placeholder_id = id,
+              payload = "foo_123456789_123456890",
+              source_name = "Test",
+              timestamp = os.time(),
+            })
+            -- Open the float window, and focus to it
+            vim.cmd("normal! 2G")
+            buffers.open_float()
+            vim.cmd("wincmd w")
+          end,
+          expected = function()
+            -- Options from config
+            assert.equals("timbertest", vim.api.nvim_get_option_value("filetype", { buf = 0 }))
+
+            -- Default options
+            assert.equals(false, vim.api.nvim_get_option_value("modifiable", { buf = 0 }))
+            assert.equals(true, vim.api.nvim_get_option_value("readonly", { buf = 0 }))
+            assert.equals("delete", vim.api.nvim_get_option_value("bufhidden", { buf = 0 }))
+            assert.equals(false, vim.api.nvim_get_option_value("swapfile", { buf = 0 }))
+          end,
+        })
+
+        -- Close the float window
+        vim.cmd("q!")
+      end)
     end)
 
     describe("given the placeholder has NO entries", function()
