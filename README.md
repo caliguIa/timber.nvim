@@ -127,13 +127,13 @@ Out of the box, timber.nvim provides [default templates](https://github.com/Goos
 Clear all log statements in the current buffer:
 
 ```lua
-    require("timber.actions").clear_log_statements({ global = false })
+require("timber.actions").clear_log_statements({ global = false })
 ```
 
 or from all buffers:
 
 ```lua
-    require("timber.actions").clear_log_statements({ global = true })
+require("timber.actions").clear_log_statements({ global = true })
 ```
 
 Be aware of [potential limitations](https://github.com/Goose97/timber.nvim/blob/a2faec8a7525d49a2e033ce54246cd50a4fb9021/doc/timber.nvim.txt#L245-L250).
@@ -229,12 +229,16 @@ See [`:h timber.nvim-watchers`](https://github.com/Goose97/timber.nvim/blob/a2fa
       cpp = [[std::cout %repeat<<< "%log_target: " << %log_target>< << "\n  " > << std::endl;]],
     },
   },
+  -- Controls the flash highlight after a log statement is inserted
+  -- or a log target is added to a batch
   highlight = {
     on_insert = true,
     on_add_to_batch = true,
     duration = 500,
   },
   keymaps = {
+    -- Set to false to disable the default keymap for specific actions
+    -- insert_log_below = false,
     insert_log_below = "glj",
     insert_log_above = "glk",
     insert_batch_log = "glb",
@@ -244,6 +248,7 @@ See [`:h timber.nvim-watchers`](https://github.com/Goose97/timber.nvim/blob/a2fa
     insert_batch_log_operator = "g<S-l>b",
     add_log_targets_to_batch_operator = "g<S-l>a",
   },
+  -- Set to false to disable all default keymaps
   default_keymaps_enabled = true,
   log_watcher = {
     enabled = false,
