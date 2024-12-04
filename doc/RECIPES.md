@@ -2,7 +2,9 @@
 
 The purpose of this document is to showcase some common use cases of `timber.nvim`.
 
-## Log current line
+## Advanced logging use cases
+
+### Log current line
 
 <details>
 <summary>Show config</summary>
@@ -18,7 +20,7 @@ end, {
 
 </details>
 
-## Plain log statements
+### Plain log statements
 
 <details>
 <summary>Show config</summary>
@@ -34,7 +36,7 @@ end, { desc = "[G]o [L]og: Insert a plain log statement above the current line" 
 ```
 </details>
 
-## Surround log statements
+### Surround log statements
 
 <details>
 <summary>Show config</summary>
@@ -63,7 +65,7 @@ print("foo", foo)
 ```
 </details>
 
-## Time log statements
+### Time log statements
 
 <details>
 <summary>Show config</summary>
@@ -105,3 +107,83 @@ print("Elapsed time: " .. tostring(os.time() - _start) .. " seconds")
 ```
 
 </details>
+
+## Pretty captured log buffer
+
+You can add syntax highlighting the captured log buffer:
+
+1. Config a custom filetype for the log buffer
+
+```lua
+-- After
+opts = {
+    watcher = {
+        sources = {
+            enabled = true,
+            javascript_log = {
+                type = "filesystem",
+                name = "Log file",
+                path = "/tmp/debug.log",
+                buffer = {
+                    filetype = "javascriptconsole",
+                }
+            }
+        }
+    }
+}
+```
+
+2. Write a syntax file for the filetype, then put it in the runtime path. For example, in your config root, `syntax/javascriptconsole.vim`
+
+<details>
+<summary>Javascript (console.log)</summary>
+
+```vim
+if exists("b:current_syntax")
+  finish
+endif
+
+" Special patterns for console.log output
+syntax match consoleLogFunction "\<\[Function.*\]\>" contained
+
+syntax sync fromstart
+
+" Special characters
+syntax match consoleLogBrace "[{}[\]]" contained
+syntax region consoleLogObject start="{" end="}" fold transparent contains=ALL
+
+" Keywords
+syntax keyword consoleLogBoolean true false
+syntax keyword consoleLogKeyword null undefined NaN Infinity
+syntax match consoleLogSpecial "\V\([Array]\|[Object]\|[Promise]\|[Function]\|[Reference]\|[Circular]\)"
+syntax match consoleLogSpecial "\[Array(\d\+)\]"
+syntax match consoleLogSpecial "Symbol(.\+)"
+
+" Numbers
+syntax match consoleLogNumber "\<\d\+\>"
+syntax match consoleLogFloat "\<\d\+\.\d\+\>"
+
+" Strings
+syntax region consoleLogString start=/'/ end=/'/ skip=/\\'/ contains=@Spell
+
+" Object keys
+syntax match consoleLogObjectKey "\<\w\+\>:" contained contains=consoleLogColon
+syntax match consoleLogColon ":" contained
+
+" Define highlighting
+highlight default link consoleLogBoolean Boolean
+highlight default link consoleLogKeyword Keyword
+highlight default link consoleLogSpecial Type
+highlight default link consoleLogNumber Number
+highlight default link consoleLogFloat Float
+highlight default link consoleLogString String
+highlight default link consoleLogObjectKey Identifier
+highlight default link consoleLogColon Operator
+highlight default link consoleLogBrace Delimiter
+highlight default link consoleLogFunction Function
+
+let b:current_syntax = "javascriptconsole"
+```
+
+</details>
+
