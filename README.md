@@ -192,9 +192,68 @@ See [`:h timber.nvim-watchers`](https://github.com/Goose97/timber.nvim/blob/a2fa
 
 ## Configuration
 
-The default configuration is found [here](https://github.com/Goose97/timber.nvim/blob/main/lua/timber/config.lua). To initialize the plugin, call `require("timber").setup` with the desired options.
+<details>
+<summary><strong>Default configuration</strong></summary>
 
-See [`:h timber.nvim-config`](https://github.com/Goose97/timber.nvim/blob/a2faec8a7525d49a2e033ce54246cd50a4fb9021/doc/timber.nvim.txt#L379) for more information.
+```lua
+{
+  log_templates = {
+    default = {
+      javascript = [[console.log("%log_target", %log_target)]],
+      typescript = [[console.log("%log_target", %log_target)]],
+      jsx = [[console.log("%log_target", %log_target)]],
+      tsx = [[console.log("%log_target", %log_target)]],
+      lua = [[print("%log_target", %log_target)]],
+      ruby = [[puts("%log_target #{%log_target}")]],
+      elixir = [[IO.inspect(%log_target, label: "%log_target")]],
+      go = [[log.Printf("%log_target: %v\n", %log_target)]],
+      rust = [[println!("%log_target: {:#?}", %log_target);]],
+      python = [[print("%log_target", %log_target)]],
+      c = [[printf("%log_target: %s\n", %log_target);]],
+      cpp = [[std::cout << "%log_target: " << %log_target << std::endl;]],
+    },
+  },
+  batch_log_templates = {
+    default = {
+      javascript = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
+      typescript = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
+      jsx = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
+      tsx = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
+      lua = [[print(string.format("%repeat<%log_target=%s><, >", %repeat<%log_target><, >))]],
+      ruby = [[puts("%repeat<%log_target: #{%log_target}><, >")]],
+      elixir = [[IO.inspect({ %repeat<%log_target><, > })]],
+      go = [[log.Printf("%repeat<%log_target: %v><, >\n", %repeat<%log_target><, >)]],
+      rust = [[println!("%repeat<%log_target: {:#?}><, >", %repeat<%log_target><, >);]],
+      python = [[print(%repeat<"%log_target", %log_target><, >)]],
+      c = [[printf("%repeat<%log_target: %s><, >\n", %repeat<%log_target><, >);]],
+      cpp = [[std::cout %repeat<<< "%log_target: " << %log_target>< << "\n  " > << std::endl;]],
+    },
+  },
+  highlight = {
+    on_insert = true,
+    on_add_to_batch = true,
+    duration = 500,
+  },
+  keymaps = {
+    insert_log_below = "glj",
+    insert_log_above = "glk",
+    insert_batch_log = "glb",
+    add_log_targets_to_batch = "gla",
+    insert_log_below_operator = "g<S-l>j",
+    insert_log_above_operator = "g<S-l>k",
+    insert_batch_log_operator = "g<S-l>b",
+    add_log_targets_to_batch_operator = "g<S-l>a",
+  },
+  default_keymaps_enabled = true,
+  log_watcher = {
+    enabled = false,
+    sources = {},
+    preview_snippet_length = 32,
+  },
+}
+```
+
+</details>
 
 ## Tips
 
