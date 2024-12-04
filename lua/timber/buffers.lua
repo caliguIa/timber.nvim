@@ -616,11 +616,7 @@ end
 function M.setup()
   M.log_placeholder_ns = vim.api.nvim_create_namespace("timber.log_placeholder")
 
-  vim.api.nvim_set_hl(
-    M.log_placeholder_ns,
-    "Timber.LogPlaceholderSnippet",
-    { link = "DiagnosticVirtualTextInfo", default = true }
-  )
+  vim.api.nvim_set_hl(0, "Timber.LogPlaceholderSnippet", { link = "DiagnosticVirtualTextInfo", default = true })
   vim.api.nvim_set_hl(0, "Timber.LogPlaceholderTime", { italic = true })
   vim.api.nvim_set_hl(M.log_placeholder_ns, "FloatFooter", { link = "CursorLineNr", force = true })
   vim.api.nvim_set_hl(M.log_placeholder_ns, "Timber.FloatingWindowEntrySeparator", { link = "FloatBorder" })
