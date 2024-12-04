@@ -112,9 +112,12 @@ print("Elapsed time: " .. tostring(os.time() - _start) .. " seconds")
 
 ![image](https://github.com/user-attachments/assets/e2ea2765-f43d-4ca2-91b5-a02d07f9a4ce)
 
-You can add syntax highlighting the captured log buffer:
+You can add syntax highlighting the captured log buffer. Here are some examples:
 
-1. Config a custom filetype for the log buffer
+<details>
+<summary>Javascript (console.log)</summary>
+
+1. Use `javascript` syntax for the log buffer
 
 ```lua
 -- After
@@ -127,7 +130,7 @@ opts = {
                 name = "Log file",
                 path = "/tmp/debug.log",
                 buffer = {
-                    filetype = "javascriptconsole",
+                    syntax = "javascript",
                 }
             }
         }
@@ -135,58 +138,27 @@ opts = {
 }
 ```
 
-2. Write a syntax file for the filetype, then put it in the runtime path. For example, in your config root, `syntax/javascriptconsole.vim`
-
-### Examples
-
-<details>
-<summary>Javascript (console.log)</summary>
+2. Optionally, you can extend the syntax file. For example, in your config root, `after/syntax/javascript.vim`
 
 ```vim
-if exists("b:current_syntax")
-  finish
-endif
-
-" Special patterns for console.log output
-syntax match consoleLogFunction "\<\[Function.*\]\>" contained
-
 syntax sync fromstart
 
 " Special characters
-syntax match consoleLogBrace "[{}[\]]" contained
 syntax region consoleLogObject start="{" end="}" fold transparent contains=ALL
 
 " Keywords
-syntax keyword consoleLogBoolean true false
-syntax keyword consoleLogKeyword null undefined NaN Infinity
-syntax match consoleLogSpecial "\V\([Array]\|[Object]\|[Promise]\|[Function]\|[Reference]\|[Circular]\)"
+syntax match consoleLogSpecial "\V\([Promise]\|[Function]\|[Reference]\|[Circular]\)"
 syntax match consoleLogSpecial "\[Array(\d\+)\]"
 syntax match consoleLogSpecial "Symbol(.\+)"
-
-" Numbers
-syntax match consoleLogNumber "\<\d\+\>"
-syntax match consoleLogFloat "\<\d\+\.\d\+\>"
-
-" Strings
-syntax region consoleLogString start=/'/ end=/'/ skip=/\\'/ contains=@Spell
 
 " Object keys
 syntax match consoleLogObjectKey "\<\w\+\>:" contained contains=consoleLogColon
 syntax match consoleLogColon ":" contained
 
 " Define highlighting
-highlight default link consoleLogBoolean Boolean
-highlight default link consoleLogKeyword Keyword
 highlight default link consoleLogSpecial Type
-highlight default link consoleLogNumber Number
-highlight default link consoleLogFloat Float
-highlight default link consoleLogString String
 highlight default link consoleLogObjectKey Identifier
 highlight default link consoleLogColon Operator
-highlight default link consoleLogBrace Delimiter
-highlight default link consoleLogFunction Function
-
-let b:current_syntax = "javascriptconsole"
 ```
 
 </details>
