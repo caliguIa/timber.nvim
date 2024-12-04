@@ -110,6 +110,8 @@ print("Elapsed time: " .. tostring(os.time() - _start) .. " seconds")
 
 ## Pretty captured log buffer
 
+![image](https://github.com/user-attachments/assets/e2ea2765-f43d-4ca2-91b5-a02d07f9a4ce)
+
 You can add syntax highlighting the captured log buffer:
 
 1. Config a custom filetype for the log buffer
@@ -134,6 +136,8 @@ opts = {
 ```
 
 2. Write a syntax file for the filetype, then put it in the runtime path. For example, in your config root, `syntax/javascriptconsole.vim`
+
+### Examples
 
 <details>
 <summary>Javascript (console.log)</summary>
