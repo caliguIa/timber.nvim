@@ -74,9 +74,7 @@ describe("timber.buffers autocmd", function()
     describe("given the buffer has some placeholders", function()
       it("attaches to the buffer and deletes the placeholder when the log statement is deleted", function()
         local id1 = watcher.generate_unique_id()
-        utils.log("🪵V5R| 72 id1 " .. utils.dump(id1) .. "|V5R")
         local id2 = watcher.generate_unique_id()
-        utils.log("🪵5P9| 74 id2 " .. utils.dump(id2) .. "|5P9")
 
         helper.assert_scenario({
           input = string.format(
@@ -143,9 +141,7 @@ describe("timber.buffers autocmd", function()
 
       it("attaches to the buffer and adds the placeholder when the log statement is inserted", function()
         local id1 = watcher.generate_unique_id()
-        utils.log("🪵75R| 139 id1 " .. utils.dump(id1) .. "|75R")
         local id2 = watcher.generate_unique_id()
-        utils.log("🪵XHR| 141 id2 " .. utils.dump(id2) .. "|XHR")
 
         helper.assert_scenario({
           input = string.format(
