@@ -15,7 +15,7 @@ local function win_content(entries)
   end
 
   -- Get the max width of the content
-  local max_width = 0
+  local max_width = 20
   for _, lines in ipairs(entry_lines) do
     for _, line in ipairs(lines) do
       max_width = math.max(max_width, #line)
