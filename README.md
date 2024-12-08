@@ -138,6 +138,20 @@ require("timber.actions").clear_log_statements({ global = true })
 
 Be aware of [potential limitations](https://github.com/Goose97/timber.nvim/blob/a2faec8a7525d49a2e033ce54246cd50a4fb9021/doc/timber.nvim.txt#L245-L250).
 
+### Comment log statements
+
+Comment/uncomment all log statements in the current buffer:
+
+```lua
+require("timber.actions").toggle_comment_log_statements({ global = false })
+```
+
+or from all buffers:
+
+```lua
+require("timber.actions").toggle_comment_log_statements({ global = true })
+```
+
 ### Capture log results
 
 `timber.nvim` can monitor multiple sources and capture the log results. For example, a common use case is to capture the log results from a test runner or from a log file.

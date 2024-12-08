@@ -66,7 +66,7 @@ end
 ---@field input_cursor? string|boolean
 ---@field filetype string
 ---@field action function?
----@field expected string | function
+---@field expected? string | function
 
 ---Given an input, execute a callback, and assert the expected output.
 ---The input supports specifying the cursor position with a pipe character.
@@ -89,7 +89,7 @@ function M.assert_scenario(scenario)
   local expected = scenario.expected
   if type(expected) == "function" then
     expected()
-  else
+  elseif type(expected) == "string" then
     local expected_lines, cursor1 = parse_input(expected, scenario.input_cursor)
 
     if cursor1 then

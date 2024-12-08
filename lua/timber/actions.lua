@@ -743,6 +743,14 @@ function M.clear_log_statements(opts)
   require("timber.actions.clear").clear(opts)
 end
 
+---@class Timber.Actions.CommentLogStatementsOptions
+---@field global? boolean Whether to comment all buffers, or just the current buffer. Defaults to `false`
+---@param opts Timber.Actions.CommentLogStatementsOptions?
+function M.toggle_comment_log_statements(opts)
+  opts = vim.tbl_deep_extend("force", { global = false }, opts or {})
+  require("timber.actions.comment").toggle_comment(opts)
+end
+
 function M.setup()
   treesitter.setup()
 end

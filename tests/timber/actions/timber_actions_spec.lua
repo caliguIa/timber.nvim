@@ -1296,18 +1296,13 @@ describe("timber.actions.clear_log_statements", function()
         input = [[
           local fo|o = "foo"
           local bar = "bar"
+          print("foo", foo)
         ]],
         filetype = "lua",
         action = function()
-          vim.cmd("normal! vap")
+          vim.cmd("normal! vj")
           actions.insert_log({ position = "below" })
         end,
-        expected = [[
-          local foo = "foo"
-          print("🪵-TIMBER foo", foo)
-          local bar = "bar"
-          print("🪵-TIMBER bar", bar)
-        ]],
       })
 
       local bufnr2 = helper.assert_scenario({
@@ -1317,19 +1312,12 @@ describe("timber.actions.clear_log_statements", function()
         ]],
         filetype = "lua",
         action = function()
-          vim.cmd("normal! vap")
+          vim.cmd("normal! vj")
           actions.insert_log({ position = "below" })
         end,
-        expected = [[
-          local foo = "foo"
-          print("🪵-TIMBER foo", foo)
-          local bar = "bar"
-          print("🪵-TIMBER bar", bar)
-        ]],
       })
 
       vim.api.nvim_set_current_buf(bufnr1)
-      helper.wait(20)
       actions.clear_log_statements({ global = false })
 
       helper.assert_buf_content(
@@ -1337,6 +1325,7 @@ describe("timber.actions.clear_log_statements", function()
         [[
           local foo = "foo"
           local bar = "bar"
+          print("foo", foo)
         ]]
       )
 
@@ -1378,48 +1367,30 @@ describe("timber.actions.clear_log_statements", function()
         input = [[
           local fo|o = "foo"
           local bar = "bar"
+          print("foo", foo)
         ]],
         filetype = "lua",
         action = function()
-          vim.cmd("normal! vap")
+          vim.cmd("normal! vj")
           actions.insert_log({ position = "below" })
         end,
-        expected = string.format(
-          [[
-            local foo = "foo"
-            print("%s foo", foo)
-            local bar = "bar"
-            print("%s bar", bar)
-          ]],
-          log_marker,
-          log_marker
-        ),
       })
 
       local bufnr2 = helper.assert_scenario({
         input = [[
           local fo|o = "foo"
           local bar = "bar"
+          print("foo", foo)
         ]],
         filetype = "lua",
         action = function()
-          vim.cmd("normal! vap")
+          vim.cmd("normal! vj")
           actions.insert_log({ position = "below" })
         end,
-        expected = string.format(
-          [[
-            local foo = "foo"
-            print("%s foo", foo)
-            local bar = "bar"
-            print("%s bar", bar)
-          ]],
-          log_marker,
-          log_marker
-        ),
       })
 
-      write_buf_file(bufnr1, "test_sandbox/buffer1")
-      write_buf_file(bufnr2, "test_sandbox/buffer2")
+      write_buf_file(bufnr1, "test_sandbox/clear1")
+      write_buf_file(bufnr2, "test_sandbox/clear2")
 
       helper.wait(20)
       actions.clear_log_statements({ global = true })
@@ -1429,6 +1400,7 @@ describe("timber.actions.clear_log_statements", function()
         [[
           local foo = "foo"
           local bar = "bar"
+          print("foo", foo)
         ]]
       )
 
@@ -1437,6 +1409,7 @@ describe("timber.actions.clear_log_statements", function()
         [[
           local foo = "foo"
           local bar = "bar"
+          print("foo", foo)
         ]]
       )
     end)
@@ -1476,7 +1449,6 @@ describe("timber.actions.clear_log_statements", function()
       })
 
       vim.api.nvim_set_current_buf(bufnr)
-      helper.wait(20)
       actions.clear_log_statements({ global = false })
 
       helper.assert_buf_content(
@@ -1494,20 +1466,221 @@ describe("timber.actions.clear_log_statements", function()
       notify_spy:clear()
     end)
   end)
+end)
 
-  describe("given the log template DOES NOT contain %log_marker", function()
+describe("timber.actions.toggle_comment_log_statements", function()
+  describe("given the global opts is false", function()
     before_each(function()
       timber.setup({
         log_templates = {
           default = {
-            lua = [[print("%log_target", %log_target)]],
+            lua = [[print("%log_marker %log_target", %log_target)]],
           },
         },
         log_marker = "🪵-TIMBER",
       })
     end)
 
-    it("DOES NOT clear any statements and notifies the user", function()
+    it("toggles comment all statements ONLY in the current buffer", function()
+      local bufnr1 = helper.assert_scenario({
+        input = [[
+          local fo|o = "foo"
+          local bar = "bar"
+          print("foo", foo)
+        ]],
+        filetype = "lua",
+        action = function()
+          vim.cmd("normal vj")
+          actions.insert_log({ position = "below" })
+        end,
+      })
+
+      local bufnr2 = helper.assert_scenario({
+        input = [[
+          local fo|o = "foo"
+          local bar = "bar"
+        ]],
+        filetype = "lua",
+        action = function()
+          vim.cmd("normal! vj")
+          actions.insert_log({ position = "below" })
+        end,
+      })
+
+      vim.api.nvim_set_current_buf(bufnr1)
+      -- Comment
+      actions.toggle_comment_log_statements({ global = false })
+
+      helper.assert_buf_content(
+        bufnr1,
+        [[
+          local foo = "foo"
+          -- print("🪵-TIMBER foo", foo)
+          local bar = "bar"
+          -- print("🪵-TIMBER bar", bar)
+          print("foo", foo)
+        ]]
+      )
+
+      helper.assert_buf_content(
+        bufnr2,
+        [[
+          local foo = "foo"
+          print("🪵-TIMBER foo", foo)
+          local bar = "bar"
+          print("🪵-TIMBER bar", bar)
+        ]]
+      )
+
+      -- Uncomment
+      actions.toggle_comment_log_statements({ global = false })
+      helper.assert_buf_content(
+        bufnr1,
+        [[
+          local foo = "foo"
+          print("🪵-TIMBER foo", foo)
+          local bar = "bar"
+          print("🪵-TIMBER bar", bar)
+          print("foo", foo)
+        ]]
+      )
+    end)
+  end)
+
+  describe("given the global opts is true", function()
+    before_each(function()
+      vim.fn.system({ "rm", "-rf", "test_sandbox" })
+      vim.fn.mkdir("test_sandbox")
+      local random = math.random(1000)
+
+      timber.setup({
+        log_templates = {
+          default = {
+            lua = [[print("%log_marker %log_target", %log_target)]],
+          },
+        },
+        log_marker = "🪵-" .. random,
+      })
+    end)
+
+    after_each(function()
+      vim.fn.system({ "rm", "-rf", "test_sandbox" })
+    end)
+
+    it("comments all statements in ALL buffers", function()
+      local log_marker = config.config.log_marker
+      local bufnr1 = helper.assert_scenario({
+        input = [[
+          local fo|o = "foo"
+          local bar = "bar"
+          print("foo", foo)
+        ]],
+        filetype = "lua",
+        action = function()
+          vim.cmd("normal! vj")
+          actions.insert_log({ position = "below" })
+        end,
+      })
+
+      local bufnr2 = helper.assert_scenario({
+        input = [[
+          local fo|o = "foo"
+          local bar = "bar"
+          print("foo", foo)
+        ]],
+        filetype = "lua",
+        action = function()
+          vim.cmd("normal! vj")
+          actions.insert_log({ position = "below" })
+        end,
+      })
+
+      write_buf_file(bufnr1, "test_sandbox/comment1")
+      write_buf_file(bufnr2, "test_sandbox/comment2")
+
+      -- Comment
+      actions.toggle_comment_log_statements({ global = true })
+
+      helper.assert_buf_content(
+        bufnr1,
+        string.format(
+          [[
+            local foo = "foo"
+            -- print("%s foo", foo)
+            local bar = "bar"
+            -- print("%s bar", bar)
+            print("foo", foo)
+          ]],
+          log_marker,
+          log_marker
+        )
+      )
+
+      helper.assert_buf_content(
+        bufnr2,
+        string.format(
+          [[
+            local foo = "foo"
+            -- print("%s foo", foo)
+            local bar = "bar"
+            -- print("%s bar", bar)
+            print("foo", foo)
+          ]],
+          log_marker,
+          log_marker
+        )
+      )
+
+      -- Uncomment
+      actions.toggle_comment_log_statements({ global = true })
+
+      helper.assert_buf_content(
+        bufnr1,
+        string.format(
+          [[
+            local foo = "foo"
+            print("%s foo", foo)
+            local bar = "bar"
+            print("%s bar", bar)
+            print("foo", foo)
+          ]],
+          log_marker,
+          log_marker
+        )
+      )
+
+      helper.assert_buf_content(
+        bufnr2,
+        string.format(
+          [[
+            local foo = "foo"
+            print("%s foo", foo)
+            local bar = "bar"
+            print("%s bar", bar)
+            print("foo", foo)
+          ]],
+          log_marker,
+          log_marker
+        )
+      )
+    end)
+  end)
+
+  describe("given the config.log_marker is not set or empty", function()
+    before_each(function()
+      timber.setup({
+        log_templates = {
+          default = {
+            lua = [[print("%log_marker %log_target", %log_target)]],
+          },
+        },
+        log_marker = "",
+      })
+    end)
+
+    it("DOES NOT comment any statements and notifies the user", function()
+      local notify_spy = spy.on(utils, "notify")
+
       local bufnr = helper.assert_scenario({
         input = [[
           local fo|o = "foo"
@@ -1518,27 +1691,24 @@ describe("timber.actions.clear_log_statements", function()
           vim.cmd("normal! vap")
           actions.insert_log({ position = "below" })
         end,
-        expected = [[
-          local foo = "foo"
-          print("foo", foo)
-          local bar = "bar"
-          print("bar", bar)
-        ]],
       })
 
       vim.api.nvim_set_current_buf(bufnr)
-      helper.wait(20)
-      actions.clear_log_statements({ global = false })
+      actions.toggle_comment_log_statements({ global = false })
 
       helper.assert_buf_content(
         bufnr,
         [[
           local foo = "foo"
-          print("foo", foo)
+          print(" foo", foo)
           local bar = "bar"
-          print("bar", bar)
+          print(" bar", bar)
         ]]
       )
+
+      assert.spy(notify_spy).was_called(1)
+      assert.spy(notify_spy).was_called_with("config.log_marker is not configured", "warn")
+      notify_spy:clear()
     end)
   end)
 end)

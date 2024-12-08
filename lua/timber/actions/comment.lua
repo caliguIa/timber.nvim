@@ -5,11 +5,14 @@ local utils = require("timber.utils")
 local log_statements = require("timber.actions.log_statements")
 
 -- Using grep to search all files globally
-local function clear_global(log_marker)
+local function toggle_comment_global(log_marker)
   local processed = {}
 
   for bufnr, lnum in log_statements.iter_global(log_marker) do
-    vim.api.nvim_buf_set_lines(bufnr, lnum - 1, lnum, false, {})
+    vim.api.nvim_buf_call(bufnr, function()
+      vim.api.nvim_win_set_cursor(0, { lnum, 0 })
+      vim.cmd("normal gcc")
+    end)
 
     if not processed[bufnr] then
       processed[bufnr] = true
@@ -25,7 +28,7 @@ local function clear_global(log_marker)
 end
 
 ---@param opts {global: boolean}
-function M.clear(opts)
+function M.toggle_comment(opts)
   local log_marker = config.config.log_marker
 
   if not log_marker or log_marker == "" then
@@ -34,10 +37,11 @@ function M.clear(opts)
   end
 
   if opts.global then
-    clear_global(log_marker)
+    toggle_comment_global(log_marker)
   else
     for linenr in log_statements.iter_local(log_marker) do
-      vim.api.nvim_buf_set_lines(0, linenr - 1, linenr, false, {})
+      vim.api.nvim_win_set_cursor(0, { linenr, 0 })
+      vim.cmd("normal gcc")
     end
   end
 end
