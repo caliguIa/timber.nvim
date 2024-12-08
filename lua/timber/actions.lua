@@ -49,7 +49,7 @@ end
 local function get_current_indent(insert_line)
   -- From the insert line, walk down to find the first non-empty line
   -- Then walk up to find the first non-empty line
-  -- Take the maximum of the two indentations
+  -- Take the maximum of the two leading_spacess
   local before = 0
   local after = 0
 
@@ -115,6 +115,13 @@ local function resolve_template_placeholders(log_template, handlers)
     placeholder_id = marker_id
   end
 
+  if string.find(log_template, "%%log_marker") then
+    local marker = config.config.log_marker
+    if marker then
+      log_template = string.gsub(log_template, "%%log_marker", marker)
+    end
+  end
+
   return log_template, placeholder_id
 end
 
@@ -150,7 +157,7 @@ local function insert_log_statements(statements)
     statement.inserted_rows = {}
 
     local insert_line = statement.row + offset
-    local indentation = get_current_indent(insert_line)
+    local leading_spaces = get_current_indent(insert_line)
     local lines = utils.process_multiline_string(statement.content)
 
     for i, line in ipairs(lines) do
@@ -164,7 +171,7 @@ local function insert_log_statements(statements)
         end
       end
 
-      lines[i] = string.rep(" ", indentation) .. line
+      lines[i] = string.rep(" ", leading_spaces) .. line
     end
 
     vim.api.nvim_buf_set_lines(bufnr, insert_line, insert_line, false, lines)
@@ -197,10 +204,14 @@ local function after_insert_log_statements(log_statements, insert_cursor_pos, or
     --   4. Go to insert mode
     -- We need to defer because the function is executed in normal mode by g@ operator
     -- After the function is executed, we can go to insert mode
-    vim.defer_fn(function()
-      vim.cmd(string.format("normal! %dG^%dl", insert_cursor_pos[1] + 1, insert_cursor_pos[2] - 1))
+    vim.schedule(function()
+      local linenr = insert_cursor_pos[1] + 1
+      local line = vim.api.nvim_buf_get_lines(0, linenr - 1, linenr, false)[1]
+      local leading_spaces = string.match(line, "^%s*")
+
+      vim.api.nvim_win_set_cursor(0, { linenr, insert_cursor_pos[2] - 1 + #leading_spaces })
       vim.cmd("startinsert")
-    end, 0)
+    end)
   elseif original_cursor_position then
     -- Move the cursor back to the original position
     -- The inserted lines above the cursor shift the cursor position away. We need to account for that
@@ -729,19 +740,7 @@ end
 ---@param opts Timber.Actions.ClearLogStatementsOptions?
 function M.clear_log_statements(opts)
   opts = vim.tbl_deep_extend("force", { global = false }, opts or {})
-  local lines_per_bufnr = buffers.get_log_statement_lines(not opts.global and vim.api.nvim_get_current_buf() or nil)
-
-  for bufnr, lines in pairs(lines_per_bufnr) do
-    -- Sort lines in descending order to avoid line number shifting
-    table.sort(lines, function(a, b)
-      return a > b
-    end)
-
-    -- Delete each line
-    for _, line_num in ipairs(lines) do
-      vim.api.nvim_buf_set_lines(bufnr, line_num, line_num + 1, false, {})
-    end
-  end
+  require("timber.actions.clear").clear(opts)
 end
 
 function M.setup()

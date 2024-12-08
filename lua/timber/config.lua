@@ -12,6 +12,7 @@ local utils = require("timber.utils")
 
 ---@class Timber.Config
 ---@field log_templates { [string]: Timber.LogTemplates }
+---@field log_marker string? The marker for the %log_marker placeholder. Defaults to `🪵`
 ---@field batch_log_templates { [string]: Timber.LogTemplates }
 ---@field highlight Timber.Highlight.Config
 ---@field keymaps { [Timber.Action | Timber.Operator]: string }
@@ -52,6 +53,7 @@ local default_config = {
       cpp = [[std::cout %repeat<<< "%log_target: " << %log_target>< << "\n  " > << std::endl;]],
     },
   },
+  log_marker = "🪵",
   highlight = {
     on_insert = true,
     on_add_to_batch = true,
@@ -177,46 +179,6 @@ local function setup_keymaps()
       operator = true,
     })
   end, { mode = "n", expr = true, desc = "Add log targets to batch operator" })
-end
-
--- Test C++ logging templates
-function M.test_cpp_templates()
-  local single_template = M.config.log_templates.default.cpp
-  local batch_template = M.config.batch_log_templates.default.cpp
-
-  -- Test cases
-  local test_cases = {
-    { input = "count", expected = [[printf("count: %s\n", count);]] },
-    { input = "x + y", expected = [[printf("x + y: %s\n", x + y);]] },
-  }
-
-  -- Test single log template
-  for _, case in ipairs(test_cases) do
-    local result = single_template:gsub("%%log_target", case.input)
-    assert(
-      result == case.expected,
-      string.format("Single template failed for '%s'\nExpected: %s\nGot: %s", case.input, case.expected, result)
-    )
-  end
-
-  -- Test batch template
-  local batch_input = { "x", "y", "z" }
-  local batch_expected = [[printf("x: %s, y: %s, z: %s\n", x, y, z);]]
-  local batch_result = batch_template:gsub("%%repeat<(.-)><(.-)>", function(template, sep)
-    local parts = {}
-    for _, var in ipairs(batch_input) do
-      local part = template:gsub("%%log_target", var)
-      table.insert(parts, part)
-    end
-    return table.concat(parts, sep)
-  end)
-
-  assert(
-    batch_result == batch_expected,
-    string.format("Batch template failed\nExpected: %s\nGot: %s", batch_expected, batch_result)
-  )
-
-  return true
 end
 
 -- This function is used during testing
