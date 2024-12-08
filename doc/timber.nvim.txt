@@ -243,13 +243,6 @@ actions.clear_log_statements({opts})   *timber.actions.clear_log_statements()*
 
   Clear all log statements in the current buffer or all buffers.
 
-  This API has some limitations:
-    - It might not work well with code formatters. The code
-      formatter can break the log statements into multiple lines and we
-      have no mechanism to keep track of them.
-    - With `global = true`, we will clear all buffers, but not all files. Which
-      means files that you haven't loaded won't be cleared.
-
   Parameters: ~
     {opts} (table)  options to pass to the action
 
