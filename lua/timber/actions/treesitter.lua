@@ -23,7 +23,7 @@ end
 ---@param lang string
 ---@param range {[1]: number, [2]: number, [3]: number, [4]: number}
 ---@return {container: TSNode, logable_ranges: logable_range[]}[]
-function M.query_log_target_container(lang, range)
+function M.query_log_target_containers(lang, range)
   local bufnr = vim.api.nvim_get_current_buf()
   local parser = vim.treesitter.get_parser(bufnr, lang)
   local tree = parser:parse()[1]
@@ -62,7 +62,7 @@ end
 ---@param containers TSNode[]
 ---@param lang string
 ---@return {container: TSNode, log_targets: TSNode[]}[]
-function M.find_log_targets(containers, lang)
+function M.query_log_targets(containers, lang)
   local query = vim.treesitter.query.get(lang, "timber-log-target")
   if not query then
     utils.notify(string.format("timber doesn't support %s language", lang), "error")

@@ -352,9 +352,9 @@ end
 ---@param selection_range range
 ---@return {log_container: TSNode, logable_ranges: logable_range[], log_target: TSNode}[]
 local function capture_log_targets(lang, selection_range)
-  local log_containers = treesitter.query_log_target_container(lang, selection_range)
+  local log_containers = treesitter.query_log_target_containers(lang, selection_range)
 
-  local log_target_grouped_by_container = treesitter.find_log_targets(
+  local log_target_grouped_by_container = treesitter.query_log_targets(
     utils.array_map(log_containers, function(i)
       return i.container
     end),
