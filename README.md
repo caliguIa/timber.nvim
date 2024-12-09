@@ -236,7 +236,7 @@ require("timber.actions").clear_log_statements({ global = false })
 or comment all log statements in the current buffers (call this again will uncomment them):
 
 ```lua
-require("timber.actions").toggle_comment_log_statements({ global = true })
+require("timber.actions").toggle_comment_log_statements({ global = false })
 ```
 
 Use `global = true` to perform the action on all files. timber.nvim use grep to find all log statements in your project. For this to work, you need to:
