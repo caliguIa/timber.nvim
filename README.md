@@ -421,6 +421,26 @@ See how to setup syntax highlighting for the float buffer in [RECIPES](https://g
 
 ## Misc
 
+### Highlight groups
+
+<details>
+<summary>Click to see all highlight groups</summary>
+
+<!-- hl_start -->
+
+| Highlight Group | Default Group | Description |
+| ----------------------------- | ----------------------- | ------------------------------ |
+| **Timber.Insert** | _Search_ | Flash highlight when insert log statements |
+| **Timber.AddToBatch** | _Search_ | Flash highlight when add log targets to batch |
+| **Timber.LogStatement** | _none_ | Log statement line |
+| **Timber.LogPlaceholderSnippet** | _DiagnosticVirtualTextInfo_ | Captured log output snippet |
+| **Timber.LogPlaceholderTime** | _none_ | Captured log output time |
+| **Timber.FloatingWindowEntrySeparator** | _FloatBorder_ | Horizontal separator between entries in the floating window |
+
+<!-- hl_end -->
+
+</details>
+
 ### Tips
 
 It's common for languages to have syntax to access fields from an object/instance. For example, in Lua, we have `foo.bar`
