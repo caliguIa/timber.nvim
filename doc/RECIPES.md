@@ -20,22 +20,6 @@ end, {
 
 </details>
 
-### Plain log statements
-
-<details>
-<summary>Show config</summary>
-
-```lua
-vim.keymap.set("n", "glo", function()
-  require("timber.actions").insert_log({ template = "plain", position = "below" })
-end, { desc = "[G]o [L]og: Insert a plain log statement below the current line" })
-
-vim.keymap.set("n", "gl<S-o>", function()
-  require("timber.actions").insert_log({ template = "plain", position = "above" })
-end, { desc = "[G]o [L]og: Insert a plain log statement above the current line" })
-```
-</details>
-
 ### Surround log statements
 
 <details>

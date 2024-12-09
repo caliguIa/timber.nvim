@@ -37,6 +37,21 @@ local default_config = {
       cpp = [[std::cout << "%log_target: " << %log_target << std::endl;]],
       java = [[System.out.println("%log_target: " + %log_target);]],
     },
+    plain = {
+      javascript = [[console.log("%insert_cursor")]],
+      typescript = [[console.log("%insert_cursor")]],
+      jsx = [[console.log("%insert_cursor")]],
+      tsx = [[console.log("%insert_cursor")]],
+      lua = [[print("%insert_cursor")]],
+      ruby = [[puts("%insert_cursor")]],
+      elixir = [[IO.puts(%insert_cursor)]],
+      go = [[log.Printf("%insert_cursor")]],
+      rust = [[println!("%insert_cursor");]],
+      python = [[print("%insert_cursor")]],
+      c = [[printf("%insert_cursor \n");]],
+      cpp = [[std::cout << "%insert_cursor" << std::endl;]],
+      java = [[System.out.println("%insert_cursor");]],
+    },
   },
   batch_log_templates = {
     default = {
@@ -64,6 +79,8 @@ local default_config = {
   keymaps = {
     insert_log_below = "glj",
     insert_log_above = "glk",
+    insert_plain_log_below = "glo",
+    insert_plain_log_above = "gl<S-o>",
     insert_batch_log = "glb",
     add_log_targets_to_batch = "gla",
     insert_log_below_operator = "g<S-l>j",
@@ -144,6 +161,20 @@ local function setup_keymaps()
     })
   end, { mode = { "n", "v" }, desc = "Insert log statement above" })
 
+  setup_keymap("insert_plain_log_below", function()
+    require("timber.actions").insert_log({
+      template = "plain",
+      position = "below",
+    })
+  end, { mode = "n", desc = "Insert log plain statement below" })
+
+  setup_keymap("insert_plain_log_above", function()
+    require("timber.actions").insert_log({
+      template = "plain",
+      position = "above",
+    })
+  end, { mode = "n", desc = "Insert log plain statement above" })
+
   setup_keymap("insert_batch_log", function()
     require("timber.actions").insert_batch_log()
   end, { mode = "n" })
@@ -195,6 +226,8 @@ function M.reset_default_key_mappings()
 
   reset_keymap("glj", { "n", "v" })
   reset_keymap("glk", { "n", "v" })
+  reset_keymap("glo", { "n" })
+  reset_keymap("gl<S-o>", { "n" })
   reset_keymap("gla", { "n", "v" })
   reset_keymap("glb", { "n", "v" })
   reset_keymap("g<S-l>j", { "n" })

@@ -113,6 +113,21 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
       cpp = [[std::cout << "%log_target: " << %log_target << std::endl;]],
       java = [[System.out.println("%log_target: " + %log_target);]],
     },
+    plain = {
+      javascript = [[console.log("%insert_cursor")]],
+      typescript = [[console.log("%insert_cursor")]],
+      jsx = [[console.log("%insert_cursor")]],
+      tsx = [[console.log("%insert_cursor")]],
+      lua = [[print("%insert_cursor")]],
+      ruby = [[puts("%insert_cursor")]],
+      elixir = [[IO.puts(%insert_cursor)]],
+      go = [[log.Printf("%insert_cursor")]],
+      rust = [[println!("%insert_cursor");]],
+      python = [[print("%insert_cursor")]],
+      c = [[printf("%insert_cursor \n");]],
+      cpp = [[std::cout << "%insert_cursor" << std::endl;]],
+      java = [[System.out.println("%insert_cursor");]],
+    },
   },
   batch_log_templates = {
     default = {
@@ -146,6 +161,8 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
     -- insert_log_below = false,
     insert_log_below = "glj",
     insert_log_above = "glk",
+    insert_plain_log_below = "glo",
+    insert_plain_log_above = "gl<S-o>",
     insert_batch_log = "glb",
     add_log_targets_to_batch = "gla",
     insert_log_below_operator = "g<S-l>j",
@@ -173,10 +190,12 @@ The default configuration comes with a set of default keymaps:
 | -      | -      | -           |
 | insert_log_below | glj | Insert a log statement below the cursor |
 | insert_log_above | glk | Insert a log statement above the cursor |
+| insert_plain_log_below | glo | Insert a plain log statement below the cursor |
+| insert_plain_log_above | gl<S-o> | Insert a plain log statement above the cursor |
 | add_log_targets_to_batch | gla | Add a log target to the batch |
 | insert_batch_log | glb | Insert a batch log statement |
 
-To insert plain log statements, time tracking log statements, etc, see [RECIPES](https://github.com/Goose97/timber.nvim/blob/main/doc/RECIPES.md#advanced-logging-use-cases) guide for keymap inspiration.
+To include context in log statements, insert time tracking log statements, etc, see [RECIPES](https://github.com/Goose97/timber.nvim/blob/main/doc/RECIPES.md#advanced-logging-use-cases) guide for keymap inspiration.
 
 ## Usage
 
