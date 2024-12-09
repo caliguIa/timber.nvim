@@ -29,6 +29,11 @@ https://github.com/user-attachments/assets/6bbcb1ab-45a0-45f3-a03a-1d0780219362
   - Elixir
   - Golang
   - Rust
+  - Python
+  - C
+  - C++
+  - Java
+  - C#
 
 ## Requirements
 
