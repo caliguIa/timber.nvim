@@ -13,6 +13,10 @@ vim.opt.rtp:append(".")
 vim.opt.rtp:append(plenary_dir)
 vim.opt.rtp:append(nvim_treesitter_dir)
 
+-- Setup grepprg for global clear and comment tests
+vim.o.grepprg = "grep --line-number --with-filename -R --exclude-dir=.git"
+vim.o.grepformat = "%f:%l:%m"
+
 vim.cmd("runtime plugin/plenary.vim")
 require("plenary.busted")
 
