@@ -220,7 +220,7 @@ local opts = {
 require("timber").setup(opts)
 ```
 
-Out of the box, timber.nvim provides [default templates](https://github.com/Goose97/timber.nvim/blob/main/lua/timber/config.lua) for all supported languages.
+Out of the box, `timber.nvim` provides [default templates](https://github.com/Goose97/timber.nvim/blob/main/lua/timber/config.lua) for all supported languages.
 
 </details>
 
@@ -239,7 +239,7 @@ or comment all log statements in the current buffers (call this again will uncom
 require("timber.actions").toggle_comment_log_statements({ global = false })
 ```
 
-Use `global = true` to perform the action on all files. timber.nvim use grep to find all log statements in your project. For this to work, you need to:
+Use `global = true` to perform the action on all files. `timber.nvim` use grep to find all log statements in your project. For this to work, you need to:
 
 1. Set `log_marker` in the configuration. The default is 🪵. This `log_marker` will be grep to find the log statements. Make sure to include it in your log templates using the `%log_marker` placeholder:
 
@@ -340,7 +340,7 @@ See how to setup syntax highlighting for the float buffer in [RECIPES](https://g
     - Can capture log output and display it inline or in a floating window
 
 - Cons:
-    - Treesitter requires hand-written queries for each languages. timber.nvim does not support all languages out of the box.
+    - Treesitter requires hand-written queries for each languages. It does not support all languages out of the box.
     - Must install Treesitter parser for each language
 
 </details>
