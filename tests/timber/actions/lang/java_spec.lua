@@ -75,6 +75,32 @@ describe("java single log", function()
     })
   end)
 
+  it("supports this keyword", function()
+    helper.assert_scenario({
+      input = [[
+        public class Student {
+            public Student(String name, int age) {
+                thi|s.name = name;
+                this.age = age;
+            }
+        }
+      ]],
+      filetype = "java",
+      action = function()
+        actions.insert_log({ position = "below" })
+      end,
+      expected = [[
+        public class Student {
+            public Student(String name, int age) {
+                this.name = name;
+                System.out.println("this: " + this);
+                this.age = age;
+            }
+        }
+      ]],
+    })
+  end)
+
   it("supports method declaration", function()
     helper.assert_scenario({
       input = [[

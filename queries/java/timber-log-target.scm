@@ -5,7 +5,6 @@
   (#not-has-parent? @log_target array_access)
   (#not-has-parent? @log_target field_access)
   (#not-field-of-parent? @log_target method_invocation name)
-  (#not-eq? @log_target "_")
 )
 
 ; Support logging a link while method chaining

@@ -112,6 +112,7 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
       c = [[printf("%log_target: %s\n", %log_target);]],
       cpp = [[std::cout << "%log_target: " << %log_target << std::endl;]],
       java = [[System.out.println("%log_target: " + %log_target);]],
+      c_sharp = [[Console.WriteLine($"%log_target: {%log_target}");]],
     },
     plain = {
       javascript = [[console.log("%insert_cursor")]],
@@ -127,6 +128,7 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
       c = [[printf("%insert_cursor \n");]],
       cpp = [[std::cout << "%insert_cursor" << std::endl;]],
       java = [[System.out.println("%insert_cursor");]],
+      c_sharp = [[Console.WriteLine("%insert_cursor");]],
     },
   },
   batch_log_templates = {
@@ -144,6 +146,7 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
       c = [[printf("%repeat<%log_target: %s><, >\n", %repeat<%log_target><, >);]],
       cpp = [[std::cout %repeat<<< "%log_target: " << %log_target>< << "\n  " > << std::endl;]],
       java = [[System.out.printf("%repeat<%log_target=%s><, >%n", %repeat<%log_target><, >);]],
+      c_sharp = [[Console.WriteLine($"%repeat<%log_target: {%log_target}><, >");]],
     },
   },
   -- The string to search for when deleting or commenting log statements
