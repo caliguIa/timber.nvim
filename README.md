@@ -225,7 +225,7 @@ Out of the box, timber.nvim provides [default templates](https://github.com/Goos
 </details>
 
 <details>
-<summary><strong>Clear log statements</strong></summary>
+<summary><strong>Clear/comment log statements</strong></summary>
 
 Clear all log statements in the current buffer:
 
@@ -233,27 +233,33 @@ Clear all log statements in the current buffer:
 require("timber.actions").clear_log_statements({ global = false })
 ```
 
-or from all buffers:
-
-```lua
-require("timber.actions").clear_log_statements({ global = true })
-```
-
-</details>
-
-<details>
-<summary><strong>Comment/uncomment log statements</strong></summary>
-
-Comment/uncomment all log statements in the current buffer:
-
-```lua
-require("timber.actions").toggle_comment_log_statements({ global = false })
-```
-
-or from all buffers:
+or comment all log statements in the current buffers (call this again will uncomment them):
 
 ```lua
 require("timber.actions").toggle_comment_log_statements({ global = true })
+```
+
+Use `global = true` to perform the action on all files. timber.nvim use grep to find all log statements in your project. For this to work, you need to:
+
+1. Set `log_marker` in the configuration. The default is 🪵. This `log_marker` will be grep to find the log statements. Make sure to include it in your log templates using the `%log_marker` placeholder:
+
+```lua
+
+opts = {
+    log_templates = {
+        default = {
+            lua = [[print("%log_marker " .. %log_target)]],
+        },
+    },
+}
+```
+
+2. Make sure your `grepprg` is suitable. The search comand will be invoked as: `<grepprg> <log_marker>`. These are some recommendations, ranking from most to least recommended:
+
+```lua
+vim.o.grepprg = "rg --vimgrep --no-heading --smart-case" -- Use ripgrep
+vim.o.grepprg = "git grep --line-number --column" -- Use git
+vim.o.grepprg = "grep --line-number --with-filename -R --exclude-dir=.git" -- Use grep
 ```
 
 </details>
