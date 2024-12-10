@@ -384,7 +384,7 @@ See how to setup syntax highlighting for the float buffer in [RECIPES](https://g
 
 - More mature plugin: support more languages and has fallback heuristic for non-supported languages.
 - Has more features: prompt users to choose expressions to print, print in insert mode
-- Does not use Treesitter to power log
+- Logging mechanism does not use Treesitter as much as timber.nvim
 
 </details>
 
@@ -394,8 +394,7 @@ See how to setup syntax highlighting for the float buffer in [RECIPES](https://g
 [Repo](https://github.com/chrisgrieser/nvim-chainsaw)
 
 - Comes with many built-in commands: objectLog, typeLog, assertLog, etc
-- Can not customize log statements content
-- Does not use Treesitter to power log
+- Logging mechanism does not use Treesitter as much as timber.nvim
 
 </details>
 
