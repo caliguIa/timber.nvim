@@ -7,7 +7,7 @@
 local M = {}
 
 ---@param log_target TSNode
-function M.highlight_add_to_batch(log_target)
+function M._highlight_add_to_batch(log_target)
   if not M.config.on_add_to_batch then
     return
   end
@@ -33,7 +33,7 @@ end
 
 ---@param start_line_number number 0-indexed
 ---@param end_line_number? number 0-indexed
-function M.highlight_insert(start_line_number, end_line_number)
+function M._highlight_insert(start_line_number, end_line_number)
   if not M.config.on_insert then
     return
   end
@@ -56,7 +56,7 @@ function M.highlight_insert(start_line_number, end_line_number)
   )
 end
 
-function M.highlight_log_statement(line_number)
+function M._highlight_log_statement(line_number)
   vim.highlight.range(
     0,
     M.hl_log_statement,
@@ -79,6 +79,18 @@ function M.setup()
 
   vim.api.nvim_set_hl(0, "Timber.Insert", { link = "Search", default = true })
   vim.api.nvim_set_hl(0, "Timber.AddToBatch", { link = "Search", default = true })
+
+  local events = require("timber.events")
+  events.on("actions:new_log_statement", function(log_statement)
+    local inserted_rows = log_statement.inserted_rows
+    for _, line in ipairs(inserted_rows) do
+      M._highlight_log_statement(line)
+    end
+
+    M._highlight_insert(inserted_rows[1], inserted_rows[#inserted_rows])
+  end)
+
+  events.on("actions:add_to_batch", M._highlight_add_to_batch)
 end
 
 return M

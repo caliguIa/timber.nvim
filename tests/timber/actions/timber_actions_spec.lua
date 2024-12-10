@@ -1,10 +1,11 @@
 local assert = require("luassert")
+local match = require("luassert.match")
 local spy = require("luassert.spy")
 local timber = require("timber")
 local config = require("timber.config")
 local actions = require("timber.actions")
 local utils = require("timber.utils")
-local highlight = require("timber.highlight")
+local events = require("timber.events")
 local helper = require("tests.timber.helper")
 
 local function write_buf_file(bufnr, filename)
@@ -351,10 +352,10 @@ describe("timber.actions.insert_log", function()
     })
   end)
 
-  it("calls highlight.highlight_insert for inserted line", function()
+  it("emits actions:new_log_statement event", function()
     timber.setup()
 
-    local highlight_spy = spy.on(highlight, "highlight_insert")
+    local events_spy = spy.on(events, "emit")
 
     helper.assert_scenario({
       input = [[
@@ -366,12 +367,12 @@ describe("timber.actions.insert_log", function()
         actions.insert_log({ position = "below" })
       end,
       expected = function()
-        assert.spy(highlight_spy).was_called(1)
-        assert.spy(highlight_spy).was_called_with(2, 2)
+        assert.spy(events_spy).was_called(1)
+        assert.spy(events_spy).was_called_with("actions:new_log_statement", match.is_table())
       end,
     })
 
-    highlight_spy:clear()
+    events_spy:clear()
 
     helper.assert_scenario({
       input = [[
@@ -384,14 +385,12 @@ describe("timber.actions.insert_log", function()
         actions.insert_log({ position = "below" })
       end,
       expected = function()
-        assert.spy(highlight_spy).was_called(3)
-        assert.spy(highlight_spy).was_called_with(2, 2)
-        assert.spy(highlight_spy).was_called_with(3, 3)
-        assert.spy(highlight_spy).was_called_with(4, 4)
+        assert.spy(events_spy).was_called(3)
+        assert.spy(events_spy).was_called_with("actions:new_log_statement", match.is_table())
       end,
     })
 
-    highlight_spy:clear()
+    events_spy:clear()
   end)
 
   it("supports dot repeat", function()
@@ -1168,8 +1167,8 @@ describe("timber.actions.add_log_targets_to_batch", function()
     actions.clear_batch()
   end)
 
-  it("calls highlight.highlight_add_to_batch for each target", function()
-    local highlight_spy = spy.on(highlight, "highlight_add_to_batch")
+  it("emits actions:add_to_batch for each target", function()
+    local events_spy = spy.on(events, "emit")
 
     helper.assert_scenario({
       input = [[
@@ -1183,11 +1182,12 @@ describe("timber.actions.add_log_targets_to_batch", function()
         actions.add_log_targets_to_batch()
       end,
       expected = function()
-        assert.spy(highlight_spy).was_called(2)
+        assert.spy(events_spy).was_called(2)
+        assert.spy(events_spy).was_called_with("actions:add_to_batch", match.is_userdata())
       end,
     })
 
-    highlight_spy:clear()
+    events_spy:clear()
   end)
 
   it("preserves the cursor position after adding in visual mode", function()
@@ -1362,7 +1362,6 @@ describe("timber.actions.clear_log_statements", function()
     end)
 
     it("clears all statements in ALL buffers", function()
-      local log_marker = config.config.log_marker
       local bufnr1 = helper.assert_scenario({
         input = [[
           local fo|o = "foo"

@@ -28,7 +28,7 @@ describe("timber.highlight.highlight_add_to_batch", function()
             error("Node not found")
           end
 
-          highlight.highlight_add_to_batch(node)
+          highlight._highlight_add_to_batch(node)
         end,
         expected = function()
           local bufnr = vim.api.nvim_get_current_buf()
@@ -74,7 +74,7 @@ describe("timber.highlight.highlight_add_to_batch", function()
             error("Node not found")
           end
 
-          highlight.highlight_add_to_batch(node)
+          highlight._highlight_add_to_batch(node)
         end,
         expected = function()
           local bufnr = vim.api.nvim_get_current_buf()
@@ -116,7 +116,7 @@ describe("timber.highlight.highlight_add_to_batch", function()
             error("Node not found")
           end
 
-          highlight.highlight_add_to_batch(node)
+          highlight._highlight_add_to_batch(node)
         end,
         expected = function()
           local bufnr = vim.api.nvim_get_current_buf()
@@ -149,7 +149,7 @@ describe("timber.highlight.highlight_insert", function()
         ]],
         filetype = "javascript",
         action = function()
-          highlight.highlight_insert(3, 3)
+          highlight._highlight_insert(3, 3)
         end,
         expected = function()
           local bufnr = vim.api.nvim_get_current_buf()
@@ -181,7 +181,7 @@ describe("timber.highlight.highlight_insert", function()
         ]],
         filetype = "javascript",
         action = function()
-          highlight.highlight_insert(3, 3)
+          highlight._highlight_insert(3, 3)
         end,
         expected = function()
           -- Wait till duration passed
@@ -210,7 +210,7 @@ describe("timber.highlight.highlight_insert", function()
         ]],
         filetype = "javascript",
         action = function()
-          highlight.highlight_insert(3)
+          highlight._highlight_insert(3)
         end,
         expected = function()
           local bufnr = vim.api.nvim_get_current_buf()

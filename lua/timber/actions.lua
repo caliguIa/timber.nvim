@@ -3,9 +3,9 @@
 local M = { batch = {} }
 
 local config = require("timber.config")
+local events = require("timber.events")
 local highlight = require("timber.highlight")
 local watcher = require("timber.watcher")
-local buffers = require("timber.buffers")
 local treesitter = require("timber.actions.treesitter")
 local utils = require("timber.utils")
 
@@ -176,7 +176,7 @@ local function insert_log_statements(statements)
 
     vim.api.nvim_buf_set_lines(bufnr, insert_line, insert_line, false, lines)
 
-    highlight.highlight_insert(insert_line, insert_line + #lines - 1)
+    -- highlight.highlight_insert(insert_line, insert_line + #lines - 1)
     offset = offset + #lines
 
     for i = 0, #lines - 1, 1 do
@@ -221,10 +221,6 @@ local function after_insert_log_statements(log_statements, insert_cursor_pos, or
       vim.list_extend(inserted_lines, statement.inserted_rows)
     end
 
-    for _, line in ipairs(inserted_lines) do
-      highlight.highlight_log_statement(line)
-    end
-
     table.sort(inserted_lines, function(a, b)
       return a < b
     end)
@@ -246,13 +242,7 @@ local function after_insert_log_statements(log_statements, insert_cursor_pos, or
 
   -- Add the log placeholder to the buffer manager
   for _, log_statement in ipairs(log_statements) do
-    buffers.new_log_placeholder({
-      id = log_statement.placeholder_id,
-      bufnr = vim.api.nvim_get_current_buf(),
-      -- TODO: support multi line log statements
-      line = log_statement.inserted_rows[1],
-      entries = {},
-    })
+    events.emit("actions:new_log_statement", log_statement)
   end
 end
 
@@ -700,7 +690,7 @@ function M.__add_log_targets_to_batch(motion_type)
   vim.list_extend(M.batch, to_add)
 
   for _, target in ipairs(to_add) do
-    highlight.highlight_add_to_batch(target)
+    events.emit("actions:add_to_batch", target)
   end
 
   -- Prepare for dot repeat. Reset the arguments

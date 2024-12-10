@@ -273,7 +273,7 @@ describe("timber.buffers.new_log_placeholder", function()
 
   it("adds the placeholder to the registry", function()
     local id = watcher.generate_unique_id()
-    buffers.new_log_placeholder({ id = id, bufnr = 1, line = 1, entries = {} })
+    buffers._new_log_placeholder({ id = id, bufnr = 1, line = 1, entries = {} })
 
     assert.is.Not.Nil(buffers.log_placeholders:get(id))
   end)
@@ -286,7 +286,7 @@ describe("timber.buffers.new_log_placeholder", function()
       filetype = "typescript",
       action = function()
         local bufnr = vim.api.nvim_get_current_buf()
-        buffers.new_log_placeholder({ id = "foo", bufnr = bufnr, line = 0, entries = {} })
+        buffers._new_log_placeholder({ id = "foo", bufnr = bufnr, line = 0, entries = {} })
         vim.fn.setreg("a", string.format([[console.log("%s%s|")]], watcher.MARKER, id), "V")
         vim.cmd([[normal! "ap]])
         helper.wait(20)
@@ -302,7 +302,7 @@ describe("timber.buffers.new_log_placeholder", function()
   end)
 end)
 
-describe("timber.buffers.receive_log_entry", function()
+describe("timber.buffers._receive_log_entry", function()
   before_each(function()
     watcher.setup({
       timber_test = {
@@ -340,7 +340,7 @@ describe("timber.buffers.receive_log_entry", function()
         filetype = "typescript",
         action = function()
           helper.wait(20)
-          buffers.receive_log_entry({
+          buffers._receive_log_entry({
             log_placeholder_id = id,
             payload = "foo",
             source_id = "timber_test",
@@ -378,14 +378,14 @@ describe("timber.buffers.receive_log_entry", function()
         filetype = "typescript",
         action = function()
           helper.wait(20)
-          buffers.receive_log_entry({
+          buffers._receive_log_entry({
             log_placeholder_id = id,
             payload = "foo",
             source_id = "timber_test",
             timestamp = os.time(),
           })
           helper.wait(20)
-          buffers.receive_log_entry({
+          buffers._receive_log_entry({
             log_placeholder_id = id,
             payload = "bar",
             source_id = "timber_test",
@@ -429,7 +429,7 @@ describe("timber.buffers.receive_log_entry", function()
           filetype = "typescript",
           action = function()
             helper.wait(20)
-            buffers.receive_log_entry({
+            buffers._receive_log_entry({
               log_placeholder_id = id,
               payload = "foo_123456789_123456890",
               source_id = "timber_test",
@@ -453,7 +453,7 @@ describe("timber.buffers.receive_log_entry", function()
     it("saves the log entry and renders it once the placeholder is created", function()
       timber.setup()
       local id = watcher.generate_unique_id()
-      buffers.receive_log_entry({
+      buffers._receive_log_entry({
         log_placeholder_id = id,
         payload = "foo",
         source_id = "timber_test",
@@ -524,13 +524,13 @@ describe("timber.buffers.open_float", function()
           filetype = "typescript",
           action = function()
             helper.wait(20)
-            buffers.receive_log_entry({
+            buffers._receive_log_entry({
               log_placeholder_id = id,
               payload = "foo_1",
               source_id = "timber_test",
               timestamp = os.time(),
             })
-            buffers.receive_log_entry({
+            buffers._receive_log_entry({
               log_placeholder_id = id,
               payload = "foo_2",
               source_id = "timber_test",
@@ -571,7 +571,7 @@ describe("timber.buffers.open_float", function()
           filetype = "typescript",
           action = function()
             helper.wait(20)
-            buffers.receive_log_entry({
+            buffers._receive_log_entry({
               log_placeholder_id = id,
               payload = "foo_123456789_123456890",
               source_id = "timber_test",
@@ -608,7 +608,7 @@ describe("timber.buffers.open_float", function()
           filetype = "typescript",
           action = function()
             helper.wait(20)
-            buffers.receive_log_entry({
+            buffers._receive_log_entry({
               log_placeholder_id = id,
               payload = "foo_123456789_123456890",
               source_id = "timber_test",
@@ -738,7 +738,7 @@ describe("timber.buffers.clear_captured_logs", function()
       filetype = "typescript",
       action = function()
         helper.wait(20)
-        buffers.receive_log_entry({
+        buffers._receive_log_entry({
           log_placeholder_id = id,
           payload = "foo",
           source_id = "timber_test",

@@ -7,6 +7,7 @@
 ---@alias Timber.Watcher.LogPlaceholderId string
 
 local sources = require("timber.watcher.sources")
+local events = require("timber.events")
 
 local M = { MARKER = "🪵", ID_LENGTH = 3, sources = {} }
 
@@ -39,7 +40,7 @@ function M.setup(source_specs)
   sources.setup({
     sources = source_specs,
     on_log_capture = function(log_entry)
-      require("timber.buffers").receive_log_entry(log_entry)
+      events.emit("watcher:new_log_entry", log_entry)
     end,
   })
 end
