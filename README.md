@@ -259,21 +259,7 @@ Out of the box, `timber.nvim` provides [default templates](https://github.com/Go
 <details>
 <summary><strong>Clear/comment log statements</strong></summary>
 
-Clear all log statements in the current buffer:
-
-```lua
-require("timber.actions").clear_log_statements({ global = false })
-```
-
-or comment all log statements in the current buffers (call this again will uncomment them):
-
-```lua
-require("timber.actions").toggle_comment_log_statements({ global = false })
-```
-
-Use `global = true` to perform the action on all files. `timber.nvim` use grep to find all log statements in your project. For this to work, you need to:
-
-1. Set `log_marker` in the configuration. The default is 🪵. This `log_marker` will be grep to find the log statements. Make sure to include it in your log templates using the `%log_marker` placeholder:
+To use this feature, you need to configure `log_marker`. The default is 🪵. This `log_marker` will be search/grep to find the log statement lines. Make sure to include it in your log templates. A convenient way to do it is using the `%log_marker` placeholder:
 
 ```lua
 
@@ -286,7 +272,19 @@ opts = {
 }
 ```
 
-2. Make sure your `grepprg` is suitable. The search comand will be invoked as: `<grepprg> <log_marker>`. These are some recommendations, ranking from most to least recommended:
+Clear all log statements in the current buffer:
+
+```lua
+require("timber.actions").clear_log_statements({ global = false })
+```
+
+or comment all log statements in the current buffers (call this again will uncomment them):
+
+```lua
+require("timber.actions").toggle_comment_log_statements({ global = false })
+```
+
+Use `global = true` to perform the action on all files. `timber.nvim` use grep to find all log statements in your project. For this to work, you need to make sure your `grepprg` is suitable. The search comand will be invoked as: `<grepprg> <log_marker>`. These are some recommendations, ranking from most to least recommended:
 
 ```lua
 vim.o.grepprg = "rg --vimgrep --no-heading --smart-case" -- Use ripgrep
