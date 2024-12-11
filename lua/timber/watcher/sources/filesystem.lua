@@ -27,16 +27,16 @@ end
 
 function SourceFilesystem:ingest(line)
   if self.state.state == "initial" then
-    local start_marker_pattern = string.format("^%s(%s)|", watcher.MARKER, string.rep("[A-Z0-9]", watcher.ID_LENGTH))
-    local match = string.match(line, start_marker_pattern)
+    local start_marker_pattern = string.format("%s(%s)|", watcher.MARKER, string.rep("[A-Z0-9]", watcher.ID_LENGTH))
+    local _, end_idx, match = string.find(line, start_marker_pattern)
 
-    if match then
+    if match and end_idx then
       self.state.state = "pending"
       self.state.pending_log_item = match
 
       -- Replay the line because it might also contain the end marker
       -- The watcher marker emoji has length of 4 bytes
-      local remaining = string.sub(line, watcher.ID_LENGTH + 4 + 2, -1)
+      local remaining = string.sub(line, end_idx + 1, -1)
       self:ingest(remaining)
     end
   elseif self.state.state == "pending" then

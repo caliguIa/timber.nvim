@@ -62,7 +62,7 @@ describe("timber.watcher.sources.setup", function()
 
       helper.wait(20)
       local start, end_, marker_id = watcher.generate_marker_pairs()
-      write_to_file(file_path, string.format("%sHello World%s\n", start, end_))
+      write_to_file(file_path, string.format("Prefix%sHello World%s\n", start, end_))
       helper.wait(20)
 
       assert.is.Not.Nil(received_log_entry)
@@ -98,7 +98,10 @@ describe("timber.watcher.sources.setup", function()
 
       helper.wait(20)
       local start, end_, marker_id = watcher.generate_marker_pairs()
-      write_to_file(file_path, string.format("%sHello World\nThis is the second line\nGoodbye World%s\n", start, end_))
+      write_to_file(
+        file_path,
+        string.format("Prefix%sHello World\nThis is the second line\nGoodbye World%s\n", start, end_)
+      )
       helper.wait(20)
 
       assert.is.Not.Nil(received_log_entry)
