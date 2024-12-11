@@ -37,7 +37,7 @@ local default_config = {
       cpp = [[std::cout << "%log_target: " << %log_target << std::endl;]],
       java = [[System.out.println("%log_target: " + %log_target);]],
       c_sharp = [[Console.WriteLine($"%log_target: {%log_target}");]],
-      odin = [[fmt.printf("%log_target: %v\n", %log_target)]],
+      odin = [[fmt.printfln("%log_target: %v", %log_target)]],
     },
     plain = {
       javascript = [[console.log("%insert_cursor")]],
@@ -73,7 +73,7 @@ local default_config = {
       cpp = [[std::cout %repeat<<< "%log_target: " << %log_target>< << "\n  " > << std::endl;]],
       java = [[System.out.printf("%repeat<%log_target=%s><, >%n", %repeat<%log_target><, >);]],
       c_sharp = [[Console.WriteLine($"%repeat<%log_target: {%log_target}><, >");]],
-      odin = [[fmt.printf("%repeat<%log_target: %v><, >\n", %repeat<%log_target><, >)]],
+      odin = [[fmt.printfln("%repeat<%log_target: %v><, >", %repeat<%log_target><, >)]],
     },
   },
   log_marker = "🪵",

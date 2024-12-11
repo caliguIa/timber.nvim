@@ -7,7 +7,7 @@ describe("odin single log", function()
     timber.setup({
       log_templates = {
         default = {
-          odin = [[fmt.printf("%log_target: %v\n", %log_target)]],
+          odin = [[fmt.printfln("%log_target: %v", %log_target)]],
         },
       },
     })
@@ -24,9 +24,9 @@ describe("odin single log", function()
         actions.insert_log({ position = "below" })
       end,
       expected = [[
-        fmt.printf("foo: %v\n", foo)
+        fmt.printfln("foo: %v", foo)
         foo: int = "bar"
-        fmt.printf("foo: %v\n", foo)
+        fmt.printfln("foo: %v", foo)
       ]],
     })
 
@@ -43,9 +43,9 @@ describe("odin single log", function()
       end,
       expected = [[
         main :: proc() {
-          fmt.printf("foo: %v\n", foo)
+          fmt.printfln("foo: %v", foo)
           foo: int = "bar"
-          fmt.printf("foo: %v\n", foo)
+          fmt.printfln("foo: %v", foo)
         }
       ]],
     })
@@ -62,9 +62,9 @@ describe("odin single log", function()
         actions.insert_log({ position = "below" })
       end,
       expected = [[
-        fmt.printf("PI: %v\n", PI)
+        fmt.printfln("PI: %v", PI)
         PI :: math.PI
-        fmt.printf("PI: %v\n", PI)
+        fmt.printfln("PI: %v", PI)
       ]],
     })
   end)
@@ -80,9 +80,9 @@ describe("odin single log", function()
         actions.insert_log({ position = "below" })
       end,
       expected = [[
-        fmt.printf("foo: %v\n", foo)
+        fmt.printfln("foo: %v", foo)
         foo := "bar"
-        fmt.printf("foo: %v\n", foo)
+        fmt.printfln("foo: %v", foo)
       ]],
     })
 
@@ -99,9 +99,9 @@ describe("odin single log", function()
       end,
       expected = [[
         main :: proc() {
-          fmt.printf("foo: %v\n", foo)
+          fmt.printfln("foo: %v", foo)
           foo := "bar"
-          fmt.printf("foo: %v\n", foo)
+          fmt.printfln("foo: %v", foo)
         }
       ]],
     })
@@ -122,8 +122,8 @@ describe("odin single log", function()
         end,
         expected = [[
           foo :: proc(bar: string, baz: string) -> int {
-            fmt.printf("bar: %v\n", bar)
-            fmt.printf("baz: %v\n", baz)
+            fmt.printfln("bar: %v", bar)
+            fmt.printfln("baz: %v", baz)
             return
           }
         ]],
@@ -144,11 +144,11 @@ describe("odin single log", function()
         end,
         expected = [[
           multiply := proc(a, b: int) -> int {
-            fmt.printf("a: %v\n", a)
-            fmt.printf("b: %v\n", b)
+            fmt.printfln("a: %v", a)
+            fmt.printfln("b: %v", b)
             return a * b
           }
-          fmt.printf("multiply: %v\n", multiply)
+          fmt.printfln("multiply: %v", multiply)
         ]],
       })
     end)
@@ -166,8 +166,8 @@ describe("odin single log", function()
       end,
       expected = [[
         foo(bar, baz)
-        fmt.printf("bar: %v\n", bar)
-        fmt.printf("baz: %v\n", baz)
+        fmt.printfln("bar: %v", bar)
+        fmt.printfln("baz: %v", baz)
       ]],
     })
 
@@ -181,7 +181,7 @@ describe("odin single log", function()
       end,
       expected = [[
         foo.bar(baz)
-        fmt.printf("foo: %v\n", foo)
+        fmt.printfln("foo: %v", foo)
       ]],
     })
   end)
@@ -207,10 +207,10 @@ describe("odin single log", function()
       expected = [[
         main :: proc() {
           if foo > 1 {
-            fmt.printf("foo: %v\n", foo)
+            fmt.printfln("foo: %v", foo)
             return true
           } else if bar < 0 {
-            fmt.printf("bar: %v\n", bar)
+            fmt.printfln("bar: %v", bar)
             return false
           } else {
             return nil
@@ -237,10 +237,10 @@ describe("odin single log", function()
       expected = [[
         main :: proc() {
           for i := 0; i < len; i += 1 {
-            fmt.printf("i: %v\n", i)
-            fmt.printf("i: %v\n", i)
-            fmt.printf("len: %v\n", len)
-            fmt.printf("i: %v\n", i)
+            fmt.printfln("i: %v", i)
+            fmt.printfln("i: %v", i)
+            fmt.printfln("len: %v", len)
+            fmt.printfln("i: %v", i)
             continue
           }
         }
@@ -263,9 +263,9 @@ describe("odin single log", function()
       expected = [[
         main :: proc() {
           for item, idx in items {
-              fmt.printf("item: %v\n", item)
-              fmt.printf("idx: %v\n", idx)
-              fmt.printf("items: %v\n", items)
+              fmt.printfln("item: %v", item)
+              fmt.printfln("idx: %v", idx)
+              fmt.printfln("items: %v", items)
               continue
           }
         }
@@ -297,16 +297,16 @@ describe("odin single log", function()
         main :: proc() {
           switch val {
           case foo:
-            fmt.printf("foo: %v\n", foo)
+            fmt.printfln("foo: %v", foo)
             return
           case bar: {
-            fmt.printf("bar: %v\n", bar)
+            fmt.printfln("bar: %v", bar)
             break
           }
           case:
             return
           }
-          fmt.printf("val: %v\n", val)
+          fmt.printfln("val: %v", val)
         }
       ]],
     })
@@ -324,7 +324,7 @@ describe("odin single log", function()
         end,
         expected = [[
           foo := bar.bar
-          fmt.printf("bar: %v\n", bar)
+          fmt.printfln("bar: %v", bar)
         ]],
       })
 
@@ -338,7 +338,7 @@ describe("odin single log", function()
         end,
         expected = [[
           foo := bar.baz.baf
-          fmt.printf("bar.baz: %v\n", bar.baz)
+          fmt.printfln("bar.baz: %v", bar.baz)
         ]],
       })
 
@@ -353,7 +353,7 @@ describe("odin single log", function()
         end,
         expected = [[
           foo := bar.bar
-          fmt.printf("bar: %v\n", bar)
+          fmt.printfln("bar: %v", bar)
         ]],
       })
 
@@ -368,8 +368,8 @@ describe("odin single log", function()
         end,
         expected = [[
           foo := bar.bar
-          fmt.printf("foo: %v\n", foo)
-          fmt.printf("bar.bar: %v\n", bar.bar)
+          fmt.printfln("foo: %v", foo)
+          fmt.printfln("bar.bar: %v", bar.bar)
         ]],
       })
     end)
@@ -442,7 +442,7 @@ describe("supports batch log", function()
     timber.setup({
       batch_log_templates = {
         default = {
-          odin = [[fmt.printf("%repeat<%log_target: %v><, >\n", %repeat<%log_target><, >)]],
+          odin = [[fmt.printfln("%repeat<%log_target: %v><, >", %repeat<%log_target><, >)]],
         },
       },
     })
@@ -459,7 +459,7 @@ describe("supports batch log", function()
       end,
       expected = [[
         foo := bar + baz
-        fmt.printf("foo: %v, bar: %v, baz: %v\n", foo, bar, baz)
+        fmt.printfln("foo: %v, bar: %v, baz: %v", foo, bar, baz)
       ]],
     })
   end)
