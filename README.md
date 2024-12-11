@@ -199,7 +199,7 @@ The default configuration comes with a set of default keymaps:
 | insert_log_below | glj | Insert a log statement below the cursor |
 | insert_log_above | glk | Insert a log statement above the cursor |
 | insert_plain_log_below | glo | Insert a plain log statement below the cursor |
-| insert_plain_log_above | gl<S-o> | Insert a plain log statement above the cursor |
+| insert_plain_log_above | gl\<S-o\> | Insert a plain log statement above the cursor |
 | add_log_targets_to_batch | gla | Add a log target to the batch |
 | insert_batch_log | glb | Insert a batch log statement |
 
@@ -227,7 +227,7 @@ These examples use the default configuration. The `|` denotes the cursor positio
                                                 foo(str)
     --------------------------------------------------------------------------------------------
     foo(st|r, num)              vi(glb          foo(str, num)
-                                                print(string.format("foo=%s, num=%s", foo, num))
+                                                print(string.format("str=%s, num=%s", str, num))
 ```
 
 </details>
