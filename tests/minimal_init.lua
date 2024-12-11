@@ -35,6 +35,7 @@ require("nvim-treesitter.configs").setup({
     "cpp",
     "java",
     "c_sharp",
+    "odin",
   },
   sync_install = true,
   auto_install = false,
