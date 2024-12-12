@@ -195,6 +195,7 @@ function M.open(placeholder, opts)
   local width, height = win_sizes(lines)
   local window_opts = win_options(width, height)
   window_opts = vim.tbl_extend("force", window_opts, {
+    width = math.max(window_opts.width, #title + 2),
     title = title,
     title_pos = "center",
     footer = footer,
