@@ -5,40 +5,46 @@ local utils = require("timber.utils")
 local M = {}
 
 local ACTIONS = {
-  show_entry = {
+  {
+    action = "show_entry",
     desc = "Show the buffer contains the log entry",
     callback = function()
       summary._open_entry({ jump = false })
     end,
   },
-  jump_to_entry = {
+  {
+    action = "jump_to_entry",
     desc = "Show the buffer contains the log entry and move the cursor to it",
     callback = function()
       summary._open_entry({ jump = true })
     end,
   },
-  next_entry = {
+  {
+    action = "next_entry",
     desc = "Jump to the next log entry in the summary window",
     callback = function()
       summary._scroll_to_next_entry()
     end,
   },
-  prev_entry = {
+  {
+    action = "prev_entry",
     desc = "Jump to the prev log entry in the summary window",
     callback = function()
       summary._scroll_to_prev_entry()
     end,
   },
-  show_help = {
-    desc = "Show the keymaps for the summary window",
-    callback = function()
-      M._show_keymaps_help()
-    end,
-  },
-  close = {
+  {
+    action = "close",
     desc = "Close the summary window",
     callback = function()
       summary.close()
+    end,
+  },
+  {
+    action = "show_help",
+    desc = "Show the keymaps for the summary window",
+    callback = function()
+      M._show_keymaps_help()
     end,
   },
 }
@@ -48,8 +54,8 @@ function M._show_keymaps_help()
   local col_desc = {}
 
   local max_lhs = 1
-  for action_key, action_spec in pairs(ACTIONS) do
-    local key = config.config.log_summary.keymaps[action_key]
+  for _, action_spec in ipairs(ACTIONS) do
+    local key = config.config.log_summary.keymaps[action_spec.action]
 
     if key ~= false then
       ---@cast key string
@@ -125,8 +131,8 @@ end
 function M._setup_buffer_keymaps(buf)
   local keymaps = config.config.log_summary.keymaps
 
-  for action_key, action_spec in pairs(ACTIONS) do
-    local key = keymaps[action_key]
+  for _, action_spec in ipairs(ACTIONS) do
+    local key = keymaps[action_spec.action]
 
     if key ~= false then
       ---@cast key string
