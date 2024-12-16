@@ -84,6 +84,29 @@ describe("lua single log", function()
     })
   end)
 
+  it("supports return statement", function()
+    helper.assert_scenario({
+      input = [[
+        function foo()
+          return bar + b|az
+        end
+      ]],
+      filetype = "lua",
+      action = function()
+        actions.insert_log({ position = "below" })
+        vim.cmd("normal! V")
+        actions.insert_log({ position = "above" })
+      end,
+      expected = [[
+        function foo()
+          print("bar", bar)
+          print("baz", baz)
+          return bar + baz
+        end
+      ]],
+    })
+  end)
+
   describe("supports function parameters", function()
     it("supports function declaration", function()
       helper.assert_scenario({

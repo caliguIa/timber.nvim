@@ -77,3 +77,8 @@
   (#make-logable-range! @b "after")
 )
 
+(
+  (return_statement) @log_container
+  (#make-logable-range! @log_container "before")
+)
+
