@@ -1,5 +1,4 @@
 # timber.nvim
-
 Insert log statements blazingly fast and capture log results inline 🪵
 
 https://github.com/user-attachments/assets/6bbcb1ab-45a0-45f3-a03a-1d0780219362
@@ -161,11 +160,14 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
   -- The string to search for when deleting or commenting log statements
   -- Can be used in log templates as %log_marker placeholder
   log_marker = "🪵",
-  -- Controls the flash highlight after a log statement is inserted
-  -- or a log target is added to a batch
+  -- Controls the flash highlight
   highlight = {
+    -- After a log statement is inserted
     on_insert = true,
+    -- After a log target is added to a batch
     on_add_to_batch = true,
+    -- After a log entry is shown/jumped to in the summary panel
+    on_summary_show_entry = true,
     duration = 500,
   },
   keymaps = {
@@ -187,7 +189,20 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
   log_watcher = {
     enabled = false,
     sources = {},
+    -- The length of the preview snippet display as extmarks
     preview_snippet_length = 32,
+  },
+  log_summary = {
+    -- Keymaps for the summary window
+    keymaps = {
+      -- Set to false to disable the default keymap for specific actions
+      -- show_entry = false,
+      show_entry = "o",
+      jump_to_entry = "<CR>",
+      next_entry = "]]",
+      prev_entry = "[[",
+      close = "q",
+    },
   },
 }
 ```
@@ -273,6 +288,7 @@ opts = {
             lua = [[print("%log_marker " .. %log_target)]],
         },
     },
+    log_marker = "🪵", -- Or any other string, e.g: MY_LOG
 }
 ```
 
@@ -348,6 +364,30 @@ After the log results are captured, a snippet of the log result will be displaye
 ![image](https://github.com/user-attachments/assets/e2ea2765-f43d-4ca2-91b5-a02d07f9a4ce)
 
 See how to setup syntax highlighting for the float buffer in [RECIPES](https://github.com/Goose97/timber.nvim/blob/main/doc/RECIPES.md#pretty-captured-log-buffer).
+
+</details>
+
+<details>
+<summary><strong>Show log output summary</strong></summary>
+
+You can view the captured log output in a split window:
+
+```lua
+require("timber.summary").open({ focus = true })
+```
+
+The summary window will show all captured log entries in chronological order. You can view or jump to the log statement line using `o` or `<CR>` with the default mappings.
+
+The summary window has the following keymaps:
+
+| Action | Keymap | Description |
+| -      | -      | -           |
+| show_entry | o | Show the buffer contains the log entry |
+| jump_to_entry | \<CR\> | Same as show_entry, but also move cursor to the location |
+| next_entry | ]] | Jump to next log entry in the summary window |
+| prev_entry | [[ | Jump to prev log entry in the summary window |
+| close | q | Close the summary window |
+| show_help | ? | Show the keymaps for the summary window |
 
 </details>
 

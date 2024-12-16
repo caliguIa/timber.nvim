@@ -3,6 +3,7 @@ local actions = require("timber.actions")
 local highlight = require("timber.highlight")
 local buffers = require("timber.buffers")
 local watcher = require("timber.watcher")
+local summary = require("timber.summary")
 
 local M = {}
 
@@ -17,6 +18,7 @@ M.setup = function(config)
   actions.setup()
   highlight.setup()
   buffers.setup()
+  summary.setup()
 
   if config_mod.config.log_watcher.enabled then
     watcher.setup(config_mod.config.log_watcher.sources)

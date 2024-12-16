@@ -677,9 +677,9 @@ describe("timber.buffers.open_float", function()
       helper.assert_scenario({
         input = string.format(
           [[
-              const foo = "bar"
-              const bar = "foo"
-            ]],
+            const foo = "bar"
+            const bar = "foo"
+          ]],
           watcher.MARKER,
           id
         ),

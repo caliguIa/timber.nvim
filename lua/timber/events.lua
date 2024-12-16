@@ -25,4 +25,8 @@ function M.emit(event, ...)
   end
 end
 
+function M.clear()
+  M.listeners = {}
+end
+
 return M

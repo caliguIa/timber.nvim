@@ -1,7 +1,6 @@
 ---@class Timber.Highlight.Module
 ---@field config Timber.Highlight.Config
----@field hl_insert integer
----@field hl_add_to_batch integer
+---@field flash_hl_ns integer
 ---@field insert_hl_timer any
 ---@field add_to_batch_hl_timer any
 local M = {}
@@ -13,45 +12,55 @@ function M._highlight_add_to_batch(log_target)
   end
 
   local srow, scol, erow, ecol = log_target:range()
-  vim.highlight.range(
-    0,
-    M.hl_add_to_batch,
-    "Timber.AddToBatch",
-    { srow, scol },
-    { erow, ecol },
-    { regtype = "v", inclusive = false }
-  )
+
+  vim.api.nvim_buf_set_extmark(0, M.flash_hl_ns, srow, scol, {
+    hl_group = "Timber.AddToBatch",
+    end_row = erow,
+    end_col = ecol,
+    priority = 100,
+  })
 
   M.add_to_batch_hl_timer:start(
     M.config.duration,
     0,
     vim.schedule_wrap(function()
-      vim.api.nvim_buf_clear_namespace(0, M.hl_add_to_batch, 0, -1)
+      vim.api.nvim_buf_clear_namespace(0, M.flash_hl_ns, 0, -1)
     end)
   )
 end
 
+---@param bufnr integer
 ---@param start_line_number number 0-indexed
 ---@param end_line_number? number 0-indexed
-function M._highlight_insert(start_line_number, end_line_number)
+---@param hl_group string
+---@param all_line boolean Whether to highlight all line, or just to the final character
+function M.highlight_lines(bufnr, start_line_number, end_line_number, hl_group, all_line)
   if not M.config.on_insert then
     return
   end
 
-  vim.highlight.range(
-    0,
-    M.hl_insert,
-    "Timber.Insert",
-    { start_line_number, 0 },
-    { end_line_number or start_line_number, 0 },
-    { regtype = "V", inclusive = false }
-  )
+  if all_line then
+    vim.api.nvim_buf_set_extmark(bufnr, M.flash_hl_ns, start_line_number, 0, {
+      line_hl_group = hl_group,
+      end_row = end_line_number,
+      priority = 500,
+    })
+  else
+    end_line_number = end_line_number or start_line_number
+    local line_text = vim.api.nvim_buf_get_lines(bufnr, end_line_number, end_line_number + 1, false)[1]
+    vim.api.nvim_buf_set_extmark(bufnr, M.flash_hl_ns, start_line_number, 0, {
+      hl_group = hl_group,
+      end_row = end_line_number,
+      end_col = line_text and #line_text or 0,
+      priority = 200,
+    })
+  end
 
   M.insert_hl_timer:start(
     M.config.duration,
     0,
     vim.schedule_wrap(function()
-      vim.api.nvim_buf_clear_namespace(0, M.hl_insert, 0, -1)
+      vim.api.nvim_buf_clear_namespace(bufnr, M.flash_hl_ns, 0, -1)
     end)
   )
 end
@@ -67,12 +76,10 @@ function M._highlight_log_statement(line_number)
   )
 end
 
----@param opts Timber.Highlight.Config
 function M.setup()
   M.config = require("timber.config").config.highlight
 
-  M.hl_insert = vim.api.nvim_create_namespace("timber.insert_log")
-  M.hl_add_to_batch = vim.api.nvim_create_namespace("timber.add_to_batch")
+  M.flash_hl_ns = vim.api.nvim_create_namespace("timber.flash_highlight")
   M.hl_log_statement = vim.api.nvim_create_namespace("timber.log_statement")
   M.insert_hl_timer = vim.uv.new_timer()
   M.add_to_batch_hl_timer = vim.uv.new_timer()
@@ -87,7 +94,7 @@ function M.setup()
       M._highlight_log_statement(line)
     end
 
-    M._highlight_insert(inserted_rows[1], inserted_rows[#inserted_rows])
+    M.highlight_lines(0, inserted_rows[1], inserted_rows[#inserted_rows], "Timber.Insert", false)
   end)
 
   events.on("actions:add_to_batch", M._highlight_add_to_batch)

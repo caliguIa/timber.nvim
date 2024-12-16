@@ -328,6 +328,25 @@ function M.clear_captured_logs()
   end
 end
 
+---@return string?
+function M.get_current_line_placeholder()
+  local line_content = vim.fn.getline(".")
+  return M._parse_log_placeholder(line_content)
+end
+
+---@return integer? bufnr, integer? line Returns nil if the placeholder is not found
+function M.get_placeholder_position(placeholder_id)
+  local placeholder = M.log_placeholders:get(placeholder_id)
+
+  if not placeholder then
+    return nil
+  end
+
+  local mark = vim.api.nvim_buf_get_extmark_by_id(placeholder.bufnr, M.log_placeholder_ns, placeholder.extmark_id, {})
+
+  return placeholder.bufnr, mark[1]
+end
+
 function M.setup()
   M.log_placeholder_ns = vim.api.nvim_create_namespace("timber.log_placeholder")
 

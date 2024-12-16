@@ -18,11 +18,14 @@ CONTENTS                                                *timber.nvim-contents*
     3.2. Sources .............................. |timber.nvim-watchers.sources|
     3.3. Markers .............................. |timber.nvim-watchers.markers|
   4. Buffers ........................................... |timber.nvim-buffers|
-  5. Configuration ...................................... |timber.nvim-config|
-    5.1. Default configuration .................. |timber.nvim-config.default|
-    5.2. Log templates .................... |timber.nvim-config.log-templates|
-    5.3. Keymaps ................................ |timber.nvim-config.keymaps|
-    5.4. Highlight ............................ |timber.nvim-config.highlight|
+  5. Summary window .................................... |timber.nvim-summary|
+    5.1. Keymaps ............................... |timber.nvim-summary.keymaps|
+    5.2. API ....................................... |timber.nvim-summary.api|
+  6. Configuration ...................................... |timber.nvim-config|
+    6.1. Default configuration .................. |timber.nvim-config.default|
+    6.2. Log templates .................... |timber.nvim-config.log-templates|
+    6.3. Keymaps ................................ |timber.nvim-config.keymaps|
+    6.4. Highlight ............................ |timber.nvim-config.highlight|
 
 ==============================================================================
 1. Introduction                                     *timber.nvim-introduction*
@@ -379,12 +382,71 @@ buffers.open_float({opts})                       *timber.buffers.open_float()*
                                               if no log placeholder is found.
                                               Default: false
 
+
 buffers.clear_captured_logs()           *timber.buffers.clear_captured_logs()*
 
-  Clear all captured log results.
+  Clear all captured log results in the buffers.
 
 ==============================================================================
-5. Configuration                                          *timber.nvim-config*
+5. Summary window                                        *timber.nvim-summary*
+
+------------------------------------------------------------------------------
+5.1. API                                             *timber.nvim-summary.api*
+
+`timber.summary` module provides API to interact with the summary window. The
+summary window displays all captured log output in a window.
+
+summary.open({opts})                                   *timber.summary.open()*
+
+  Open the summary window in a split window.
+
+  Parameters: ~
+    {opts} (table)  options to pass to the action
+
+  Options: ~
+    {focus}            (boolean)             Whether to move cursor to the
+					     summary window.
+					     Default: true
+
+
+summary.close()                                       *timber.summary.close()*
+
+  Close the summary window.
+
+
+summary.toggle({opts})                               *timber.summary.toggle()*
+
+  Same as `open`, but if the summary window is already open, close it.
+
+
+summary.clear()                                       *timber.summary.clear()*
+
+  Clear the summary window.
+
+------------------------------------------------------------------------------
+5.2. Keymaps                                     *timber.nvim-summary.keymaps*
+
+|timber.nvim| provides default keymaps for the summary window:
+
+  Action name                           Mapping      Description ~
+  ------------------------------------------------------------------------------
+  show_entry                            o            Show the buffer that
+                                                     contains the log entry
+  ------------------------------------------------------------------------------
+  jump_to_entry                         <CR>         Same as show_entry, but
+                                                     also move cursor to the
+                                                     location
+  ------------------------------------------------------------------------------
+  next_entry                            ]]           Jump to next log entry
+                                                     in the summary window
+  ------------------------------------------------------------------------------
+  prev_entry                            [[           Jump to prev log entry
+                                                     in the summary window
+  ------------------------------------------------------------------------------
+  close                                 q            Close the summary window
+
+==============================================================================
+6. Configuration                                          *timber.nvim-config*
 
 |timber.nvim| is highly configurable. The configuration is broke down into multiple
 parts which are laid out in the following sections. It also provides a default
@@ -416,7 +478,7 @@ timber.setup({opts})                                          *timber.setup()*
     |timber.nvim-config.highlight|
 
 ------------------------------------------------------------------------------
-5.1. Default configuration                        *timber.nvim-config.default*
+6.1. Default configuration                        *timber.nvim-config.default*
 >lua
   {
     log_templates = {
@@ -426,6 +488,33 @@ timber.setup({opts})                                          *timber.setup()*
 	jsx = [[console.log("%log_target", %log_target)]],
 	tsx = [[console.log("%log_target", %log_target)]],
 	lua = [[print("%log_target", %log_target)]],
+	ruby = [[puts("%log_target #{%log_target}")]],
+	elixir = [[IO.inspect(%log_target, label: "%log_target")]],
+	go = [[log.Printf("%log_target: %v\n", %log_target)]],
+	rust = [[println!("%log_target: {:#?}", %log_target);]],
+	python = [[print("%log_target", %log_target)]],
+	c = [[printf("%log_target: %s\n", %log_target);]],
+	cpp = [[std::cout << "%log_target: " << %log_target << std::endl;]],
+	java = [[System.out.println("%log_target: " + %log_target);]],
+	c_sharp = [[Console.WriteLine($"%log_target: {%log_target}");]],
+	odin = [[fmt.printfln("%log_target: %v", %log_target)]],
+      },
+      plain = {
+	javascript = [[console.log("%insert_cursor")]],
+	typescript = [[console.log("%insert_cursor")]],
+	jsx = [[console.log("%insert_cursor")]],
+	tsx = [[console.log("%insert_cursor")]],
+	lua = [[print("%insert_cursor")]],
+	ruby = [[puts("%insert_cursor")]],
+	elixir = [[IO.puts(%insert_cursor)]],
+	go = [[log.Println("%insert_cursor")]],
+	rust = [[println!("%insert_cursor");]],
+	python = [[print("%insert_cursor")]],
+	c = [[printf("%insert_cursor \n");]],
+	cpp = [[std::cout << "%insert_cursor" << std::endl;]],
+	java = [[System.out.println("%insert_cursor");]],
+	c_sharp = [[Console.WriteLine("%insert_cursor");]],
+	odin = [[fmt.println("%insert_cursor")]],
       },
     },
     batch_log_templates = {
@@ -435,11 +524,30 @@ timber.setup({opts})                                          *timber.setup()*
 	jsx = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
 	tsx = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
 	lua = [[print(string.format("%repeat<%log_target=%s><, >", %repeat<%log_target><, >))]],
+	ruby = [[puts("%repeat<%log_target: #{%log_target}><, >")]],
+	elixir = [[IO.inspect({ %repeat<%log_target><, > })]],
+	go = [[log.Printf("%repeat<%log_target: %v><, >\n", %repeat<%log_target><, >)]],
+	rust = [[println!("%repeat<%log_target: {:#?}><, >", %repeat<%log_target><, >);]],
+	python = [[print(%repeat<"%log_target", %log_target><, >)]],
+	c = [[printf("%repeat<%log_target: %s><, >\n", %repeat<%log_target><, >);]],
+	cpp = [[std::cout %repeat<<< "%log_target: " << %log_target>< << "\n  " > << std::endl;]],
+	java = [[System.out.printf("%repeat<%log_target=%s><, >%n", %repeat<%log_target><, >);]],
+	c_sharp = [[Console.WriteLine($"%repeat<%log_target: {%log_target}><, >");]],
+	odin = [[fmt.printfln("%repeat<%log_target: %v><, >", %repeat<%log_target><, >)]],
       },
+    },
+    log_marker = "🪵",
+    highlight = {
+      on_insert = true,
+      on_add_to_batch = true,
+      on_summary_show_entry = true,
+      duration = 500,
     },
     keymaps = {
       insert_log_below = "glj",
       insert_log_above = "glk",
+      insert_plain_log_below = "glo",
+      insert_plain_log_above = "gl<S-o>",
       insert_batch_log = "glb",
       add_log_targets_to_batch = "gla",
       insert_log_below_operator = "g<S-l>j",
@@ -448,20 +556,24 @@ timber.setup({opts})                                          *timber.setup()*
       add_log_targets_to_batch_operator = "g<S-l>a",
     },
     default_keymaps_enabled = true,
-    highlight = {
-      on_insert = true,
-      on_add_to_batch = true,
-      duration = 500,
-    },
     log_watcher = {
       enabled = false,
       sources = {},
       preview_snippet_length = 32,
     },
+    log_summary = {
+      keymaps = {
+	show_entry = "o",
+	jump_to_entry = "<CR>",
+	next_entry = "]]",
+	prev_entry = "[[",
+	close = "q",
+      },
+    },
   }
 <
 ------------------------------------------------------------------------------
-5.2. Log templates                          *timber.nvim-config.log-templates*
+6.2. Log templates                          *timber.nvim-config.log-templates*
 
 `log_templates` determines the content of the log statements. The format is as
 follows: `{ [template_name]: { [language]: string } }`. `batch_log_templates` is
@@ -505,7 +617,7 @@ all placeholders supported by `log_templates`, plus:
 See the default configuration for some examples of template.
 
 ------------------------------------------------------------------------------
-5.3. Keymaps                                      *timber.nvim-config.keymaps*
+6.3. Keymaps                                      *timber.nvim-config.keymaps*
 
 |timber.nvim| provides default keymaps for common actions:
 
@@ -570,7 +682,7 @@ Log template string supports special placeholders that will be expanded during
  will disable the default `insert_log_below` and `insert_log_above` keymaps.
 
 ------------------------------------------------------------------------------
-5.4. Highlight					*timber.nvim-config.highlight*
+6.4. Highlight					*timber.nvim-config.highlight*
 
 Control highlight behaviors when insert log statements or add log targets to
 batch. |timber.nvim| uses the following highlight groups:

@@ -4,7 +4,7 @@ local highlight = require("timber.highlight")
 local config = require("timber.config")
 local helper = require("tests.timber.helper")
 
-describe("timber.highlight.highlight_add_to_batch", function()
+describe("timber.highlight._highlight_add_to_batch", function()
   describe("on_add_to_batch is TRUE", function()
     it("highlights the given node", function()
       config.setup({ highlight = { duration = 100, on_add_to_batch = true } })
@@ -32,13 +32,8 @@ describe("timber.highlight.highlight_add_to_batch", function()
         end,
         expected = function()
           local bufnr = vim.api.nvim_get_current_buf()
-          local extmarks = vim.api.nvim_buf_get_extmarks(
-            bufnr,
-            highlight.hl_add_to_batch,
-            0,
-            -1,
-            { details = true, type = "highlight" }
-          )
+          local extmarks =
+            vim.api.nvim_buf_get_extmarks(bufnr, highlight.flash_hl_ns, 0, -1, { details = true, type = "highlight" })
 
           assert.equals(1, #extmarks)
 
@@ -79,13 +74,8 @@ describe("timber.highlight.highlight_add_to_batch", function()
         expected = function()
           local bufnr = vim.api.nvim_get_current_buf()
           helper.wait(750)
-          local extmarks = vim.api.nvim_buf_get_extmarks(
-            bufnr,
-            highlight.hl_add_to_batch,
-            0,
-            -1,
-            { details = true, type = "highlight" }
-          )
+          local extmarks =
+            vim.api.nvim_buf_get_extmarks(bufnr, highlight.flash_hl_ns, 0, -1, { details = true, type = "highlight" })
 
           assert.equals(0, #extmarks)
         end,
@@ -120,13 +110,8 @@ describe("timber.highlight.highlight_add_to_batch", function()
         end,
         expected = function()
           local bufnr = vim.api.nvim_get_current_buf()
-          local extmarks = vim.api.nvim_buf_get_extmarks(
-            bufnr,
-            highlight.hl_add_to_batch,
-            0,
-            -1,
-            { details = true, type = "highlight" }
-          )
+          local extmarks =
+            vim.api.nvim_buf_get_extmarks(bufnr, highlight.flash_hl_ns, 0, -1, { details = true, type = "highlight" })
 
           assert.equals(0, #extmarks)
         end,
@@ -135,7 +120,7 @@ describe("timber.highlight.highlight_add_to_batch", function()
   end)
 end)
 
-describe("timber.highlight.highlight_insert", function()
+describe("timber.highlight.highlight_lines", function()
   describe("on_insert is TRUE", function()
     it("highlights the given line number", function()
       config.setup({ highlight = { duration = 100, on_insert = true } })
@@ -149,18 +134,18 @@ describe("timber.highlight.highlight_insert", function()
         ]],
         filetype = "javascript",
         action = function()
-          highlight._highlight_insert(3, 3)
+          highlight.highlight_lines(0, 3, 3, "Timber.Insert", false)
         end,
         expected = function()
           local bufnr = vim.api.nvim_get_current_buf()
           local extmarks =
-            vim.api.nvim_buf_get_extmarks(bufnr, highlight.hl_insert, 0, -1, { details = true, type = "highlight" })
+            vim.api.nvim_buf_get_extmarks(bufnr, highlight.flash_hl_ns, 0, -1, { details = true, type = "highlight" })
 
           assert.equals(1, #extmarks)
 
           local _, start_row, start_col, details = unpack(extmarks[1])
 
-          assert.equals(2, start_row)
+          assert.equals(3, start_row)
           assert.equals(0, start_col)
           -- Because we are using V mode
           assert.equals(3, details.end_row)
@@ -181,7 +166,7 @@ describe("timber.highlight.highlight_insert", function()
         ]],
         filetype = "javascript",
         action = function()
-          highlight._highlight_insert(3, 3)
+          highlight.highlight_lines(0, 3, 3, "Timber.Insert", false)
         end,
         expected = function()
           -- Wait till duration passed
@@ -189,7 +174,7 @@ describe("timber.highlight.highlight_insert", function()
 
           local bufnr = vim.api.nvim_get_current_buf()
           local extmarks =
-            vim.api.nvim_buf_get_extmarks(bufnr, highlight.hl_insert, 0, -1, { details = true, type = "highlight" })
+            vim.api.nvim_buf_get_extmarks(bufnr, highlight.flash_hl_ns, 0, -1, { details = true, type = "highlight" })
 
           assert.equals(0, #extmarks)
         end,
@@ -210,12 +195,12 @@ describe("timber.highlight.highlight_insert", function()
         ]],
         filetype = "javascript",
         action = function()
-          highlight._highlight_insert(3)
+          highlight.highlight_lines(0, 3, 3, "Timber.Insert", false)
         end,
         expected = function()
           local bufnr = vim.api.nvim_get_current_buf()
           local extmarks =
-            vim.api.nvim_buf_get_extmarks(bufnr, highlight.hl_insert, 0, -1, { details = true, type = "highlight" })
+            vim.api.nvim_buf_get_extmarks(bufnr, highlight.flash_hl_ns, 0, -1, { details = true, type = "highlight" })
 
           assert.equals(0, #extmarks)
         end,

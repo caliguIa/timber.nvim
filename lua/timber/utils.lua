@@ -362,4 +362,14 @@ function M.get_lang(filetype)
   return has_lang(lang) and lang or nil
 end
 
+function M.str_pad_right(str, length, char)
+  char = char or " "
+  local n = length - #str
+  if n <= 0 then
+    return str
+  end
+
+  return str .. string.rep(char, n)
+end
+
 return M

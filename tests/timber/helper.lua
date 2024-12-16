@@ -25,11 +25,14 @@ end
 ---Trim the redundant whitespaces from the input lines.
 ---@param input string
 ---@param cursor_char? string|boolean
+---@param remove_trailing_whitespace? boolean
 ---@return string[], {[1]: number, [2]: number}?
-local function parse_input(input, cursor_char)
-  -- Remove trailing whitespaces
-  input = input:gsub("%s+$", "")
-  local lines = vim.split(input, "\n", { trimempty = true })
+local function parse_input(input, cursor_char, remove_trailing_whitespace)
+  if remove_trailing_whitespace ~= false then
+    input = input:gsub("%s+$", "")
+  end
+
+  local lines = vim.split(input, "\n", { trimempty = false })
   local smallest_indent
 
   for _, line in ipairs(lines) do
@@ -103,8 +106,8 @@ function M.assert_scenario(scenario)
   return bufnr
 end
 
-function M.assert_buf_content(bufnr, expected)
-  local expected_lines = parse_input(expected, false)
+function M.assert_buf_content(bufnr, expected, remove_trailing_whitespace)
+  local expected_lines = parse_input(expected, false, remove_trailing_whitespace)
   local buf_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
   assert.are.same(expected_lines, buf_lines)
 end

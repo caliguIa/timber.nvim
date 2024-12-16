@@ -3,6 +3,7 @@ local utils = require("timber.utils")
 ---@class Timber.Highlight.Config
 ---@field on_insert? boolean Whether to highlight the log target when inserting the log. Defaults to `true`
 ---@field on_add_to_batch? boolean Whether to highlight the log target when adding to the batch. Defaults to `true`
+---@field on_summary_show_entry? boolean Whether to highlight the line when showing the entry in the log summary. Defaults to `true`
 ---@field duration number The timeout in ms for highlighting
 
 ---@class Timber.Watcher.Config
@@ -10,14 +11,18 @@ local utils = require("timber.utils")
 ---@field sources table<string, Timber.Watcher.SourceSpec> The sources to watch
 ---@field preview_snippet_length? integer The length of the preview snippet display as extmarks. Defaults to `32`
 
+---@class Timber.Summary.Config
+---@field keymaps { [ "show_entry" | "jump_to_entry" | "next_entry" | "prev_entry" | "close" ]: string | boolean }
+
 ---@class Timber.Config
 ---@field log_templates { [string]: Timber.LogTemplates }
 ---@field log_marker string? The marker for the %log_marker placeholder. Defaults to `🪵`
 ---@field batch_log_templates { [string]: Timber.LogTemplates }
 ---@field highlight Timber.Highlight.Config
----@field keymaps { [Timber.Action | Timber.Operator]: string }
+---@field keymaps { [Timber.Action | Timber.Operator]: string | boolean }
 ---@field default_keymaps_enabled boolean Whether to enable default keymaps. Defaults to `true`
 ---@field log_watcher Timber.Watcher.Config
+---@field log_summary Timber.Summary.Config
 
 ---@type Timber.Config
 local default_config = {
@@ -80,6 +85,7 @@ local default_config = {
   highlight = {
     on_insert = true,
     on_add_to_batch = true,
+    on_summary_show_entry = true,
     duration = 500,
   },
   keymaps = {
@@ -99,6 +105,16 @@ local default_config = {
     enabled = false,
     sources = {},
     preview_snippet_length = 32,
+  },
+  log_summary = {
+    keymaps = {
+      show_entry = "o",
+      jump_to_entry = "<CR>",
+      next_entry = "]]",
+      prev_entry = "[[",
+      show_help = "?",
+      close = "q",
+    },
   },
 }
 
