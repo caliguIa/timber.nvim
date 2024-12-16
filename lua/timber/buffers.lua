@@ -1,3 +1,4 @@
+local watcher = require("timber.watcher")
 local utils = require("timber.utils")
 
 ---@class Timber.Buffers.LogPlaceholderEntries
@@ -6,7 +7,7 @@ local utils = require("timber.utils")
 ---@field timestamp integer
 
 ---@class Timber.Buffers.LogPlaceholder
----@field id Timber.Watcher.LogPlaceholderId? The log placeholder id. It is only set when the log template has %watcher_marker_start
+---@field id Timber.Watcher.LogPlaceholderId The log placeholder id.
 ---@field bufnr number
 ---@field line number 0-indexed line number. The line number is only correct when the placeholder is newly created. Overtime, after updates, the real line number will be shifted.
 ---@field extmark_id? integer
@@ -141,12 +142,28 @@ end
 
 ---@param log_placeholder Timber.Buffers.LogPlaceholder
 function M._new_log_placeholder(log_placeholder)
+  if not log_placeholder.id then
+    return
+  end
+
   if log_placeholder.id and M.log_placeholders:get(log_placeholder.id) then
     return
   end
 
-  local extmark_id =
-    vim.api.nvim_buf_set_extmark(log_placeholder.bufnr, M.log_placeholder_ns, log_placeholder.line, 0, {})
+  local line =
+    vim.api.nvim_buf_get_lines(log_placeholder.bufnr, log_placeholder.line, log_placeholder.line + 1, false)[1]
+  -- Find the log marker
+  local marker_pattern = watcher.MARKER .. log_placeholder.id
+  local log_marker_index = line:find(marker_pattern) - 1
+  ---@cast log_marker_index integer
+
+  local extmark_id = vim.api.nvim_buf_set_extmark(
+    log_placeholder.bufnr,
+    M.log_placeholder_ns,
+    log_placeholder.line,
+    log_marker_index,
+    { end_col = log_marker_index + #marker_pattern }
+  )
 
   log_placeholder.extmark_id = extmark_id
   M.log_placeholders:add(log_placeholder)
