@@ -1343,8 +1343,8 @@ describe("timber.actions.clear_log_statements", function()
 
   describe("given the global opts is true", function()
     before_each(function()
-      vim.fn.system({ "rm", "-rf", "test_sandbox" })
-      vim.fn.mkdir("test_sandbox")
+      vim.fn.system({ "rm", "-rf", "test_sandbox.actions" })
+      vim.fn.mkdir("test_sandbox.actions")
       local random = math.random(1000)
 
       timber.setup({
@@ -1358,7 +1358,7 @@ describe("timber.actions.clear_log_statements", function()
     end)
 
     after_each(function()
-      vim.fn.system({ "rm", "-rf", "test_sandbox" })
+      vim.fn.system({ "rm", "-rf", "test_sandbox.actions" })
     end)
 
     it("clears all statements in ALL buffers", function()
@@ -1388,8 +1388,8 @@ describe("timber.actions.clear_log_statements", function()
         end,
       })
 
-      write_buf_file(bufnr1, "test_sandbox/clear1")
-      write_buf_file(bufnr2, "test_sandbox/clear2")
+      write_buf_file(bufnr1, "test_sandbox.actions/clear1")
+      write_buf_file(bufnr2, "test_sandbox.actions/clear2")
 
       helper.wait(20)
       actions.clear_log_statements({ global = true })

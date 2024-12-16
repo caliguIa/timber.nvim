@@ -608,19 +608,19 @@ describe("timber.summary._open_entry", function()
 
   describe("given the log placeholder is NOT in a loaded buffer", function()
     before_each(function()
-      vim.fn.system({ "rm", "-rf", "test_sandbox" })
-      vim.fn.mkdir("test_sandbox")
+      vim.fn.system({ "rm", "-rf", "test_sandbox.summary" })
+      vim.fn.mkdir("test_sandbox.summary")
     end)
 
     after_each(function()
-      vim.fn.system({ "rm", "-rf", "test_sandbox" })
+      vim.fn.system({ "rm", "-rf", "test_sandbox.summary" })
     end)
 
     it("opens the buffer and jump to the line", function()
       local id = watcher.generate_unique_id()
       local file_content = string.format([[print("%s%s| Hello world")]], watcher.MARKER, id)
 
-      local file = io.open("test_sandbox/open_entry1", "w")
+      local file = io.open("test_sandbox.summary/open_entry1", "w")
       ---@cast file -nil
       file:write(file_content)
       file:close()
