@@ -597,12 +597,18 @@ placeholders are:
 <
   - `%line_number`: the line number of the log target. If the log template
     doesn't have a log target, line_number will be the current line at the
-    cursor >lua
+    cursor. >lua
 
       -- Template: [[print("LOG %line_number", %log_target)]]
       local foo = 1
       print("LOG 1", foo)
 <
+  - `%filename`: the current filename >lua
+
+      -- Template: [[print("LOG %filename", %log_target)]]
+      local foo = 1
+      print("LOG foo.lua", foo)
+
 `batch_log_templates` is similar, but for batch log statements. It supports
 all placeholders supported by `log_templates`, plus:
 

@@ -258,13 +258,14 @@ These examples use the default configuration. The `|` denotes the cursor positio
 The content of the log statement can be customized via templates. `timber.nvim` supports some special placeholders which will be replaced after inserting:
 
 - `%log_target`: the log target text
-- `%line_number`: the line number of the log target.
+- `%line_number`: the line number of the log target
+- `%filename`: the name of the current file
 
 ```lua
 local opts = {
     log_templates = {
         default = {
-            lua = [[print("LOG %log_target ON LINE %line_number", %log_target)]],
+            lua = [[print("LOG %log_target ON LINE %filename:%line_number", %log_target)]],
         },
     },
 }

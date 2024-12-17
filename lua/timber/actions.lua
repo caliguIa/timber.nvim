@@ -73,16 +73,23 @@ local function get_current_indent(insert_line)
 end
 
 --- Build the log statement from template. Support special placeholers:
----   %log_target: the identifier text
+---   %log_target: the log target text
 ---   %line_number: the line_number number
+---   %filename: the file name
 ---   %insert_cursor: after inserting the log statement, go to insert mode and place the cursor here.
 ---     If there's multiple log statements, choose the first one
 ---   %watcher_marker_start and %watcher_marker_end: the start and end markers for timber.watchers
 ---@alias handler (fun(): string) | string
 ---@param log_template string
----@param handlers {identifier: handler, line_number: handler}
+---@param handlers {log_target: handler, line_number: handler, filename: handler}
 ---@return string resolved_template, Timber.Watcher.LogPlaceholderId? placeholder_id
 local function resolve_template_placeholders(log_template, handlers)
+  handlers = vim.tbl_extend("force", {
+    filename = function()
+      return vim.fn.expand("%:t")
+    end,
+  }, handlers)
+
   ---@type fun(string): string
   local invoke_handler = function(handler_name)
     local handler = handlers[handler_name]
@@ -97,14 +104,13 @@ local function resolve_template_placeholders(log_template, handlers)
     end
   end
 
-  if string.find(log_template, "%%log_target") then
-    local replacement = invoke_handler("identifier")
-    log_template = string.gsub(log_template, "%%log_target", replacement)
-  end
+  local to_resolve = { "log_target", "line_number", "filename" }
 
-  if string.find(log_template, "%%line_number") then
-    local replacement = invoke_handler("line_number")
-    log_template = string.gsub(log_template, "%%line_number", replacement)
+  for _, placeholder in ipairs(to_resolve) do
+    if string.find(log_template, "%%" .. placeholder) then
+      local replacement = invoke_handler(placeholder)
+      log_template = string.gsub(log_template, "%%" .. placeholder, replacement)
+    end
   end
 
   local placeholder_id
@@ -420,7 +426,7 @@ local function build_capture_log_statements(log_template, lang, position, select
     local logable_ranges = entry.logable_ranges
 
     local content, placeholder_id = resolve_template_placeholders(log_template, {
-      identifier = function()
+      log_target = function()
         local bufnr = vim.api.nvim_get_current_buf()
         return vim.treesitter.get_node_text(log_target, bufnr)
       end,
@@ -484,7 +490,7 @@ local function build_batch_log_statement(log_template, batch, insert_line)
     local repeat_items = utils.array_map(batch, function(log_target)
       return (
         resolve_template_placeholders(repeat_item_template, {
-          identifier = function()
+          log_target = function()
             local bufnr = vim.api.nvim_get_current_buf()
             return vim.treesitter.get_node_text(log_target, bufnr)
           end,
@@ -502,7 +508,7 @@ local function build_batch_log_statement(log_template, batch, insert_line)
 
   -- Then resolve the rest
   local content, placeholder_id = resolve_template_placeholders(result, {
-    identifier = function()
+    log_target = function()
       utils.notify("Cannot use %log_target placeholder outside %repeat placeholder", "error")
       return "%log_target"
     end,
@@ -570,7 +576,7 @@ function M.__insert_log(motion_type)
   state.current_command_arguments.insert_log = { opts, nil, nil }
 end
 
---- Insert log statement for the current identifier at the cursor
+--- Insert log statement for the current log target at the cursor
 --- @class Timber.Actions.InsertLogOptions
 --- @field template string? Which template to use. Defaults to `default`
 --- @field templates { before: string, after: string }? Which templates to use for the log statement. Only used when position is `surround`. Defaults to `{ before = "default", after = "default" }`

@@ -16,205 +16,242 @@ local function write_buf_file(bufnr, filename)
 end
 
 describe("timber.actions.insert_log", function()
-  it("supports %log_target in log template", function()
-    timber.setup({
-      log_templates = {
-        testing = {
-          javascript = [[console.log("%log_target", %log_target)]],
-        },
-      },
-    })
-
-    helper.assert_scenario({
-      input = [[
-        // Comment
-        const fo|o = "bar"
-      ]],
-      filetype = "javascript",
-      action = function()
-        actions.insert_log({ template = "testing", position = "below" })
-      end,
-      expected = [[
-        // Comment
-        const foo = "bar"
-        console.log("foo", foo)
-      ]],
-    })
-  end)
-
-  it("supports %line_number in log template", function()
-    timber.setup({
-      log_templates = {
-        testing = {
-          javascript = [[console.log("%line_number", %log_target)]],
-        },
-      },
-    })
-
-    helper.assert_scenario({
-      input = [[
-        // Comment
-        const fo|o = "bar"
-      ]],
-      filetype = "javascript",
-      action = function()
-        actions.insert_log({ template = "testing", position = "below" })
-      end,
-      expected = [[
-        // Comment
-        const foo = "bar"
-        console.log("2", foo)
-      ]],
-    })
-  end)
-
-  describe("supports %insert_cursor in log template", function()
-    describe("move the the %insert_cursor placeholder and go to insert mode after inserting the log", function()
-      it("supports single line template", function()
-        timber.setup({
-          log_templates = {
-            testing = {
-              javascript = [[console.log("%log_marker %log_target %insert_cursor", %log_target)]],
-            },
-          },
-          log_marker = "🪵",
-        })
-
-        helper.assert_scenario({
-          input = [[
-            const fo|o = "bar"
-            const bar = "foo"
-          ]],
-          filetype = "javascript",
-          action = function()
-            actions.insert_log({
-              template = "testing",
-              position = "below",
-            })
-
-            vim.defer_fn(function()
-              vim.api.nvim_feedkeys("abc", "n", false)
-            end, 0)
-          end,
-          expected = function()
-            helper.wait(20)
-
-            local mode = vim.api.nvim_get_mode().mode
-            assert.are.same("i", mode)
-
-            local output = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-            local expected = {
-              [[const foo = "bar"]],
-              [[console.log("🪵 foo abc", foo)]],
-              [[const bar = "foo"]],
-            }
-            assert.are.same(expected, output)
-          end,
-        })
-
-        -- Wait for Neovim to actually stop insert mode
-        vim.cmd("stopinsert")
-        helper.wait(20)
-      end)
-
-      it("supports single line template", function()
-        timber.setup({
-          log_templates = {
-            testing = {
-              javascript = [[
-                // Comment above
-                console.log("%log_target %insert_cursor", %log_target)
-                // Comment below
-              ]],
-            },
-          },
-        })
-
-        helper.assert_scenario({
-          input = [[
-            const fo|o = "bar"
-            const bar = "foo"
-          ]],
-          filetype = "javascript",
-          action = function()
-            actions.insert_log({
-              template = "testing",
-              position = "below",
-            })
-
-            vim.defer_fn(function()
-              vim.api.nvim_feedkeys("abc", "n", false)
-            end, 0)
-          end,
-          expected = function()
-            helper.wait(20)
-
-            local mode = vim.api.nvim_get_mode().mode
-            assert.are.same("i", mode)
-
-            local output = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-            local expected = {
-              [[const foo = "bar"]],
-              [[// Comment above]],
-              [[console.log("foo abc", foo)]],
-              [[// Comment below]],
-              [[const bar = "foo"]],
-            }
-            assert.are.same(expected, output)
-          end,
-        })
-
-        -- Wait for Neovim to actually stop insert mode
-        vim.cmd("stopinsert")
-        helper.wait(20)
-      end)
-    end)
-
-    it("chooses the first statement if there are multiple", function()
+  describe("supports log templates", function()
+    it("supports %log_target in log template", function()
       timber.setup({
         log_templates = {
           testing = {
-            javascript = [[console.log("%log_target %insert_cursor", %log_target)]],
+            javascript = [[console.log("%log_target", %log_target)]],
           },
         },
       })
 
       helper.assert_scenario({
         input = [[
-          const fo|o = bar + baz
-        ]],
+        // Comment
+        const fo|o = "bar"
+      ]],
         filetype = "javascript",
         action = function()
-          vim.cmd("normal! V")
-          actions.insert_log({
-            template = "testing",
-            position = "below",
-          })
-
-          vim.defer_fn(function()
-            vim.api.nvim_feedkeys("abc", "n", false)
-          end, 0)
+          actions.insert_log({ template = "testing", position = "below" })
         end,
-        expected = function()
-          helper.wait(20)
+        expected = [[
+        // Comment
+        const foo = "bar"
+        console.log("foo", foo)
+      ]],
+      })
+    end)
 
-          local mode = vim.api.nvim_get_mode().mode
-          assert.are.same("i", mode)
-
-          local output = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-          local expected = {
-            [[const foo = bar + baz]],
-            [[console.log("foo abc", foo)]],
-            [[console.log("bar ", bar)]],
-            [[console.log("baz ", baz)]],
-          }
-          assert.are.same(expected, output)
-        end,
+    it("supports %line_number in log template", function()
+      timber.setup({
+        log_templates = {
+          testing = {
+            javascript = [[console.log("%line_number", %log_target)]],
+          },
+        },
       })
 
-      -- Wait for Neovim to actually stop insert mode
-      vim.cmd("stopinsert")
-      helper.wait(20)
+      helper.assert_scenario({
+        input = [[
+        // Comment
+        const fo|o = "bar"
+      ]],
+        filetype = "javascript",
+        action = function()
+          actions.insert_log({ template = "testing", position = "below" })
+        end,
+        expected = [[
+        // Comment
+        const foo = "bar"
+        console.log("2", foo)
+      ]],
+      })
+    end)
+
+    it("supports %filename in log template", function()
+      vim.fn.system({ "rm", "-rf", "test_sandbox.actions" })
+      vim.fn.mkdir("test_sandbox.actions")
+
+      timber.setup({
+        log_templates = {
+          testing = {
+            javascript = [[console.log("%filename:%line_number", %log_target)]],
+          },
+        },
+      })
+
+      local bufnr1 = helper.assert_scenario({
+        input = [[
+          // Comment
+          const fo|o = "bar"
+        ]],
+        filetype = "javascript",
+      })
+
+      write_buf_file(bufnr1, "test_sandbox.actions/filename_placeholder")
+      actions.insert_log({ template = "testing", position = "below" })
+
+      helper.assert_buf_content(
+        bufnr1,
+        [[
+          // Comment
+          const foo = "bar"
+          console.log("filename_placeholder:2", foo)
+        ]]
+      )
+
+      vim.fn.system({ "rm", "-rf", "test_sandbox.actions" })
+    end)
+
+    describe("supports %insert_cursor in log template", function()
+      describe("move the the %insert_cursor placeholder and go to insert mode after inserting the log", function()
+        it("supports single line template", function()
+          timber.setup({
+            log_templates = {
+              testing = {
+                javascript = [[console.log("%log_marker %log_target %insert_cursor", %log_target)]],
+              },
+            },
+            log_marker = "🪵",
+          })
+
+          helper.assert_scenario({
+            input = [[
+              const fo|o = "bar"
+              const bar = "foo"
+            ]],
+            filetype = "javascript",
+            action = function()
+              actions.insert_log({
+                template = "testing",
+                position = "below",
+              })
+
+              vim.defer_fn(function()
+                vim.api.nvim_feedkeys("abc", "n", false)
+              end, 0)
+            end,
+            expected = function()
+              helper.wait(20)
+
+              local mode = vim.api.nvim_get_mode().mode
+              assert.are.same("i", mode)
+
+              local output = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+              local expected = {
+                [[const foo = "bar"]],
+                [[console.log("🪵 foo abc", foo)]],
+                [[const bar = "foo"]],
+              }
+              assert.are.same(expected, output)
+            end,
+          })
+
+          -- Wait for Neovim to actually stop insert mode
+          vim.cmd("stopinsert")
+          helper.wait(20)
+        end)
+
+        it("supports single line template", function()
+          timber.setup({
+            log_templates = {
+              testing = {
+                javascript = [[
+                  // Comment above
+                  console.log("%log_target %insert_cursor", %log_target)
+                  // Comment below
+                ]],
+              },
+            },
+          })
+
+          helper.assert_scenario({
+            input = [[
+              const fo|o = "bar"
+              const bar = "foo"
+            ]],
+            filetype = "javascript",
+            action = function()
+              actions.insert_log({
+                template = "testing",
+                position = "below",
+              })
+
+              vim.defer_fn(function()
+                vim.api.nvim_feedkeys("abc", "n", false)
+              end, 0)
+            end,
+            expected = function()
+              helper.wait(20)
+
+              local mode = vim.api.nvim_get_mode().mode
+              assert.are.same("i", mode)
+
+              local output = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+              local expected = {
+                [[const foo = "bar"]],
+                [[// Comment above]],
+                [[console.log("foo abc", foo)]],
+                [[// Comment below]],
+                [[const bar = "foo"]],
+              }
+              assert.are.same(expected, output)
+            end,
+          })
+
+          -- Wait for Neovim to actually stop insert mode
+          vim.cmd("stopinsert")
+          helper.wait(20)
+        end)
+      end)
+
+      it("chooses the first statement if there are multiple", function()
+        timber.setup({
+          log_templates = {
+            testing = {
+              javascript = [[console.log("%log_target %insert_cursor", %log_target)]],
+            },
+          },
+        })
+
+        helper.assert_scenario({
+          input = [[
+            const fo|o = bar + baz
+          ]],
+          filetype = "javascript",
+          action = function()
+            vim.cmd("normal! V")
+            actions.insert_log({
+              template = "testing",
+              position = "below",
+            })
+
+            vim.defer_fn(function()
+              vim.api.nvim_feedkeys("abc", "n", false)
+            end, 0)
+          end,
+          expected = function()
+            helper.wait(20)
+
+            local mode = vim.api.nvim_get_mode().mode
+            assert.are.same("i", mode)
+
+            local output = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+            local expected = {
+              [[const foo = bar + baz]],
+              [[console.log("foo abc", foo)]],
+              [[console.log("bar ", bar)]],
+              [[console.log("baz ", baz)]],
+            }
+            assert.are.same(expected, output)
+          end,
+        })
+
+        -- Wait for Neovim to actually stop insert mode
+        vim.cmd("stopinsert")
+        helper.wait(20)
+      end)
     end)
   end)
 
