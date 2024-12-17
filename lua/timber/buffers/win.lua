@@ -31,7 +31,7 @@ local function win_content(entries)
     line_count = line_count + #lines
 
     if i < #entries then
-      table.insert(buf_content, string.rep("─", max_width))
+      table.insert(buf_content, "")
       table.insert(separators, line_count)
       line_count = line_count + 1
     end
@@ -211,7 +211,11 @@ function M.open(placeholder, opts)
   vim.api.nvim_win_set_hl_ns(winnr, M.highlight_ns)
 
   for _, i in ipairs(separators) do
-    vim.api.nvim_buf_add_highlight(bufnr, M.highlight_ns, "Timber.FloatingWindowEntrySeparator", i, 0, -1)
+    vim.api.nvim_buf_set_extmark(bufnr, M.highlight_ns, i, 0, {
+      virt_text_win_col = -1,
+      virt_text = { { string.rep("-", vim.go.columns), "Timber.FloatingWindowEntrySeparator" } },
+      priority = 100,
+    })
   end
 end
 
