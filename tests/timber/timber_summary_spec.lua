@@ -102,6 +102,101 @@ describe("timber.summary.open", function()
     assert.equals("Good bye world", content[4])
   end)
 
+  describe("allows customize the window", function()
+    describe("supports customize window width", function()
+      describe("given a single integer", function()
+        it("sets the width to the given value", function()
+          timber.setup({
+            log_summary = {
+              win = {
+                width = 60,
+              },
+            },
+          })
+
+          local winnr, _ = summary.open()
+
+          local win_width = vim.api.nvim_win_get_width(winnr)
+          assert.equals(60, win_width)
+        end)
+      end)
+
+      describe("given a single float from 0 to 1", function()
+        it("sets the width to the given percentage of the window width", function()
+          timber.setup({
+            log_summary = {
+              win = {
+                width = 0.4,
+              },
+            },
+          })
+
+          local win_width = vim.api.nvim_win_get_width(0)
+          local winnr, _ = summary.open()
+
+          local summary_win_width = vim.api.nvim_win_get_width(winnr)
+          assert.equals(win_width * 0.4, summary_win_width)
+        end)
+      end)
+
+      describe("given an array of mixed values", function()
+        it("sets the width to the lesser of them", function()
+          timber.setup({
+            log_summary = {
+              win = {
+                width = { 20, 0.4 },
+              },
+            },
+          })
+
+          local win_width = vim.api.nvim_win_get_width(0)
+          local winnr, _ = summary.open()
+
+          local summary_win_width = vim.api.nvim_win_get_width(winnr)
+          assert.is.True(20 <= win_width * 0.4)
+          assert.equals(20, summary_win_width)
+        end)
+      end)
+    end)
+
+    describe("supports customize window position", function()
+      it("sets the window position to the given value", function()
+        timber.setup({
+          log_summary = {
+            win = {
+              position = "right",
+            },
+          },
+        })
+
+        local winnr, _ = summary.open()
+        -- Move to the right window
+        vim.cmd("wincmd l")
+
+        local current_win = vim.api.nvim_get_current_win()
+        assert.equals(winnr, current_win)
+      end)
+    end)
+
+    describe("supports customize win opts", function()
+      it("sets the win opts", function()
+        timber.setup({
+          log_summary = {
+            win = {
+              opts = {
+                wrap = false,
+              },
+            },
+          },
+        })
+
+        local winnr, _ = summary.open()
+
+        assert.equals(false, vim.api.nvim_win_get_option(winnr, "wrap"))
+      end)
+    end)
+  end)
+
   it("focuses the window if focus is true", function()
     events.emit("watcher:new_log_entry", {
       log_placeholder_id = "ABC",

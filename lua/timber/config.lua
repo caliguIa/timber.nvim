@@ -13,6 +13,8 @@ local utils = require("timber.utils")
 
 ---@class Timber.Summary.Config
 ---@field keymaps { [ "show_entry" | "jump_to_entry" | "next_entry" | "prev_entry" | "close" ]: string | boolean }
+---@field default_keymaps_enabled boolean Whether to enable default keymaps in the summary window. Defaults to `true`
+---@field win { width: number | number[], position: "left" | "right", opts: table }
 
 ---@class Timber.Config
 ---@field log_templates { [string]: Timber.LogTemplates }
@@ -84,14 +86,23 @@ local default_config = {
       bash = [[echo "%repeat<%log_target: ${%log_target}><, >"]],
     },
   },
+  -- The string to search for when deleting or commenting log statements
+  -- Can be used in log templates as %log_marker placeholder
   log_marker = "🪵",
+  -- Controls the flash highlight
   highlight = {
+    -- After a log statement is inserted
     on_insert = true,
+    -- After a log target is added to a batch
     on_add_to_batch = true,
+    -- After a log entry is shown/jumped to in the summary panel
     on_summary_show_entry = true,
+    -- The duration of the flash highlight
     duration = 500,
   },
   keymaps = {
+    -- Set to false to disable the default keymap for specific actions
+    -- insert_log_below = false,
     insert_log_below = "glj",
     insert_log_above = "glk",
     insert_plain_log_below = "glo",
@@ -103,13 +114,16 @@ local default_config = {
     insert_batch_log_operator = "g<S-l>b",
     add_log_targets_to_batch_operator = "g<S-l>a",
   },
+  -- Set to false to disable all default keymaps
   default_keymaps_enabled = true,
   log_watcher = {
     enabled = false,
     sources = {},
+    -- The length of the preview snippet display as extmarks
     preview_snippet_length = 32,
   },
   log_summary = {
+    -- Keymaps for the summary window
     keymaps = {
       show_entry = "<CR>",
       jump_to_entry = "o",
@@ -117,6 +131,20 @@ local default_config = {
       prev_entry = "[[",
       show_help = "?",
       close = "q",
+    },
+    -- Set to false to disable all default keymaps in the summary window
+    default_keymaps_enabled = true,
+    win = {
+      -- Control the width of the summary window
+      -- They can be a single integer (number of columns)
+      -- or a float from 0 to 1 (percentage of the current window width e.g. 0.4 for 40%)
+      -- or an array of mixed types
+      -- width = {60, 0.4} means "the lesser of 60 columns and 40% of the current window width"
+      width = { 60, 0.4 },
+      -- Determines where the summary window will be opened: left, right
+      position = "left",
+      -- Customize the window options
+      opts = {},
     },
   },
 }

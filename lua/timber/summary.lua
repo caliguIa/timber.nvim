@@ -170,6 +170,41 @@ function M._should_show_source_name(entries)
   return source_count > 1
 end
 
+function M._make_win(buf)
+  local win_config = require("timber.config").config.log_summary.win
+
+  local width = win_config.width
+  if type(width) == "number" then
+    width = { width }
+  end
+
+  local screen_width = vim.api.nvim_win_get_width(0)
+  local smallest_width
+
+  for _, w in ipairs(width) do
+    local w1
+    if w < 1 and w > 0 then
+      w1 = screen_width * w
+    else
+      w1 = w
+    end
+
+    smallest_width = smallest_width and math.min(smallest_width, w1) or w1
+  end
+
+  local win = vim.api.nvim_open_win(buf, false, {
+    width = math.floor(smallest_width),
+    style = "minimal",
+    split = win_config.position,
+  })
+
+  for option, value in pairs(win_config.opts) do
+    vim.api.nvim_set_option_value(option, value, { win = win })
+  end
+
+  return win
+end
+
 function M._make_buffer()
   local buf = vim.api.nvim_create_buf(false, true)
   vim.api.nvim_set_option_value("modifiable", false, { buf = buf })
@@ -369,13 +404,7 @@ function M.open(opts)
   local buf = M._make_buffer()
   M._append_buffer(buf, M.log_entries)
 
-  local screen_width = vim.api.nvim_win_get_width(0)
-  local win = vim.api.nvim_open_win(buf, false, {
-    width = math.floor(screen_width * 0.3),
-    anchor = "NW",
-    style = "minimal",
-    split = "left",
-  })
+  local win = M._make_win(buf)
   M.attach_winnr = vim.api.nvim_get_current_win()
   M.winnr = win
   M.bufnr = buf

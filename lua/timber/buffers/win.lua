@@ -62,10 +62,10 @@ local function close_win(winnr, bufnrs)
 end
 
 local function win_sizes(lines)
-  local screen_width = vim.api.nvim_win_get_width(0)
-  local screen_height = vim.api.nvim_win_get_height(0)
-  local max_width = math.floor(screen_width * 0.8)
-  local max_height = math.floor(screen_height * 0.8)
+  local win_width = vim.api.nvim_win_get_width(0)
+  local win_height = vim.api.nvim_win_get_height(0)
+  local max_width = math.floor(win_width * 0.8)
+  local max_height = math.floor(win_height * 0.8)
 
   local width = 0
   for _, line in ipairs(lines) do

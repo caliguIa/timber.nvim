@@ -169,6 +169,7 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
     on_add_to_batch = true,
     -- After a log entry is shown/jumped to in the summary panel
     on_summary_show_entry = true,
+    -- The duration of the flash highlight
     duration = 500,
   },
   keymaps = {
@@ -203,6 +204,21 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
       next_entry = "]]",
       prev_entry = "[[",
       close = "q",
+    },
+    -- Set to false to disable all default keymaps in the summary window
+    default_keymaps_enabled = true,
+    -- Customize the summary window
+    win = {
+      -- Control the width of the summary window
+      -- They can be a single integer (number of columns)
+      -- or a float from 0 to 1 (percentage of the current window width e.g. 0.4 for 40%)
+      -- or an array of mixed types
+      -- width = {60, 0.4} means "the lesser of 60 columns and 40% of the current window width"
+      width = { 60, 0.4 },
+      -- Determines where the summary window will be opened: left, right
+      position = "left",
+      -- Customize the window options
+      opts = {},
     },
   },
 }

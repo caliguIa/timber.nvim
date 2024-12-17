@@ -129,6 +129,12 @@ function M._show_keymaps_help()
 end
 
 function M._setup_buffer_keymaps(buf)
+  local log_summary_config = config.config.log_summary
+
+  if not log_summary_config.default_keymaps_enabled then
+    return
+  end
+
   local keymaps = config.config.log_summary.keymaps
 
   for _, action_spec in ipairs(ACTIONS) do
