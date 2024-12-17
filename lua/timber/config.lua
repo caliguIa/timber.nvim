@@ -43,6 +43,7 @@ local default_config = {
       java = [[System.out.println("%log_target: " + %log_target);]],
       c_sharp = [[Console.WriteLine($"%log_target: {%log_target}");]],
       odin = [[fmt.printfln("%log_target: %v", %log_target)]],
+      bash = [[echo "%log_target: ${%log_target}"]],
     },
     plain = {
       javascript = [[console.log("%insert_cursor")]],
@@ -60,6 +61,7 @@ local default_config = {
       java = [[System.out.println("%insert_cursor");]],
       c_sharp = [[Console.WriteLine("%insert_cursor");]],
       odin = [[fmt.println("%insert_cursor")]],
+      bash = [[echo "%insert_cursor"]],
     },
   },
   batch_log_templates = {
@@ -79,6 +81,7 @@ local default_config = {
       java = [[System.out.printf("%repeat<%log_target=%s><, >%n", %repeat<%log_target><, >);]],
       c_sharp = [[Console.WriteLine($"%repeat<%log_target: {%log_target}><, >");]],
       odin = [[fmt.printfln("%repeat<%log_target: %v><, >", %repeat<%log_target><, >)]],
+      bash = [[echo "%repeat<%log_target: ${%log_target}><, >"]],
     },
   },
   log_marker = "🪵",
