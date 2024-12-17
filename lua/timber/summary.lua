@@ -205,11 +205,39 @@ function M._make_win(buf)
   return win
 end
 
-function M._make_buffer()
+function M._make_buffer(log_entries)
   local buf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_set_option_value("modifiable", false, { buf = buf })
-  vim.api.nvim_set_option_value("buftype", "nofile", { buf = buf })
-  vim.api.nvim_set_option_value("swapfile", false, { buf = buf })
+
+  local seen = {}
+  local uniq_sources = {}
+
+  for _, entry in ipairs(log_entries) do
+    if not seen[entry.source_id] then
+      seen[entry.source_id] = true
+      table.insert(uniq_sources, entry.source_id)
+    end
+  end
+
+  local opts = {
+    modifiable = false,
+    buftype = "nofile",
+    swapfile = false,
+  }
+
+  -- If there's only one source, apply the source buffer opts
+  -- to the summary buffer
+  -- We optimize for this case because it's the most common path
+  if #uniq_sources == 1 then
+    local source = watcher.get_source(uniq_sources[1])
+    if source and source.buffer then
+      opts = vim.tbl_extend("force", opts, source.buffer)
+    end
+  end
+
+  for option, value in pairs(opts) do
+    vim.api.nvim_set_option_value(option, value, { buf = buf })
+  end
+
   return buf
 end
 
@@ -401,7 +429,7 @@ function M.open(opts)
   local placeholder_id = buffers.get_current_line_placeholder()
 
   -- Format and display log entries
-  local buf = M._make_buffer()
+  local buf = M._make_buffer(M.log_entries)
   M._append_buffer(buf, M.log_entries)
 
   local win = M._make_win(buf)
