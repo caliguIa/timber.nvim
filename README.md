@@ -198,8 +198,8 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
     keymaps = {
       -- Set to false to disable the default keymap for specific actions
       -- show_entry = false,
-      show_entry = "o",
-      jump_to_entry = "<CR>",
+      show_entry = "<CR>",
+      jump_to_entry = "o",
       next_entry = "]]",
       prev_entry = "[[",
       close = "q",
@@ -384,8 +384,8 @@ The summary window has the following keymaps:
 
 | Action | Keymap | Description |
 | -      | -      | -           |
-| show_entry | o | Show the buffer contains the log entry |
-| jump_to_entry | \<CR\> | Same as show_entry, but also move cursor to the location |
+| show_entry | \<CR\> | Show the buffer contains the log entry |
+| jump_to_entry | o | Same as show_entry, but also move cursor to the location |
 | next_entry | ]] | Jump to next log entry in the summary window |
 | prev_entry | [[ | Jump to prev log entry in the summary window |
 | close | q | Close the summary window |

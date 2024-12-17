@@ -430,10 +430,10 @@ summary.clear()                                       *timber.summary.clear()*
 
   Action name                           Mapping      Description ~
   ------------------------------------------------------------------------------
-  show_entry                            o            Show the buffer that
+  show_entry                            <CR>         Show the buffer that
                                                      contains the log entry
   ------------------------------------------------------------------------------
-  jump_to_entry                         <CR>         Same as show_entry, but
+  jump_to_entry                         o            Same as show_entry, but
                                                      also move cursor to the
                                                      location
   ------------------------------------------------------------------------------
@@ -563,8 +563,8 @@ timber.setup({opts})                                          *timber.setup()*
     },
     log_summary = {
       keymaps = {
-	show_entry = "o",
-	jump_to_entry = "<CR>",
+	show_entry = "<CR>",
+	jump_to_entry = "o",
 	next_entry = "]]",
 	prev_entry = "[[",
 	close = "q",

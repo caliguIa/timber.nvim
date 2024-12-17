@@ -407,16 +407,16 @@ describe("timber.summary.open", function()
         -- Focus to the summary window
         assert.equals(winnr, vim.api.nvim_get_current_win())
 
-        -- o: open
-        vim.api.nvim_feedkeys("o", "m", false)
+        -- CR: open
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>", true, true, true), "m", false)
         helper.wait(20)
         assert.spy(open_entry_spy).was_called(1)
         assert.spy(open_entry_spy).was_called_with({ jump = false })
 
         open_entry_spy:clear()
 
-        -- CR: open and jump
-        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>", true, true, true), "m", false)
+        -- o: open and jump
+        vim.api.nvim_feedkeys("o", "m", false)
         helper.wait(20)
         assert.spy(open_entry_spy).was_called(1)
         assert.spy(open_entry_spy).was_called_with({ jump = true })

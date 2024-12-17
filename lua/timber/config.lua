@@ -111,8 +111,8 @@ local default_config = {
   },
   log_summary = {
     keymaps = {
-      show_entry = "o",
-      jump_to_entry = "<CR>",
+      show_entry = "<CR>",
+      jump_to_entry = "o",
       next_entry = "]]",
       prev_entry = "[[",
       show_help = "?",
