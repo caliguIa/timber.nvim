@@ -54,19 +54,30 @@ describe("timber.summary.open", function()
     assert.equals("Good bye world", content[4])
   end)
 
-  it("sorts the log entries by timestamp", function()
+  it("sorts the log entries by timestamp and sequence", function()
+    local now = os.time()
     events.emit("watcher:new_log_entry", {
       log_placeholder_id = "ABC",
       payload = "After",
       source_id = "timber_test",
-      timestamp = os.time(),
+      timestamp = now,
+      sequence = 1,
     })
 
     events.emit("watcher:new_log_entry", {
       log_placeholder_id = "DEF",
       payload = "Before",
       source_id = "timber_test",
-      timestamp = os.time() - 20,
+      timestamp = now - 20,
+      sequence = 1,
+    })
+
+    events.emit("watcher:new_log_entry", {
+      log_placeholder_id = "GHI",
+      payload = "Middle",
+      source_id = "timber_test",
+      timestamp = now,
+      sequence = 0,
     })
 
     local _, bufnr = summary.open()
@@ -77,6 +88,9 @@ describe("timber.summary.open", function()
 
         🪵DEF
         Before
+
+        🪵GHI
+        Middle
 
         🪵ABC
         After

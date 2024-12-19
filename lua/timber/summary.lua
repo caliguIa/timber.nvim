@@ -422,6 +422,10 @@ function M.open(opts)
   opts = vim.tbl_deep_extend("force", { focus = true }, opts or {})
 
   table.sort(M.log_entries, function(a, b)
+    if a.timestamp == b.timestamp then
+      return a.sequence < b.sequence
+    end
+
     return a.timestamp < b.timestamp
   end)
 

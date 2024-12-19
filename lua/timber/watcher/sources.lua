@@ -16,11 +16,18 @@
 ---@field buffer table<string, any>? A table of buffer options to apply to the float buffer.
 ---@field type "neotest"
 
+---@alias source_id string
+
 ---@class Timber.Watcher.Sources.Opts
----@field sources table<string, Timber.Watcher.SourceSpec>
+---@field sources table<source_id, Timber.Watcher.SourceSpec>
 ---@field on_log_capture fun(log_entry: Timber.Watcher.LogEntry)
 
-local M = { sources = {} }
+local M = {
+  sources = {},
+  source_sequences = vim.defaulttable(function()
+    return 0
+  end),
+}
 
 ---@param opts Timber.Watcher.Sources.Opts
 function M.setup(opts)
@@ -32,7 +39,10 @@ function M.setup(opts)
         payload = payload,
         source_id = source_id,
         timestamp = os.time(),
+        sequence = M.source_sequences[source_id],
       })
+
+      M.source_sequences[source_id] = M.source_sequences[source_id] + 1
     end)
 
     source_instance:start()

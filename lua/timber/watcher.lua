@@ -3,6 +3,7 @@
 ---@field payload string
 ---@field source_id string
 ---@field timestamp integer
+---@field sequence integer Auto-incremented sequence number. This is used to determine the order of a log entries from a same source
 
 ---@alias Timber.Watcher.LogPlaceholderId string
 
