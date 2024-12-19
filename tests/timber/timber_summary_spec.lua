@@ -232,15 +232,14 @@ describe("timber.summary.open", function()
       helper.assert_scenario({
         input = string.format(
           [[
-            print("%s%s|")
-            print("%s%s|")
+            print("%s%s")
+            print("%s%s")
           ]],
           watcher.MARKER,
           id1,
           watcher.MARKER,
           id2
         ),
-        input_cursor = false,
         filetype = "lua",
         action = function()
           events.emit("watcher:new_log_entry", {
@@ -248,6 +247,7 @@ describe("timber.summary.open", function()
             payload = "First",
             source_id = "timber_test",
             timestamp = os.time(),
+            sequence = 0,
           })
 
           events.emit("watcher:new_log_entry", {
@@ -255,6 +255,7 @@ describe("timber.summary.open", function()
             payload = "Second",
             source_id = "timber_test",
             timestamp = os.time(),
+            sequence = 1,
           })
 
           -- Move cursor to the second line
@@ -275,9 +276,9 @@ describe("timber.summary.open", function()
       helper.assert_scenario({
         input = string.format(
           [[
-            print("%s%s|")
-            print("%s%s|")
-            print("%s%s|")
+            print("%s%s")
+            print("%s%s")
+            print("%s%s")
           ]],
           watcher.MARKER,
           id1,
@@ -286,7 +287,6 @@ describe("timber.summary.open", function()
           watcher.MARKER,
           id1
         ),
-        input_cursor = false,
         filetype = "lua",
         action = function()
           events.emit("watcher:new_log_entry", {
@@ -351,9 +351,9 @@ describe("timber.summary.open", function()
       helper.assert_scenario({
         input = string.format(
           [[
-            print("%s%s|")
-            print("%s%s|")
-            print("%s%s|")
+            print("%s%s")
+            print("%s%s")
+            print("%s%s")
           ]],
           watcher.MARKER,
           id1,
@@ -362,7 +362,6 @@ describe("timber.summary.open", function()
           watcher.MARKER,
           id1
         ),
-        input_cursor = false,
         filetype = "lua",
         action = function()
           events.emit("watcher:new_log_entry", {
@@ -431,15 +430,14 @@ describe("timber.summary.open", function()
     helper.assert_scenario({
       input = string.format(
         [[
-          print("%s%s|")
-          print("%s%s|")
+          print("%s%s")
+          print("%s%s")
         ]],
         watcher.MARKER,
         id1,
         watcher.MARKER,
         id2
       ),
-      input_cursor = false,
       filetype = "lua",
       action = function()
         events.emit("watcher:new_log_entry", {
@@ -447,6 +445,7 @@ describe("timber.summary.open", function()
           payload = "First",
           source_id = "timber_test",
           timestamp = os.time(),
+          sequence = 0,
         })
 
         events.emit("watcher:new_log_entry", {
@@ -454,6 +453,7 @@ describe("timber.summary.open", function()
           payload = "Second",
           source_id = "timber_test",
           timestamp = os.time(),
+          sequence = 1,
         })
 
         -- Move cursor to the second line
@@ -495,12 +495,11 @@ describe("timber.summary.open", function()
       input = string.format(
         [[
           -- Dummy comment
-          print("%s%s|")
+          print("%s%s")
         ]],
         watcher.MARKER,
         id
       ),
-      input_cursor = false,
       filetype = "lua",
       action = function()
         events.emit("watcher:new_log_entry", {
@@ -647,12 +646,11 @@ describe("timber.summary._open_entry", function()
         input = string.format(
           [[
             -- Dummy comment
-            print("%s%s|")
+            print("%s%s")
           ]],
           watcher.MARKER,
           id
         ),
-        input_cursor = false,
         filetype = "lua",
         action = function()
           helper.wait(20)
@@ -670,7 +668,7 @@ describe("timber.summary._open_entry", function()
         end,
         expected = function()
           local current_line = vim.fn.getline(".")
-          assert.equals(string.format([[print("🪵%s|")]], id), current_line)
+          assert.equals(string.format([[print("🪵%s")]], id), current_line)
         end,
       })
     end)
@@ -685,12 +683,11 @@ describe("timber.summary._open_entry", function()
         input = string.format(
           [[
             -- Dummy comment
-            print("%s%s|")
+            print("%s%s")
           ]],
           watcher.MARKER,
           id
         ),
-        input_cursor = false,
         filetype = "lua",
         action = function()
           helper.wait(20)
@@ -727,7 +724,7 @@ describe("timber.summary._open_entry", function()
 
     it("opens the buffer and jump to the line", function()
       local id = watcher.generate_unique_id()
-      local file_content = string.format([[print("%s%s| Hello world")]], watcher.MARKER, id)
+      local file_content = string.format([[print("%s%s Hello world")]], watcher.MARKER, id)
 
       local file = io.open("test_sandbox.summary/open_entry1", "w")
       ---@cast file -nil
@@ -746,7 +743,7 @@ describe("timber.summary._open_entry", function()
       summary._open_entry({ jump = true })
 
       local current_line = vim.api.nvim_get_current_line()
-      assert.equals(string.format([[print("🪵%s| Hello world")]], id), current_line)
+      assert.equals(string.format([[print("🪵%s Hello world")]], id), current_line)
     end)
   end)
 
@@ -759,11 +756,10 @@ describe("timber.summary._open_entry", function()
         input = string.format(
           [[
             -- Dummy comment
-            print("%sZZZ|")
+            print("%sZZZ")
           ]],
           watcher.MARKER
         ),
-        input_cursor = false,
         filetype = "lua",
         action = function()
           helper.wait(20)
@@ -991,12 +987,11 @@ describe("timber.summary custom keymaps", function()
       input = string.format(
         [[
           -- Dummy comment
-          print("%s%s|")
+          print("%s%s")
         ]],
         watcher.MARKER,
         id
       ),
-      input_cursor = false,
       filetype = "lua",
       action = function()
         events.emit("watcher:new_log_entry", {
