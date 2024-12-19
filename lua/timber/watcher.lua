@@ -27,8 +27,8 @@ end
 ---@return string start_marker, string end_marker, string marker_id
 function M.generate_marker_pairs()
   local id = M.generate_unique_id()
-  local start = M.MARKER .. id .. "|"
-  local end_ = "|" .. id
+  local start = M.MARKER .. id
+  local end_ = id
   return start, end_, id
 end
 

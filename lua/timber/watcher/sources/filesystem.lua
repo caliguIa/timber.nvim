@@ -27,7 +27,7 @@ end
 
 function SourceFilesystem:ingest(line)
   if self.state.state == "initial" then
-    local start_marker_pattern = string.format("%s(%s)|", watcher.MARKER, string.rep("[A-Z0-9]", watcher.ID_LENGTH))
+    local start_marker_pattern = string.format("%s(%s)", watcher.MARKER, string.rep("[A-Z0-9]", watcher.ID_LENGTH))
     local _, end_idx, match = string.find(line, start_marker_pattern)
 
     if match and end_idx then
@@ -41,7 +41,7 @@ function SourceFilesystem:ingest(line)
     end
   elseif self.state.state == "pending" then
     local pending_log_item = self.state.pending_log_item
-    local end_marker_pattern = string.format("|%s$", pending_log_item)
+    local end_marker_pattern = string.format("%s$", pending_log_item)
     local match = string.match(line, end_marker_pattern)
     local buffer = self.state.buffer
 

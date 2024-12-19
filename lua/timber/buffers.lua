@@ -29,7 +29,7 @@ local M = {
 ---@param line string
 ---@return string? placeholder_id
 function M._parse_log_placeholder(line)
-  local pattern = string.format("🪵(%s)|", string.rep("[A-Z0-9]", 3))
+  local pattern = string.format("🪵(%s)", string.rep("[A-Z0-9]", 3))
   return string.match(line, pattern)
 end
 
@@ -152,6 +152,7 @@ function M._new_log_placeholder(log_placeholder)
 
   local line =
     vim.api.nvim_buf_get_lines(log_placeholder.bufnr, log_placeholder.line, log_placeholder.line + 1, false)[1]
+
   -- Find the log marker
   local marker_pattern = watcher.MARKER .. log_placeholder.id
   local log_marker_index = line:find(marker_pattern) - 1

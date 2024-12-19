@@ -17,8 +17,8 @@ end
 
 ---@param text string
 function SourceNeotest:capture_log_entries(text)
-  local id_pattern = string.format("🪵(%s)", string.rep("[A-Z0-9]", watcher.ID_LENGTH))
-  local pattern = id_pattern .. "%|(.-)%|%1"
+  local id_pattern = string.format("%s(%s)", watcher.MARKER, string.rep("[A-Z0-9]", watcher.ID_LENGTH))
+  local pattern = id_pattern .. "(.-)%1"
 
   for id, content in string.gmatch(text, pattern) do
     self.on_log_capture(id, content)

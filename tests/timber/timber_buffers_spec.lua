@@ -52,8 +52,8 @@ describe("timber.buffers autocmd", function()
         input = string.format(
           [[
             const foo = "bar"
-            console.log("%s%s|")
-            console.log("%s%s|")
+            console.log("%s%s")
+            console.log("%s%s")
           ]],
           watcher.MARKER,
           id1,
@@ -80,8 +80,8 @@ describe("timber.buffers autocmd", function()
           input = string.format(
             [[
               const foo = "bar"
-              console.log("%s%s|")
-              console.log("%s%s|")
+              console.log("%s%s")
+              console.log("%s%s")
               const bar = "foo"
             ]],
             watcher.MARKER,
@@ -113,8 +113,8 @@ describe("timber.buffers autocmd", function()
           input = string.format(
             [[
               const foo = "bar"
-              console.log("%s%s|")
-              console.log("%s%s|")
+              console.log("%s%s")
+              console.log("%s%s")
               const bar = "foo"
             ]],
             watcher.MARKER,
@@ -157,7 +157,7 @@ describe("timber.buffers autocmd", function()
           filetype = "typescript",
           action = function()
             helper.wait(20)
-            vim.fn.setreg("a", string.format([[console.log("%s%s|")]], watcher.MARKER, id2), "V")
+            vim.fn.setreg("a", string.format([[console.log("%s%s")]], watcher.MARKER, id2), "V")
             vim.cmd([[normal! 2G"ap]])
             helper.wait(20)
           end,
@@ -183,7 +183,7 @@ describe("timber.buffers autocmd", function()
           ]],
           filetype = "typescript",
           action = function()
-            vim.fn.setreg("a", string.format([[console.log("%s%s|")]], watcher.MARKER, id), "V")
+            vim.fn.setreg("a", string.format([[console.log("%s%s")]], watcher.MARKER, id2), "V")
             vim.cmd([[normal! "ap]])
             helper.wait(20)
           end,
@@ -205,7 +205,7 @@ describe("timber.buffers autocmd", function()
         input = string.format(
           [[
             const foo = "bar"
-            console.log("%s%s|")
+            console.log("%s%s")
           ]],
           watcher.MARKER,
           id
@@ -233,7 +233,7 @@ describe("timber.buffers autocmd", function()
         input = string.format(
           [[
             const foo = "bar"
-            console.log("%s%s|")
+            console.log("%s%s")
           ]],
           watcher.MARKER,
           id
@@ -273,21 +273,29 @@ describe("timber.buffers.new_log_placeholder", function()
 
   it("adds the placeholder to the registry", function()
     local id = watcher.generate_unique_id()
-    buffers._new_log_placeholder({ id = id, bufnr = 1, line = 1, entries = {} })
 
-    assert.is.Not.Nil(buffers.log_placeholders:get(id))
+    helper.assert_scenario({
+      input = string.format([[console.log("%s%s")]], watcher.MARKER, id),
+      filetype = "typescript",
+      action = function()
+        buffers._new_log_placeholder({ id = id, bufnr = 0, line = 0, entries = {} })
+      end,
+      expected = function()
+        assert.is.Not.Nil(buffers.log_placeholders:get(id))
+      end,
+    })
   end)
 
   it("attaches to the buffer and reacts to buffer changes", function()
     local id = watcher.generate_unique_id()
 
     helper.assert_scenario({
-      input = [[const fo|o = "bar"]],
+      input = string.format([[console.log("%sfoo")]], watcher.MARKER),
       filetype = "typescript",
       action = function()
         local bufnr = vim.api.nvim_get_current_buf()
         buffers._new_log_placeholder({ id = "foo", bufnr = bufnr, line = 0, entries = {} })
-        vim.fn.setreg("a", string.format([[console.log("%s%s|")]], watcher.MARKER, id), "V")
+        vim.fn.setreg("a", string.format([[console.log("%s%s")]], watcher.MARKER, id), "V")
         vim.cmd([[normal! "ap]])
         helper.wait(20)
         vim.cmd("normal! 1Gdd")
@@ -330,7 +338,7 @@ describe("timber.buffers._receive_log_entry", function()
         input = string.format(
           [[
             const foo = "bar"
-            console.log("%s%s|")
+            console.log("%s%s")
             const bar = "foo"
           ]],
           watcher.MARKER,
