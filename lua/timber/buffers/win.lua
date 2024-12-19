@@ -177,12 +177,24 @@ local function open_win(lines, window_opts, buffer_opts)
   return floating_bufnr, floating_winnr
 end
 
+local function sorted_entries(placeholder, direction)
+  -- Naturally, the entries are sorted as oldest first
+  if direction == "oldest_first" then
+    return placeholder.entries
+  end
+
+  local reversed = {}
+  for i = #placeholder.entries, 1, -1 do
+    table.insert(reversed, placeholder.entries[i])
+  end
+
+  return reversed
+end
+
 ---Render a floating window showing placeholder content
 ---@param placeholder Timber.Buffers.LogPlaceholder
----@param opts? { silent?: boolean }
+---@param opts Timber.Buffers.OpenFloatOpts
 function M.open(placeholder, opts)
-  opts = vim.tbl_extend("force", { silent = false }, opts or {})
-
   if not placeholder.entries or #placeholder.entries == 0 then
     if not opts.silent then
       utils.notify("Log placeholder has no content", "warn")
@@ -191,7 +203,8 @@ function M.open(placeholder, opts)
     return
   end
 
-  local lines, separators, title, footer = win_content(placeholder.entries)
+  local entries = sorted_entries(placeholder, opts.sort)
+  local lines, separators, title, footer = win_content(entries)
   local width, height = win_sizes(lines)
   local window_opts = win_options(width, height)
   window_opts = vim.tbl_extend("force", window_opts, {
@@ -203,7 +216,7 @@ function M.open(placeholder, opts)
   })
 
   -- TODO: handle multiple sources
-  local source_id = placeholder.entries[1].source_id
+  local source_id = entries[1].source_id
   local source = require("timber.watcher").get_source(source_id)
   assert(source, string.format("Unrecognized watcher source '%s'", source_id))
 

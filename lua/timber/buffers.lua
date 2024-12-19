@@ -279,8 +279,13 @@ function M._receive_log_entry(entry)
   end
 end
 
+---@class Timber.Buffers.OpenFloatOpts
+---@field silent? boolean Whether to show a notification when no log placeholder is found. Defaults to `false`
+---@field sort? "newest_first" | "oldest_first" The sort order by timestamp. Defaults to `oldest_first`
+
+---@param opts Timber.Buffers.OpenFloatOpts?
 function M.open_float(opts)
-  opts = vim.tbl_extend("force", { silent = false }, opts or {})
+  opts = vim.tbl_extend("force", { silent = false, sort = "oldest_first" }, opts or {})
 
   local current_line = vim.fn.getline(".")
   local placeholder_id = M._parse_log_placeholder(current_line)
@@ -295,7 +300,7 @@ function M.open_float(opts)
 
   local placeholder = M.log_placeholders:get(placeholder_id)
   if placeholder then
-    require("timber.buffers.win").open(placeholder, { silent = opts.silent })
+    require("timber.buffers.win").open(placeholder, opts)
   else
     error(string.format("Log placeholder %s does not exist", placeholder_id))
   end

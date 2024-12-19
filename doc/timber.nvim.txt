@@ -170,10 +170,11 @@ actions.insert_log({opts})                       *timber.actions.insert_log()*
     {opts} (table)  options to pass to the action
 
   Options: ~
-    {template}            (string)                template for the log
+    {template}            (string)                Template for the log
                                                   statement. Default: "default"
+
     {templates}           (table)                 `{ before = string, after = string }`
-                                                  templates for the log
+                                                  Templates for the log
                                                   statement with "surround"
                                                   position. The `before`
                                                   template will be used for
@@ -183,11 +184,13 @@ actions.insert_log({opts})                       *timber.actions.insert_log()*
                                                   log statement below the cursor.
                                                   If either templates are not
                                                   provided, use "default" template.
-    {position}            (string)                insert position for the
+
+    {position}            (string)                Insert position for the
                                                   log statement. Supported
                                                   values: "above", "below",
                                                   "surround"
-    {operator}            (boolean)               whether to go use operator
+
+    {operator}            (boolean)               Whether to go use operator
                                                   mode. Default: false
 
 
@@ -199,14 +202,14 @@ actions.insert_batch_log({opts})           *timber.actions.insert_batch_log()*
     {opts} (table)  options to pass to the action
 
   Options: ~
-    {template}            (string)                template for the batch log
+    {template}            (string)                Template for the batch log
                                                   statement. Default: "default"
-    {auto_add}            (string)                automatically add the log
+    {auto_add}            (string)                Automatically add the log
                                                   the log targets the the
                                                   batch before inserting the batch
                                                   log. This field is `true` if
 						  operator is `true`. Default: false
-    {operator}            (boolean)               whether to go use operator
+    {operator}            (boolean)               Whether to go use operator
                                                   mode. Default: false
 
   See: ~
@@ -222,7 +225,7 @@ actions.add_log_targets_to_batch({opts})          *timber.actions.add_log_target
     {opts} (table)  options to pass to the action
 
   Options: ~
-    {operator}            (boolean)               whether to go use operator
+    {operator}            (boolean)               Whether to go use operator
                                                   mode. Default: false
 
   See: ~
@@ -250,7 +253,7 @@ actions.clear_log_statements({opts})   *timber.actions.clear_log_statements()*
     {opts} (table)  options to pass to the action
 
   Options: ~
-    {global}            (boolean)         whether to clear all buffers (true)
+    {global}            (boolean)         Whether to clear all buffers (true)
                                           or just the current one (false).
 					  Default: false
 
@@ -263,7 +266,7 @@ actions.toggle_comment_log_statements({opts})   *timber.actions.toggle_comment_l
     {opts} (table)  options to pass to the action
 
   Options: ~
-    {global}            (boolean)         whether to toggle all buffers (true)
+    {global}            (boolean)         Whether to toggle all buffers (true)
                                           or just the current one (false).
 					  Default: false
 
@@ -381,6 +384,10 @@ buffers.open_float({opts})                       *timber.buffers.open_float()*
     {silent}            (boolean)             Whether to silent the notification
                                               if no log placeholder is found.
                                               Default: false
+
+    {sort}              (string)              Sort order for the log entries.
+                                              Supported values: "newest_first",
+                                              "oldest_first". Default: "oldest_first"
 
 
 buffers.clear_captured_logs()           *timber.buffers.clear_captured_logs()*

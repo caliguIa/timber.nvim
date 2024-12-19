@@ -183,7 +183,7 @@ describe("timber.buffers autocmd", function()
           ]],
           filetype = "typescript",
           action = function()
-            vim.fn.setreg("a", string.format([[console.log("%s%s")]], watcher.MARKER, id2), "V")
+            vim.fn.setreg("a", string.format([[console.log("%s%s")]], watcher.MARKER, id), "V")
             vim.cmd([[normal! "ap]])
             helper.wait(20)
           end,
@@ -353,6 +353,7 @@ describe("timber.buffers._receive_log_entry", function()
             payload = "foo",
             source_id = "timber_test",
             timestamp = os.time(),
+            sequence = 0,
           })
           helper.wait(20)
         end,
@@ -391,6 +392,7 @@ describe("timber.buffers._receive_log_entry", function()
             payload = "foo",
             source_id = "timber_test",
             timestamp = os.time(),
+            sequence = 0,
           })
           helper.wait(20)
           buffers._receive_log_entry({
@@ -398,6 +400,7 @@ describe("timber.buffers._receive_log_entry", function()
             payload = "bar",
             source_id = "timber_test",
             timestamp = os.time(),
+            sequence = 1,
           })
           helper.wait(20)
         end,
@@ -442,6 +445,7 @@ describe("timber.buffers._receive_log_entry", function()
               payload = "foo_123456789_123456890",
               source_id = "timber_test",
               timestamp = os.time(),
+              sequence = 0,
             })
             helper.wait(20)
           end,
@@ -466,6 +470,7 @@ describe("timber.buffers._receive_log_entry", function()
         payload = "foo",
         source_id = "timber_test",
         timestamp = os.time(),
+        sequence = 0,
       })
 
       helper.assert_scenario({
@@ -537,12 +542,14 @@ describe("timber.buffers.open_float", function()
               payload = "foo_1",
               source_id = "timber_test",
               timestamp = os.time(),
+              sequence = 0,
             })
             buffers._receive_log_entry({
               log_placeholder_id = id,
               payload = "foo_2",
               source_id = "timber_test",
               timestamp = os.time(),
+              sequence = 1,
             })
             -- Open the float window, and focus to it
             vim.cmd("normal! 2G")
@@ -584,6 +591,7 @@ describe("timber.buffers.open_float", function()
               payload = "foo_123456789_123456890",
               source_id = "timber_test",
               timestamp = os.time(),
+              sequence = 0,
             })
             -- Open the float window, and focus to it
             vim.cmd("normal! 2G")
@@ -621,6 +629,7 @@ describe("timber.buffers.open_float", function()
               payload = "foo_123456789_123456890",
               source_id = "timber_test",
               timestamp = os.time(),
+              sequence = 0,
             })
             -- Open the float window, and focus to it
             vim.cmd("normal! 2G")
@@ -636,6 +645,74 @@ describe("timber.buffers.open_float", function()
             assert.equals(true, vim.api.nvim_get_option_value("readonly", { buf = 0 }))
             assert.equals("delete", vim.api.nvim_get_option_value("bufhidden", { buf = 0 }))
             assert.equals(false, vim.api.nvim_get_option_value("swapfile", { buf = 0 }))
+          end,
+        })
+
+        -- Close the float window
+        vim.cmd("q!")
+      end)
+
+      it("sorts the entries according to the sort option", function()
+        local id = watcher.generate_unique_id()
+
+        helper.assert_scenario({
+          input = string.format(
+            [[
+              const foo = "bar"
+              console.log("%s%s|")
+              const bar = "foo"
+            ]],
+            watcher.MARKER,
+            id
+          ),
+          input_cursor = false,
+          filetype = "typescript",
+          action = function()
+            helper.wait(20)
+            buffers._receive_log_entry({
+              log_placeholder_id = id,
+              payload = "foo_before",
+              source_id = "timber_test",
+              timestamp = os.time(),
+              sequence = 0,
+            })
+            buffers._receive_log_entry({
+              log_placeholder_id = id,
+              payload = "foo_after",
+              source_id = "timber_test",
+              timestamp = os.time() + 20,
+              sequence = 1,
+            })
+          end,
+          expected = function()
+            -- Open the float window, and focus to it
+            vim.cmd("normal! 2G")
+            buffers.open_float({ sort = "oldest_first" })
+            vim.cmd("wincmd w")
+
+            helper.assert_buf_content(
+              0,
+              [[
+                foo_before
+
+                foo_after
+              ]]
+            )
+
+            -- Close and reopen the float window
+            vim.cmd("wincmd w")
+            vim.cmd("normal! 2G")
+            buffers.open_float({ sort = "newest_first" })
+            vim.cmd("wincmd w")
+
+            helper.assert_buf_content(
+              0,
+              [[
+                foo_after
+
+                foo_before
+              ]]
+            )
           end,
         })
 
@@ -751,6 +828,7 @@ describe("timber.buffers.clear_captured_logs", function()
           payload = "foo",
           source_id = "timber_test",
           timestamp = os.time(),
+          sequence = 0,
         })
         -- Open the float window, and focus to it
         vim.cmd("normal! 2G")
