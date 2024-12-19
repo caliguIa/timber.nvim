@@ -253,6 +253,38 @@ describe("timber.actions.insert_log", function()
         helper.wait(20)
       end)
     end)
+
+    it("supports custom placeholder in log template", function()
+      timber.setup({
+        log_templates = {
+          testing = {
+            javascript = [[console.log("%hello", %log_target)]],
+          },
+        },
+        template_placeholders = {
+          hello = function(ctx)
+            local line = ctx.log_target:start()
+            return string.format("Hello World %s line %s", ctx.log_position, line)
+          end,
+        },
+      })
+
+      helper.assert_scenario({
+        input = [[
+          // Comment
+          const fo|o = "bar"
+        ]],
+        filetype = "javascript",
+        action = function()
+          actions.insert_log({ template = "testing", position = "below" })
+        end,
+        expected = [[
+          // Comment
+          const foo = "bar"
+          console.log("Hello World below line 1", foo)
+        ]],
+      })
+    end)
   end)
 
   describe("supports log template that doesn't contain %log_target", function()

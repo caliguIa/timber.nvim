@@ -20,6 +20,7 @@ local utils = require("timber.utils")
 ---@field log_templates { [string]: Timber.LogTemplates }
 ---@field log_marker string? The marker for the %log_marker placeholder. Defaults to `🪵`
 ---@field batch_log_templates { [string]: Timber.LogTemplates }
+---@field template_placeholders table<string, fun(Timber.Actions.Context): string>
 ---@field highlight Timber.Highlight.Config
 ---@field keymaps { [Timber.Action | Timber.Operator]: string | boolean }
 ---@field default_keymaps_enabled boolean Whether to enable default keymaps. Defaults to `true`
@@ -88,6 +89,16 @@ local default_config = {
       bash = [[echo "%repeat<%log_target: ${%log_target}><, >"]],
       swift = [[print("%repeat<%log_target: %log_target><, >")]],
     },
+  },
+  template_placeholders = {
+    filename = function()
+      return vim.fn.expand("%:t")
+    end,
+    -- Custom placeholder. For example, this can be used in log templates as %truncated_line
+    -- truncated_line = function(ctx)
+    --   local line = ctx.log_target:start()
+    --   return nvim_buf_get_lines(0, line - 1, line, false)[1]:sub(1, 16)
+    -- end,
   },
   -- The string to search for when deleting or commenting log statements
   -- Can be used in log templates as %log_marker placeholder

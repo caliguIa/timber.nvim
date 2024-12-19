@@ -29,6 +29,10 @@ local utils = require("timber.utils")
 ---@field current_command_arguments Timber.Actions.CurrentCommandArgument
 ---@field current_selection_range {[1]: number, [2]: number, [3]: number, [4]: number}?
 
+---@class Timber.Actions.Context
+---@field log_target TSNode?
+---@field log_position Timber.Actions.LogPosition
+
 ---@type Timber.Actions.State
 local state = {
   current_command_arguments = {},
@@ -78,16 +82,13 @@ end
 ---   %insert_cursor: after inserting the log statement, go to insert mode and place the cursor here.
 ---     If there's multiple log statements, choose the first one
 ---   %watcher_marker_start and %watcher_marker_end: the start and end markers for timber.watchers
----@alias handler (fun(): string) | string
+---@alias handler (fun(Timber.Actions.Context): string) | string
 ---@param log_template string
+---@param context Timber.Actions.Context
 ---@param handlers {log_target: handler, line_number: handler, filename: handler}
 ---@return string resolved_template, Timber.Watcher.LogPlaceholderId? placeholder_id
-local function resolve_template_placeholders(log_template, handlers)
-  handlers = vim.tbl_extend("force", {
-    filename = function()
-      return vim.fn.expand("%:t")
-    end,
-  }, handlers)
+local function resolve_template_placeholders(log_template, context, handlers)
+  handlers = vim.tbl_extend("force", config.config.template_placeholders, handlers)
 
   ---@type fun(string): string
   local invoke_handler = function(handler_name)
@@ -96,14 +97,18 @@ local function resolve_template_placeholders(log_template, handlers)
       error(string.format("No handler for %s", handler_name))
     end
 
+    ---@type Timber.Actions.Context
     if type(handler) == "function" then
-      return handler()
+      return handler(context)
     else
       return handler
     end
   end
 
-  local to_resolve = { "log_target", "line_number", "filename" }
+  local to_resolve = { "log_target", "line_number" }
+  for k, _ in pairs(config.config.template_placeholders) do
+    table.insert(to_resolve, k)
+  end
 
   for _, placeholder in ipairs(to_resolve) do
     if string.find(log_template, "%%" .. placeholder) then
@@ -424,15 +429,19 @@ local function build_capture_log_statements(log_template, lang, position, select
     local log_target = entry.log_target
     local logable_ranges = entry.logable_ranges
 
-    local content, placeholder_id = resolve_template_placeholders(log_template, {
-      log_target = function()
-        local bufnr = vim.api.nvim_get_current_buf()
-        return vim.treesitter.get_node_text(log_target, bufnr)
-      end,
-      line_number = function()
-        return tostring(log_target:start() + 1)
-      end,
-    })
+    local content, placeholder_id = resolve_template_placeholders(
+      log_template,
+      { log_target = log_target, log_position = position },
+      {
+        log_target = function(ctx)
+          local bufnr = vim.api.nvim_get_current_buf()
+          return vim.treesitter.get_node_text(ctx.log_target, bufnr)
+        end,
+        line_number = function(ctx)
+          return tostring(ctx.log_target:start() + 1)
+        end,
+      }
+    )
 
     local insert_row = get_insert_row(log_target, logable_ranges, position)
 
@@ -458,9 +467,13 @@ end
 local function build_non_capture_log_statement(log_template, position)
   local current_line = vim.fn.getpos(".")[2]
   local insert_row = position == "above" and current_line or current_line + 1
-  local content, placeholder_id = resolve_template_placeholders(log_template, {
-    line_number = tostring(insert_row),
-  })
+  local content, placeholder_id = resolve_template_placeholders(
+    log_template,
+    { log_target = nil, log_position = position },
+    {
+      line_number = tostring(insert_row),
+    }
+  )
 
   return {
     content = content,
@@ -489,12 +502,16 @@ local function build_batch_log_statement(log_template, batch, insert_line)
     local repeat_items = utils.array_map(batch, function(log_target)
       return (
         resolve_template_placeholders(repeat_item_template, {
-          log_target = function()
+          log_target = log_target,
+          -- Batch log always logs below
+          log_position = "below",
+        }, {
+          log_target = function(ctx)
             local bufnr = vim.api.nvim_get_current_buf()
-            return vim.treesitter.get_node_text(log_target, bufnr)
+            return vim.treesitter.get_node_text(ctx.log_target, bufnr)
           end,
-          line_number = function()
-            return tostring(log_target:start() + 1)
+          line_number = function(ctx)
+            return tostring(ctx.log_target:start() + 1)
           end,
         })
       )
@@ -506,7 +523,7 @@ local function build_batch_log_statement(log_template, batch, insert_line)
   end
 
   -- Then resolve the rest
-  local content, placeholder_id = resolve_template_placeholders(result, {
+  local content, placeholder_id = resolve_template_placeholders(result, { log_target = nil, log_position = "below" }, {
     log_target = function()
       utils.notify("Cannot use %log_target placeholder outside %repeat placeholder", "error")
       return "%log_target"
