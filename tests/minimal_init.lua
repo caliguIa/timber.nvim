@@ -38,6 +38,7 @@ require("nvim-treesitter.configs").setup({
     "odin",
     "bash",
     "swift",
+    "kotlin",
   },
   sync_install = true,
   auto_install = false,
