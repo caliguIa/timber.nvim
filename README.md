@@ -412,6 +412,8 @@ You can view the captured log output in a split window:
 require("timber.summary").open({ focus = true })
 ```
 
+https://github.com/user-attachments/assets/469cd456-f4a3-4d20-833c-ea1be908776c
+
 The summary window will show all captured log entries in chronological order. You can view or jump to the log statement line using `o` or `<CR>` with the default mappings.
 
 The summary window has the following keymaps:
