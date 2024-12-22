@@ -743,12 +743,24 @@ Log template string supports special placeholders that will be expanded during
 Control highlight behaviors when insert log statements or add log targets to
 batch. |timber.nvim| uses the following highlight groups:
 
-  Group                 Default         Description ~
-  ------------------------------------------------------------------------------------
-  Timber.Insert         Search          Flash highlight for inserted log statements
-  ------------------------------------------------------------------------------------
-  Timber.AddToBatch     Search          Flash highlight for log targets added to batch
-  ------------------------------------------------------------------------------------
-  Timber.LogStatement   -               Log statements line
+  Group                                 Default                    Description ~
+  -----------------------------------------------------------------------------------------------------------------------------------
+  Timber.Insert                         Search                     Flash highlight for inserted log statements
+  -----------------------------------------------------------------------------------------------------------------------------------
+  Timber.AddToBatch                     Search                     Flash highlight for log targets added to batch
+  -----------------------------------------------------------------------------------------------------------------------------------
+  Timber.LogStatement                   -                          Log statements line
+  -----------------------------------------------------------------------------------------------------------------------------------
+  Timber.LogPlaceholderSnippet          DiagnosticVirtualTextInfo  Captured log output snippet
+  -----------------------------------------------------------------------------------------------------------------------------------
+  Timber.LogPlaceholderTime             -                          Captured log output time
+  -----------------------------------------------------------------------------------------------------------------------------------
+  Timber.FloatingWindowEntrySeparator   FloatBorder                Horizontal separator between entries in the floating window
+  -----------------------------------------------------------------------------------------------------------------------------------
+  Timber.SummarySeparator               _                          Horizontal separator between entries in the summary window
+  -----------------------------------------------------------------------------------------------------------------------------------
+  Timber.SummarySeparatorHighlighted    CursorLineNr               Focused horizontal separator between entries in the summary window
+  -----------------------------------------------------------------------------------------------------------------------------------
+  Timber.SummaryJumpToLine              Search                     Flash highlight when jump to line in the summary window
 
 vim:tw=78:ts=8:noet:ft=help:norl:
