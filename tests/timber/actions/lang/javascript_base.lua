@@ -37,6 +37,36 @@ local run = function(language)
     })
   end)
 
+  it("supports class property", function()
+    helper.assert_scenario({
+      input = [[
+        class Foo {
+          foo = 1;
+
+          bar() {
+            this.fo|o = 2;
+          }
+        }
+      ]],
+      filetype = language,
+      action = function()
+        actions.insert_log({ position = "above" })
+        actions.insert_log({ position = "below" })
+      end,
+      expected = [[
+        class Foo {
+          foo = 1;
+
+          bar() {
+            console.log("this.foo", this.foo)
+            this.foo = 2;
+            console.log("this.foo", this.foo)
+          }
+        }
+      ]],
+    })
+  end)
+
   it("supports array destructuring assignment", function()
     local input = [[
       const [fo|o] = ["bar"]

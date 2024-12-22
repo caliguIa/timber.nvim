@@ -18,6 +18,7 @@
     (member_expression
       object: [
        (identifier)
+       (this)
        (member_expression)
        (subscript_expression)
       ]
@@ -26,6 +27,7 @@
     (subscript_expression
       object: [
        (identifier)
+       (this)
        (member_expression)
        (subscript_expression)
       ]
