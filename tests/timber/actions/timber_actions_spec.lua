@@ -484,27 +484,8 @@ describe("timber.actions.insert_log", function()
   end)
 
   describe("handles user errors", function()
-    it("notifies when the filetype is not recognized", function()
-      local notify_spy = spy.on(utils, "notify")
-
-      helper.assert_scenario({
-        input = [[
-          // Comment
-          const fo|o = bar + baz
-        ]],
-        filetype = "unknown",
-        action = function()
-          actions.insert_log({ position = "below" })
-        end,
-        expected = function()
-          assert.spy(notify_spy).was_called(1)
-          assert.spy(notify_spy).was_called_with("Treesitter parser for unknown language is not found", "error")
-          notify_spy:clear()
-        end,
-      })
-    end)
-
     it("notifies when the log template is not found", function()
+      timber.setup()
       local notify_spy = spy.on(utils, "notify")
 
       helper.assert_scenario({
@@ -524,7 +505,7 @@ describe("timber.actions.insert_log", function()
       })
     end)
 
-    it("notifies when the filetype is not recognized", function()
+    it("notifies when the log template does not include the language", function()
       timber.setup({
         log_templates = {
           testing = {},
@@ -891,6 +872,67 @@ describe("timber.actions.insert_log", function()
         console.log("bar", bar)
       ]],
     })
+  end)
+
+  describe("supports languages without Treesitter parsers", function()
+    it("captures the current word under cursor", function()
+      timber.setup({
+        log_templates = {
+          default = {
+            timber = [[timber.log("%log_target", %log_target)]],
+          },
+        },
+      })
+
+      helper.assert_scenario({
+        input = [[
+          function foo(ba|r, baz) {
+            return null
+          }
+        ]],
+        filetype = "timber",
+        action = function()
+          actions.insert_log({ position = "above" })
+          actions.insert_log({ position = "below" })
+        end,
+        expected = [[
+          timber.log("bar", bar)
+          function foo(bar, baz) {
+            timber.log("bar", bar)
+            return null
+          }
+        ]],
+      })
+    end)
+
+    it("captures the selection range", function()
+      timber.setup({
+        log_templates = {
+          default = {
+            timber = [[timber.log("%log_target", %log_target)]],
+          },
+        },
+      })
+
+      helper.assert_scenario({
+        input = [[
+          function foo(ba|r, baz) {
+            return null
+          }
+        ]],
+        filetype = "timber",
+        action = function()
+          vim.cmd("normal! v4l")
+          actions.insert_log({ position = "below" })
+        end,
+        expected = [[
+          function foo(bar, baz) {
+            timber.log("ar, b", ar, b)
+            return null
+          }
+        ]],
+      })
+    end)
   end)
 end)
 

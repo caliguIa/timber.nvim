@@ -418,11 +418,59 @@ local function get_insert_row(log_target, logable_ranges, position)
 end
 
 ---@param log_template string
+---@param position Timber.Actions.LogPosition
+---@param selection_range range
+---@return Timber.Actions.PendingLogStatement
+local function build_capture_log_statements_non_treesitter(log_template, position, selection_range)
+  local current_line = vim.fn.line(".")
+
+  local content, placeholder_id = resolve_template_placeholders(
+    log_template,
+    { log_target = nil, log_position = position },
+    {
+      log_target = function()
+        local is_single_char_range = selection_range[1] == selection_range[3]
+          and selection_range[2] == selection_range[4]
+        if is_single_char_range then
+          return vim.fn.expand("<cword>")
+        else
+          return vim.api.nvim_buf_get_text(
+            0,
+            selection_range[1],
+            selection_range[2],
+            selection_range[3],
+            selection_range[4] + 1,
+            {}
+          )[1]
+        end
+      end,
+      line_number = function()
+        return tostring(current_line)
+      end,
+    }
+  )
+
+  local insert_row = position == "above" and current_line - 1 or current_line
+  return {
+    content = content,
+    row = insert_row,
+    insert_cursor_offset = nil,
+    log_target = nil,
+    placeholder_id = placeholder_id,
+  }
+end
+
+---@param log_template string
 ---@param lang string
 ---@param position Timber.Actions.LogPosition
 ---@param selection_range range
+---@param treesitter_supported boolean Whether the treesitter parser is installed for the current filetype
 ---@return Timber.Actions.PendingLogStatement[]
-local function build_capture_log_statements(log_template, lang, position, selection_range)
+local function build_capture_log_statements(log_template, lang, position, selection_range, treesitter_supported)
+  if not treesitter_supported then
+    return { build_capture_log_statements_non_treesitter(log_template, position, selection_range) }
+  end
+
   local to_insert = {}
 
   for _, entry in ipairs(capture_log_targets(lang, selection_range)) do
@@ -554,7 +602,7 @@ function M.__insert_log(motion_type)
   local original_cursor_position = state.current_command_arguments.insert_log[3] or vim.fn.getpos(".")
 
   local function build_to_insert(template, position)
-    local log_template_lang, lang = config.get_lang_log_template(template, "single")
+    local log_template_lang, lang, treesitter_supported = config.get_lang_log_template(template, "single")
 
     if not log_template_lang or not lang then
       return {}
@@ -566,7 +614,8 @@ function M.__insert_log(motion_type)
     --   2. Non-capture log statements: log statements that don't contain %log_target placeholder
     --     We simply replace the placeholder text
     return log_template_lang:find("%%log_target")
-        and build_capture_log_statements(log_template_lang, lang, position, selection_range)
+        --- @cast treesitter_supported boolean
+        and build_capture_log_statements(log_template_lang, lang, position, selection_range, treesitter_supported)
       or { build_non_capture_log_statement(log_template_lang, position) }
   end
 

@@ -37,6 +37,7 @@ https://github.com/user-attachments/assets/6bbcb1ab-45a0-45f3-a03a-1d0780219362
   - Bash
   - Swift
   - Kotlin
+  - [Fallback for others](#fallback-for-non-treesitter-languages)
 
 ## Requirements
 
@@ -522,6 +523,13 @@ The summary window has the following keymaps:
 <!-- hl_end -->
 
 </details>
+
+### Fallback for non-Treesitter languages
+
+In case the language does not have a Treesitter parser, the plugin will fallback to use a simple capture mechanism for the `%log_target` placeholder:
+
+1. In normal mode, capture the current word under cursor
+2. In visual mode, capture the selection range
 
 ### Tips
 

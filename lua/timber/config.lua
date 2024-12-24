@@ -172,12 +172,19 @@ local M = {}
 
 ---@param template_set string
 ---@param kind "single" | "batch"
----@return string?, string?
+---@return string? log_template, string? lang, boolean? treesitter_supported
 function M.get_lang_log_template(template_set, kind)
+  local treesitter_supported = true
+
   local lang = utils.get_lang(vim.bo.filetype)
   if not lang then
-    utils.notify(string.format("Treesitter parser for %s language is not found", vim.bo.filetype), "error")
-    return
+    if kind == "batch" then
+      utils.notify(string.format("Treesitter parser for %s language is not found", vim.bo.filetype), "error")
+      return
+    else
+      lang = vim.bo.filetype
+      treesitter_supported = false
+    end
   end
 
   local log_template_set = (kind == "single" and M.config.log_templates or M.config.batch_log_templates)[template_set]
@@ -200,7 +207,7 @@ function M.get_lang_log_template(template_set, kind)
     return
   end
 
-  return log_template_lang, lang
+  return log_template_lang, lang, treesitter_supported
 end
 
 local function setup_keymap(name, rhs, opts)
