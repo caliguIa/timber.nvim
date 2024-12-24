@@ -1,5 +1,5 @@
-name: Bug Report
-description: File a bug/issue
+name: Report Treesitter capture bug
+description: Report a case where the treesitter capture is incomplete
 title: "bug: "
 labels: [bug]
 body:
@@ -12,8 +12,6 @@ body:
       label: Did you check docs and existing issues?
       description: Make sure you checked all of the below before submitting an issue
       options:
-        - label: I have read all the plugin docs
-          required: true
         - label: I have searched the existing issues
           required: true
         - label: I have searched the existing issues of plugins related to this issue
@@ -32,14 +30,14 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: Describe the bug
-      description: A clear and concise description of what the bug is. Please include any related errors you see in Neovim.
+      label: The input text
+      description: "The buffer content before the logging action. Use | to indicate the cursor position. e.g: `local foo = \"ba|r\"` means the cursor position is at the `a` letter."
     validations:
       required: true
   - type: textarea
     attributes:
-      label: Steps To Reproduce
-      description: Steps to reproduce the behavior.
+      label: Actions performed
+      description: "One or more actions performed on the input text. e.g: insert_log_below, insert_log_above, insert_plain_log_below, insert_plain_log_above, insert_batch_log, add_log_targets_to_batch, ..."
       placeholder: |
         1.
         2.
@@ -48,7 +46,7 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: Expected Behavior
-      description: A concise description of what you expected to happen.
+      label: Expected output text
+      description: The expected buffer content after the loggin action.
     validations:
       required: true
