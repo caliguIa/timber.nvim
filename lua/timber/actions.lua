@@ -1,3 +1,4 @@
+local utils = require("custom.utils")
 ---@class Timber.Actions.Module
 --- @field batch TSNode[]
 local M = { batch = {} }
@@ -200,7 +201,6 @@ end
 ---Perform post-insert operations:
 ---   1. Place the cursor at the insert_cursor placeholder if any
 ---   2. Move the cursor back to the original position if needed
----   3. Add the log placeholder to the buffer manager
 ---@param log_statements Timber.Actions.PendingLogStatement[] The log statements after inserted
 ---@param insert_cursor_pos {[1]: number, [2]: number}?
 ---@param original_cursor_position range?
@@ -249,11 +249,37 @@ local function after_insert_log_statements(log_statements, insert_cursor_pos, or
       vim.fn.setpos(".", original_cursor_position)
     end, 0)
   end
+end
 
-  -- Add the log placeholder to the buffer manager
+---@param log_statements Timber.Actions.PendingLogStatement[] The log statements after inserted
+local function emit_new_log_events(log_statements)
   for _, log_statement in ipairs(log_statements) do
     events.emit("actions:new_log_statement", log_statement)
   end
+end
+
+---@param auto_imports string[]
+---@return integer The number of auto imports inserted
+local function insert_auto_import(auto_imports)
+  local inserted = 0
+
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+  vim
+    .iter(auto_imports)
+    :filter(function(auto_import)
+      local exists = vim.iter(lines):any(function(line)
+        return line == auto_import
+      end)
+
+      return not exists
+    end)
+    :each(function(auto_import)
+      vim.api.nvim_buf_set_lines(0, 0, 0, false, { auto_import })
+      inserted = inserted + 1
+    end)
+
+  return inserted
 end
 
 ---Group log targets that overlap with each other
@@ -608,33 +634,58 @@ function M.__insert_log(motion_type)
       return {}
     end
 
+    local normalized = type(log_template_lang) == "string" and { log_template_lang } or log_template_lang
+    local template_string = normalized[1]
+
     -- There are two kinds of log statements:
     --   1. Capture log statements: log statements that contain %log_target placeholder
     --     We need to capture the log target in the selection range and replace it
     --   2. Non-capture log statements: log statements that don't contain %log_target placeholder
     --     We simply replace the placeholder text
-    return log_template_lang:find("%%log_target")
+    local log_statements = template_string:find("%%log_target")
         --- @cast treesitter_supported boolean
-        and build_capture_log_statements(log_template_lang, lang, position, selection_range, treesitter_supported)
-      or { build_non_capture_log_statement(log_template_lang, position) }
+        and build_capture_log_statements(template_string, lang, position, selection_range, treesitter_supported)
+      or { build_non_capture_log_statement(template_string, position) }
+
+    return log_statements, normalized.auto_import
   end
 
   local to_insert = {}
+  local auto_imports = {}
 
   if opts.position == "surround" then
-    local to_insert_before = build_to_insert(opts.templates.before, "above")
-    local to_insert_after = build_to_insert(opts.templates.after, "below")
+    local to_insert_before, auto_import_before = build_to_insert(opts.templates.before, "above")
+    local to_insert_after, auto_import_after = build_to_insert(opts.templates.after, "below")
     to_insert = { unpack(to_insert_before), unpack(to_insert_after) }
+
+    if auto_import_before then
+      table.insert(auto_imports, auto_import_before)
+    end
+
+    if auto_import_after then
+      table.insert(auto_imports, auto_import_after)
+    end
   else
     if opts.templates then
       utils.notify("'templates' can only be used with position 'surround'", "warn")
     end
 
-    to_insert = build_to_insert(opts.template, opts.position)
+    local _to_insert, auto_import = build_to_insert(opts.template, opts.position)
+    to_insert = _to_insert
+    if auto_import then
+      table.insert(auto_imports, auto_import)
+    end
+  end
+
+  local imported_inserted = insert_auto_import(auto_imports)
+  -- Adjust the row to account for the auto import lines
+  for _, statement in ipairs(to_insert) do
+    statement.row = statement.row + imported_inserted
   end
 
   local after_inserted_statements, insert_cursor_pos = insert_log_statements(to_insert)
   after_insert_log_statements(after_inserted_statements, insert_cursor_pos, original_cursor_position)
+  emit_new_log_events(after_inserted_statements)
 
   -- Prepare for dot repeat. We only preserve the opts
   make_dot_repeatable("__insert_log")
@@ -696,11 +747,19 @@ function M.__insert_batch_log(motion_type)
   if not log_template_lang or not lang then
     return
   end
+  local normalized = type(log_template_lang) == "string" and { log_template_lang } or log_template_lang
 
   -- Insert 1 line after the selection range
-  local to_insert = build_batch_log_statement(log_template_lang, M.batch, selection_range[3] + 1)
-  local after_insert_statements, insert_cursor_pos = insert_log_statements({ to_insert })
-  after_insert_log_statements(after_insert_statements, insert_cursor_pos, nil)
+  local to_insert = build_batch_log_statement(normalized[1], M.batch, selection_range[3] + 1)
+
+  local imported_inserted = insert_auto_import({ normalized.auto_import })
+  -- Adjust the row to account for the auto import lines
+  to_insert.row = to_insert.row + imported_inserted
+
+  local after_inserted_statements, insert_cursor_pos = insert_log_statements({ to_insert })
+  after_insert_log_statements(after_inserted_statements, insert_cursor_pos, nil)
+  emit_new_log_events(after_inserted_statements)
+
   M.clear_batch()
 
   make_dot_repeatable("__insert_batch_log")

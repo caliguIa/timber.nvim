@@ -934,6 +934,73 @@ describe("timber.actions.insert_log", function()
       })
     end)
   end)
+
+  describe("supports auto_import", function()
+    it("inserts the import line at the top of the file", function()
+      timber.setup({
+        log_templates = {
+          testing = {
+            javascript = {
+              [[log("Testing")]],
+              auto_import = [[import { log } from "some-package"]],
+            },
+          },
+        },
+      })
+
+      helper.assert_scenario({
+        input = [[
+          // Comment
+          const fo|o = "foo"
+          const bar = "bar"
+        ]],
+        filetype = "javascript",
+        action = function()
+          actions.insert_log({ position = "below", template = "testing" })
+        end,
+        expected = [[
+          import { log } from "some-package"
+          // Comment
+          const foo = "foo"
+          log("Testing")
+          const bar = "bar"
+        ]],
+      })
+    end)
+
+    it("DO NOT insert the import line if the line already exists", function()
+      timber.setup({
+        log_templates = {
+          testing = {
+            javascript = {
+              [[log(%log_target)]],
+              auto_import = [[import { log } from "some-package"]],
+            },
+          },
+        },
+      })
+
+      helper.assert_scenario({
+        input = [[
+          import { log } from "some-package"
+          // Comment
+          const fo|o = "foo"
+          const bar = "bar"
+        ]],
+        filetype = "javascript",
+        action = function()
+          actions.insert_log({ position = "below", template = "testing" })
+        end,
+        expected = [[
+          import { log } from "some-package"
+          // Comment
+          const foo = "foo"
+          log(foo)
+          const bar = "bar"
+        ]],
+      })
+    end)
+  end)
 end)
 
 describe("timber.actions.insert_batch_log", function()
@@ -1269,6 +1336,112 @@ describe("timber.actions.insert_batch_log", function()
         console.log({ "foo": foo, "bar": bar, "baz": baz })
       ]],
     })
+  end)
+
+  describe("supports auto_import", function()
+    it("inserts the import line at the top of the file", function()
+      timber.setup({
+        batch_log_templates = {
+          testing = {
+            javascript = {
+              [[log({ %repeat<"%log_target": %log_target><, > })]],
+              auto_import = [[import { log } from 'some-package']],
+            },
+          },
+        },
+      })
+
+      helper.assert_scenario({
+        input = [[
+          // Comment
+          const foo = "foo"
+          const bar = "bar"
+          const ba|z = "baz"
+        ]],
+        filetype = "javascript",
+        action = function()
+          vim.cmd("normal! V2k")
+          actions.insert_batch_log({ auto_add = true, template = "testing" })
+        end,
+        expected = [[
+          import { log } from 'some-package'
+          // Comment
+          const foo = "foo"
+          const bar = "bar"
+          const baz = "baz"
+          log({ "foo": foo, "bar": bar, "baz": baz })
+        ]],
+      })
+    end)
+
+    it("inserts the import line at the top of the file", function()
+      timber.setup({
+        batch_log_templates = {
+          testing = {
+            javascript = {
+              [[log({ %repeat<"%log_target": %log_target><, > })]],
+              auto_import = [[import { log } from 'some-package']],
+            },
+          },
+        },
+      })
+
+      helper.assert_scenario({
+        input = [[
+          import { log } from 'some-package'
+          // Comment
+          const foo = "foo"
+          const bar = "bar"
+          const ba|z = "baz"
+        ]],
+        filetype = "javascript",
+        action = function()
+          vim.cmd("normal! V2k")
+          actions.insert_batch_log({ auto_add = true, template = "testing" })
+        end,
+        expected = [[
+          import { log } from 'some-package'
+          // Comment
+          const foo = "foo"
+          const bar = "bar"
+          const baz = "baz"
+          log({ "foo": foo, "bar": bar, "baz": baz })
+        ]],
+      })
+    end)
+
+    it("DO NOT insert the import line if the line already exists", function()
+      timber.setup({
+        log_templates = {
+          testing = {
+            javascript = {
+              [[log(%log_target)]],
+              auto_import = [[import { log } from "some-package"]],
+            },
+          },
+        },
+      })
+
+      helper.assert_scenario({
+        input = [[
+          import { log } from "some-package"
+          // Comment
+          const fo|o = "foo"
+          const bar = "bar"
+        ]],
+        filetype = "javascript",
+        action = function()
+          actions.insert_log({ position = "below", template = "testing" })
+        end,
+        expected = [[
+          import { log } from "some-package"
+          // Comment
+          const foo = "foo"
+          log(foo)
+          const bar = "bar"
+        ]],
+      })
+    end)
   end)
 end)
 

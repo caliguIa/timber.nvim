@@ -1,4 +1,4 @@
----@alias Template string
+---@alias Template string | { [1]: string, auto_import?: string }
 ---@alias Timber.LogTemplates { [string]: Template }
 
 ---@alias Timber.Action 'insert_log_below' | 'insert_log_above' | 'insert_batch_log' | 'add_log_targets_to_batch'

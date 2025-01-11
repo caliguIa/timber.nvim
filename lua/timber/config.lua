@@ -31,6 +31,11 @@ local utils = require("timber.utils")
 local default_config = {
   log_templates = {
     default = {
+      -- Templates with auto_import: when inserting a log statement, the import line is inserted automatically
+      -- javascript = {
+      --   [[logger.info('hello world')]],
+      --   auto_import = [[const logger = require('pino')()]]
+      -- }
       javascript = [[console.log("%log_target", %log_target)]],
       typescript = [[console.log("%log_target", %log_target)]],
       jsx = [[console.log("%log_target", %log_target)]],
@@ -172,7 +177,7 @@ local M = {}
 
 ---@param template_set string
 ---@param kind "single" | "batch"
----@return string? log_template, string? lang, boolean? treesitter_supported
+---@return Template? log_template, string? lang, boolean? treesitter_supported
 function M.get_lang_log_template(template_set, kind)
   local treesitter_supported = true
 
@@ -193,6 +198,7 @@ function M.get_lang_log_template(template_set, kind)
     return
   end
 
+  ---@type Template
   local log_template_lang = log_template_set[lang]
   if not log_template_lang then
     utils.notify(

@@ -109,6 +109,12 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
 {
     log_templates = {
         default = {
+            -- Templates with auto_import: when inserting a log statement, the import line is inserted automatically
+            -- Applies to batch log statements as well
+            -- javascript = {
+            --   [[logger.info('hello world')]],
+            --   auto_import = [[const logger = require('pino')()]]
+            -- }
             javascript = [[console.log("%log_target", %log_target)]],
             typescript = [[console.log("%log_target", %log_target)]],
             jsx = [[console.log("%log_target", %log_target)]],

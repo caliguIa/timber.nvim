@@ -10,6 +10,7 @@ local utils = require("timber.utils")
 ---@field id Timber.Watcher.LogPlaceholderId The log placeholder id.
 ---@field bufnr number
 ---@field line number 0-indexed line number. The line number is only correct when the placeholder is newly created. Overtime, after updates, the real line number will be shifted.
+---@field content string
 ---@field extmark_id? integer
 ---@field entries Timber.Buffers.LogPlaceholderEntries[]
 
@@ -68,7 +69,7 @@ function M._process_line(content, bufnr, line)
 
   if placeholder_id and not M.log_placeholders:get(placeholder_id) then
     vim.schedule(function()
-      M._new_log_placeholder({ id = placeholder_id, bufnr = bufnr, line = line, entries = {} })
+      M._new_log_placeholder({ id = placeholder_id, bufnr = bufnr, line = line, content = content, entries = {} })
     end)
 
     return placeholder_id
@@ -150,12 +151,9 @@ function M._new_log_placeholder(log_placeholder)
     return
   end
 
-  local line =
-    vim.api.nvim_buf_get_lines(log_placeholder.bufnr, log_placeholder.line, log_placeholder.line + 1, false)[1]
-
   -- Find the log marker
   local marker_pattern = watcher.MARKER .. log_placeholder.id
-  local log_marker_index = line:find(marker_pattern) - 1
+  local log_marker_index = log_placeholder.content:find(marker_pattern) - 1
   ---@cast log_marker_index integer
 
   local extmark_id = vim.api.nvim_buf_set_extmark(
@@ -417,6 +415,7 @@ function M.setup()
       bufnr = vim.api.nvim_get_current_buf(),
       -- TODO: support multi line log statements
       line = log_statement.inserted_rows[1],
+      content = log_statement.content,
       entries = {},
     })
   end)

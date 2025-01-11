@@ -274,11 +274,12 @@ describe("timber.buffers.new_log_placeholder", function()
   it("adds the placeholder to the registry", function()
     local id = watcher.generate_unique_id()
 
+    local input = string.format([[console.log("%s%s")]], watcher.MARKER, id)
     helper.assert_scenario({
-      input = string.format([[console.log("%s%s")]], watcher.MARKER, id),
+      input = input,
       filetype = "typescript",
       action = function()
-        buffers._new_log_placeholder({ id = id, bufnr = 0, line = 0, entries = {} })
+        buffers._new_log_placeholder({ id = id, bufnr = 0, line = 0, content = input, entries = {} })
       end,
       expected = function()
         assert.is.Not.Nil(buffers.log_placeholders:get(id))
@@ -289,12 +290,13 @@ describe("timber.buffers.new_log_placeholder", function()
   it("attaches to the buffer and reacts to buffer changes", function()
     local id = watcher.generate_unique_id()
 
+    local input = string.format([[console.log("%sfoo")]], watcher.MARKER)
     helper.assert_scenario({
-      input = string.format([[console.log("%sfoo")]], watcher.MARKER),
+      input = input,
       filetype = "typescript",
       action = function()
         local bufnr = vim.api.nvim_get_current_buf()
-        buffers._new_log_placeholder({ id = "foo", bufnr = bufnr, line = 0, entries = {} })
+        buffers._new_log_placeholder({ id = "foo", bufnr = bufnr, line = 0, content = input, entries = {} })
         vim.fn.setreg("a", string.format([[console.log("%s%s")]], watcher.MARKER, id), "V")
         vim.cmd([[normal! "ap]])
         helper.wait(20)
