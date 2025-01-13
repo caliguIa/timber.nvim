@@ -1,4 +1,3 @@
-local utils = require("custom.utils")
 ---@class Timber.Actions.Module
 --- @field batch TSNode[]
 local M = { batch = {} }
