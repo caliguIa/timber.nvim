@@ -204,15 +204,6 @@ function M.setup()
     return is_node_field_of_parent(node, parent_type, field_name)
   end, { force = true })
 
-  -- The negation of field-of-parent?
-  vim.treesitter.query.add_predicate("not-field-of-parent?", function(match, _, _, predicate)
-    local node = get_match_node(match, predicate[2])
-    local parent_type = predicate[3]
-    local field_name = predicate[4]
-
-    return not is_node_field_of_parent(node, parent_type, field_name)
-  end, { force = true })
-
   -- Similar to has-ancestor?, but also check the node is in a field of the ancestor subtree
   vim.treesitter.query.add_predicate("field-of-ancestor?", function(match, _, _, predicate)
     local node = get_match_node(match, predicate[2])
@@ -220,14 +211,6 @@ function M.setup()
     local field_name = predicate[4]
 
     return is_node_field_of_ancestor(node, ancestor_type, field_name)
-  end, { force = true })
-
-  vim.treesitter.query.add_predicate("not-field-of-ancestor?", function(match, _, _, predicate)
-    local node = get_match_node(match, predicate[2])
-    local ancestor_type = predicate[3]
-    local field_name = predicate[4]
-
-    return not is_node_field_of_ancestor(node, ancestor_type, field_name)
   end, { force = true })
 end
 
