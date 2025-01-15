@@ -2004,7 +2004,6 @@ describe("timber.actions.search_log_statements", function()
     local telescope_spy = spy.on(telescope, "grep_string")
 
     actions.search_log_statements()
-    vim.cmd("close!")
 
     assert.spy(telescope_spy).was_called(1)
     assert.spy(telescope_spy).was_called_with({ search = "foo", prompt_title = "Log Statements (timber.nvim)" })
