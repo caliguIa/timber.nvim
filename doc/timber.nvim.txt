@@ -155,6 +155,7 @@ Users can invoke actions via the API. Action APIs are defined in the
   :h timber.actions.add_log_targets_to_batch
   :h timber.actions.clear_log_statements
   :h timber.actions.toggle_comment_log_statements
+  :h timber.actions.search_log_statements
 
 
 actions.insert_log({opts})                       *timber.actions.insert_log()*
@@ -269,6 +270,11 @@ actions.toggle_comment_log_statements({opts})   *timber.actions.toggle_comment_l
     {global}            (boolean)         Whether to toggle all buffers (true)
                                           or just the current one (false).
 					  Default: false
+
+
+actions.search_log_statements({opts}) *timber.actions.search_log_statements()*
+
+  Search log statements in all files using |telescope.nvim|.
 
 ==============================================================================
 3. Watchers                                             *timber.nvim-watchers*

@@ -870,6 +870,10 @@ function M.toggle_comment_log_statements(opts)
   require("timber.actions.comment").toggle_comment(opts)
 end
 
+function M.search_log_statements()
+  require("timber.actions.search").search()
+end
+
 function M.setup()
   treesitter.setup()
 end

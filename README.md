@@ -44,6 +44,7 @@ https://github.com/user-attachments/assets/6bbcb1ab-45a0-45f3-a03a-1d0780219362
 
 - [Neovim 0.10+](https://github.com/neovim/neovim/releases)
 - [Recommended] [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter): to support languages, users need to install appropriate Treesitter parsers. `nvim-treesitter` provides an easy interface to manage them.
+- [Optional] [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim): required for log statements search feature.
 
 ## Installation
 
@@ -322,7 +323,7 @@ Out of the box, `timber.nvim` provides [default templates](https://github.com/Go
 <details>
 <summary><strong>Clear/comment log statements</strong></summary>
 
-To use this feature, you need to configure `log_marker`. The default is 🪵. This `log_marker` will be search/grep to find the log statement lines. Make sure to include it in your log templates. A convenient way to do it is using the `%log_marker` placeholder:
+To use these features, you need to configure `log_marker`. The default is 🪵. This `log_marker` will be search/grep to find the log statement lines. Make sure to include it in your log templates. A convenient way to do it is using the `%log_marker` placeholder:
 
 ```lua
 
@@ -356,6 +357,16 @@ vim.o.grepprg = "git grep --line-number --column" -- Use git
 vim.o.grepprg = "grep --line-number --with-filename -R --exclude-dir=.git" -- Use grep
 ```
 
+</details>
+
+<details>
+<summary><strong>Search log statements</strong></summary>
+
+Similar to clear/comment log statements feature, you need to configure `log_marker`. `timber.nvim` uses `telescope.nvim` to search log statements:
+
+```lua
+require("timber.actions").search_log_statements()
+```
 </details>
 
 <details>

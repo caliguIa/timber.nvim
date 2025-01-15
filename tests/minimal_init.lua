@@ -1,17 +1,14 @@
-local plenary_dir = "./vendor/plenary.nvim"
-
-if vim.fn.isdirectory(plenary_dir) == 0 then
-  vim.fn.system({ "git", "clone", "https://github.com/nvim-lua/plenary.nvim", plenary_dir })
-end
-
-local nvim_treesitter_dir = "./vendor/nvim-treesitter"
-if vim.fn.isdirectory(nvim_treesitter_dir) == 0 then
-  vim.fn.system({ "git", "clone", "https://github.com/nvim-treesitter/nvim-treesitter.git", nvim_treesitter_dir })
+local function install_dep(dir, path)
+  if vim.fn.isdirectory(dir) == 0 then
+    vim.fn.system({ "git", "clone", path, dir })
+  end
+  vim.opt.rtp:append(dir)
 end
 
 vim.opt.rtp:append(".")
-vim.opt.rtp:append(plenary_dir)
-vim.opt.rtp:append(nvim_treesitter_dir)
+install_dep("./vendor/plenary.nvim", "https://github.com/nvim-lua/plenary.nvim.git")
+install_dep("./vendor/nvim-treesitter", "https://github.com/nvim-treesitter/nvim-treesitter.git")
+install_dep("./vendor/telescope.nvim", "https://github.com/nvim-telescope/telescope.nvim.git")
 
 -- Setup grepprg for global clear and comment tests
 vim.o.grepprg = "grep --line-number --with-filename -R --exclude-dir=.git"

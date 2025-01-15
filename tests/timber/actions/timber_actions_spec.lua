@@ -1995,3 +1995,18 @@ describe("timber.actions.toggle_comment_log_statements", function()
     end)
   end)
 end)
+
+describe("timber.actions.search_log_statements", function()
+  it("calls telescope.builtin.grep_string with the log_marker", function()
+    timber.setup({ log_marker = "foo" })
+
+    local telescope = require("telescope.builtin")
+    local telescope_spy = spy.on(telescope, "grep_string")
+
+    actions.search_log_statements()
+    vim.cmd("close!")
+
+    assert.spy(telescope_spy).was_called(1)
+    assert.spy(telescope_spy).was_called_with({ search = "foo", prompt_title = "Log Statements (timber.nvim)" })
+  end)
+end)
