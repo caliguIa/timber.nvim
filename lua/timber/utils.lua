@@ -117,38 +117,6 @@ function M.string_left_pad(str, len, char)
   return string.rep(char, len - #str) .. str
 end
 
-function M.dump(o, nest)
-  nest = nest or 2
-  if type(o) == "table" then
-    local s = "{ " .. "\n" .. string.rep(" ", nest)
-    for k, v in pairs(o) do
-      if type(k) ~= "number" then
-        k = '"' .. k .. '"'
-      end
-      s = s .. "[" .. k .. "] = " .. M.dump(v, nest + 2) .. "," .. "\n" .. string.rep(" ", nest)
-    end
-    return s .. "} "
-  else
-    return tostring(o)
-  end
-end
-
-function M.log(message)
-  local log_file_path = "/tmp/nvim_debug.log"
-  local log_file = io.open(log_file_path, "a")
-  io.output(log_file)
-  io.write(M.dump(message) .. "\n")
-  io.close(log_file)
-end
-
-function M.log_test(message)
-  local log_file_path = "/tmp/timber_debug.log"
-  local log_file = io.open(log_file_path, "a")
-  io.output(log_file)
-  io.write(M.dump(message) .. "\n")
-  io.close(log_file)
-end
-
 local function range_start_before(range1, range2)
   if range1[1] == range2[1] then
     return range1[2] < range2[2]
