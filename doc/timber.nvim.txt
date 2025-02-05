@@ -719,25 +719,25 @@ See the default configuration for some examples of template.
                                                     end)
   -----------------------------------------------------------------------------------------------------------------
   insert_log_below_operator             g<S-l>j     vim.keymap.set("n", "g<S-l>j", function()
-                                                      require("timber.actions").insert_log({
+                                                      return require("timber.actions").insert_log({
                                                         position = "below",
                                                         operator = true
                                                       })
                                                     end, { expr = true })
   -----------------------------------------------------------------------------------------------------------------
   insert_log_above_operator             g<S-l>k     vim.keymap.set("n", "g<S-l>k", function()
-                                                      require("timber.actions").insert_log({
+                                                      return require("timber.actions").insert_log({
                                                         position = "above",
                                                         operator = true
                                                       })
                                                     end, { expr = true })
   -----------------------------------------------------------------------------------------------------------------
   insert_batch_log_operator             g<S-l>b     vim.keymap.set("n", "g<S-l>b", function()
-                                                      require("timber.actions").insert_log({ operator = true })
+                                                      return require("timber.actions").insert_log({ operator = true })
                                                     end, { expr = true })
   -----------------------------------------------------------------------------------------------------------------
   add_log_targets_to_batch_operator     g<S-l>a     vim.keymap.set("n", "g<S-l>a", function()
-                                                      require("timber.actions").add_log_targets_to_batch({
+                                                      return require("timber.actions").add_log_targets_to_batch({
                                                         operator = true
                                                       })
                                                     end, { expr = true })
