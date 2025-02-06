@@ -19,17 +19,39 @@ function M.sort_ts_nodes_preorder(nodes)
   end)
 end
 
+local function get_language_tree(lang)
+  local bufnr = vim.api.nvim_get_current_buf()
+  local parser = vim.treesitter.get_parser(bufnr, lang)
+
+  if lang == "astro" then
+    -- Astro has injected Typescript syntax
+    local child_parser = parser:children()["typescript"]
+    return child_parser:parse()[1]
+  else
+    return parser:parse()[1]
+  end
+end
+
+-- Some languages have injected languages, e.g. Astro has Typescript injected
+local function get_logable_lang(lang)
+  if lang == "astro" then
+    return "typescript"
+  else
+    return lang
+  end
+end
+
 ---@alias logable_range {[1]: number, [2]: number}
 ---@param lang string
 ---@param range {[1]: number, [2]: number, [3]: number, [4]: number}
 ---@return {container: TSNode, logable_ranges: logable_range[]}[]
 function M.query_log_target_containers(lang, range)
   local bufnr = vim.api.nvim_get_current_buf()
-  local parser = vim.treesitter.get_parser(bufnr, lang)
-  local tree = parser:parse()[1]
+  local tree = get_language_tree(lang)
   local root = tree:root()
 
-  local query = vim.treesitter.query.get(lang, "timber-log-container")
+  local logable_lang = get_logable_lang(lang)
+  local query = vim.treesitter.query.get(logable_lang, "timber-log-container")
   if not query then
     utils.notify(string.format("timber doesn't support %s language", lang), "error")
     return {}
@@ -63,7 +85,8 @@ end
 ---@param lang string
 ---@return {container: TSNode, log_targets: TSNode[]}[]
 function M.query_log_targets(containers, lang)
-  local query = vim.treesitter.query.get(lang, "timber-log-target")
+  local logable_lang = get_logable_lang(lang)
+  local query = vim.treesitter.query.get(logable_lang, "timber-log-target")
   if not query then
     utils.notify(string.format("timber doesn't support %s language", lang), "error")
     return {}
