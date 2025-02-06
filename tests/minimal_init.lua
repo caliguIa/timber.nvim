@@ -21,6 +21,7 @@ require("nvim-treesitter.configs").setup({
   ensure_installed = {
     "javascript",
     "typescript",
+    "astro",
     "tsx",
     "lua",
     "ruby",
