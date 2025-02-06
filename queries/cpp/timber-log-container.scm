@@ -145,7 +145,7 @@
 ; Lambda expressions
 (
   (lambda_expression
-    declarator: (abstract_function_declarator
+    declarator: (lambda_declarator
       parameters: (parameter_list) @log_container
     )
     body: (compound_statement) @a
