@@ -777,7 +777,7 @@ batch. |timber.nvim| uses the following highlight groups:
   -----------------------------------------------------------------------------------------------------------------------------------
   Timber.SummarySeparator               _                          Horizontal separator between entries in the summary window
   -----------------------------------------------------------------------------------------------------------------------------------
-  Timber.SummarySeparatorHighlighted    CursorLineNr               Focused horizontal separator between entries in the summary window
+  Timber.SummaryEntryBodyHighlighted    PmenuSel                   Highlighted entry body in the summary window
   -----------------------------------------------------------------------------------------------------------------------------------
   Timber.SummaryJumpToLine              Search                     Flash highlight when jump to line in the summary window
 

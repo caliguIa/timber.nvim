@@ -1,3 +1,4 @@
+local _utils = require("custom.utils")
 local assert = require("luassert")
 local spy = require("luassert.spy")
 local events = require("timber.events")
@@ -269,7 +270,7 @@ describe("timber.summary.open", function()
       })
     end)
 
-    it("highlights ALL the matching log entries header", function()
+    it("highlights ALL the matching log entries body", function()
       local id1 = watcher.generate_unique_id()
       local id2 = watcher.generate_unique_id()
 
@@ -319,18 +320,16 @@ describe("timber.summary.open", function()
 
           for i, line in ipairs(lines) do
             if line:match("🪵" .. id1) then
-              local hl_extmars = get_line_hl_groups(i - 1)
-              assert.is.True(vim.list_contains(hl_extmars, "Timber.SummarySeparatorHighlighted"))
-            else
-              local hl_extmars = get_line_hl_groups(i - 1)
-              assert.is.False(vim.list_contains(hl_extmars, "Timber.SummarySeparatorHighlighted"))
+              -- The next line after the header is the body
+              local hl_extmars = get_line_hl_groups(i)
+              assert.is.True(vim.list_contains(hl_extmars, "Timber.SummaryEntryBodyHighlighted"))
             end
           end
         end,
       })
     end)
 
-    it("highlights NEW matching log entries header", function()
+    it("highlights NEW matching log entries body", function()
       local id1 = watcher.generate_unique_id()
       local id2 = watcher.generate_unique_id()
 
@@ -339,11 +338,9 @@ describe("timber.summary.open", function()
 
         for i, line in ipairs(lines) do
           if line:match("🪵" .. id1) then
-            local hl_extmars = get_line_hl_groups(i - 1)
-            assert.is.True(vim.list_contains(hl_extmars, "Timber.SummarySeparatorHighlighted"))
-          else
-            local hl_extmars = get_line_hl_groups(i - 1)
-            assert.is.False(vim.list_contains(hl_extmars, "Timber.SummarySeparatorHighlighted"))
+            -- The next line after the header is the body
+            local hl_extmars = get_line_hl_groups(i)
+            assert.is.True(vim.list_contains(hl_extmars, "Timber.SummaryEntryBodyHighlighted"))
           end
         end
       end
@@ -418,11 +415,9 @@ describe("timber.summary.open", function()
 
       for i, line in ipairs(lines) do
         if line:match("🪵" .. placeholder_id) then
-          local hl_extmars = get_line_hl_groups(i - 1, bufnr)
-          assert.is.True(vim.list_contains(hl_extmars, "Timber.SummarySeparatorHighlighted"))
-        else
-          local hl_extmars = get_line_hl_groups(i - 1, bufnr)
-          assert.is.False(vim.list_contains(hl_extmars, "Timber.SummarySeparatorHighlighted"))
+          -- The next line after the header is the body
+          local hl_extmars = get_line_hl_groups(i, bufnr)
+          assert.is.True(vim.list_contains(hl_extmars, "Timber.SummaryEntryBodyHighlighted"))
         end
       end
     end

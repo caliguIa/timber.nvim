@@ -29,16 +29,14 @@ local M = {
 
 M.CURSOR_TRACKING_DEBOUNCE = 250
 
-function M._clear_log_entry_header_highlight()
+function M._clear_log_entry_highlight()
   vim.api.nvim_buf_clear_namespace(M.bufnr, M.summary_focus_ns, 0, -1)
   M.highlight_placeholder = nil
 end
 
 ---@param placeholder_id string
----@param range integer[]? The range to highlight. Defaults to the whole buffer
 ---@param force boolean? Whether to highlight the header despite already highlighted. Defaults to `false`
-function M._highlight_log_entry_header(placeholder_id, range, force)
-  range = range or { 0, -1 }
+function M._highlight_log_entry(placeholder_id, force)
   force = force or false
 
   if M.highlight_placeholder == placeholder_id and not force then
@@ -47,45 +45,24 @@ function M._highlight_log_entry_header(placeholder_id, range, force)
 
   -- If the placeholder is already highlighted, clear the highlight
   if M.highlight_placeholder and M.highlight_placeholder ~= placeholder_id then
-    M._clear_log_entry_header_highlight()
+    M._clear_log_entry_highlight()
   end
 
   if not M.bufnr then
     return
   end
 
-  local lines = vim.api.nvim_buf_get_lines(M.bufnr, range[1], range[2], false)
-
-  -- Find the line containing our placeholder ID
-  for i, line in ipairs(lines) do
-    if line:match("^🪵" .. placeholder_id) then
-      local row = range[1] + i - 1
-
-      local extmarks = vim.api.nvim_buf_get_extmarks(M.bufnr, M.summary_ns, { row, 0 }, { row, -1 }, { details = true })
-
-      for _, extmark in ipairs(extmarks) do
-        local id, _, _, details = unpack(extmark)
-        if details.virt_text then
-          -- Highlight the header separator line
-          vim.api.nvim_buf_set_extmark(M.bufnr, M.summary_focus_ns, row, 0, {
-            id = id,
-            virt_text = { { details.virt_text[1][1], "Timber.SummarySeparatorHighlighted" } },
-            virt_text_win_col = details.virt_text_win_col,
-            hl_mode = "combine",
-            priority = 150,
-          })
-
-          break
-        end
-      end
-
-      -- Highlight the header string
-      vim.api.nvim_buf_set_extmark(M.bufnr, M.summary_focus_ns, row, 0, {
-        line_hl_group = "Timber.SummarySeparatorHighlighted",
-        priority = 150,
+  vim
+    .iter(M.ranges)
+    :filter(function(range)
+      return range.placeholder_id == placeholder_id
+    end)
+    :each(function(range)
+      vim.api.nvim_buf_set_extmark(M.bufnr, M.summary_focus_ns, range.start, 0, {
+        end_row = range["end"] - 2,
+        line_hl_group = "Timber.SummaryEntryBodyHighlighted",
       })
-    end
-  end
+    end)
 
   M.highlight_placeholder = placeholder_id
 end
@@ -127,9 +104,9 @@ function M._track_cursor_movement()
           local placeholder_id = buffers.get_current_line_placeholder()
 
           if placeholder_id then
-            M._highlight_log_entry_header(placeholder_id)
+            M._highlight_log_entry(placeholder_id)
           else
-            M._clear_log_entry_header_highlight()
+            M._clear_log_entry_highlight()
           end
         end)
       )
@@ -393,9 +370,9 @@ function M._on_received_log_entry(log_entry)
   -- If the summary window is open, update the buffer
   if M.bufnr then
     vim.schedule(function()
-      local updated_range = M._append_buffer(M.bufnr, { log_entry })
+      M._append_buffer(M.bufnr, { log_entry })
       if M.highlight_placeholder then
-        M._highlight_log_entry_header(M.highlight_placeholder, updated_range, true)
+        M._highlight_log_entry(M.highlight_placeholder, true)
       end
     end)
   end
@@ -449,7 +426,7 @@ function M.open(opts)
   -- If the current line has a log placeholder, scroll the matching entry into view
   if placeholder_id then
     M._scroll_log_entry_into_view(M.winnr, placeholder_id)
-    M._highlight_log_entry_header(placeholder_id, { 0, -1 }, true)
+    M._highlight_log_entry(placeholder_id, true)
   end
 
   local untrack = M._track_cursor_movement()
@@ -501,7 +478,7 @@ function M.setup()
 
   local hl_info = vim.api.nvim_get_hl(0, { name = "FloatBorder" })
   vim.api.nvim_set_hl(0, "Timber.SummarySeparator", { fg = hl_info.fg, bg = "none" })
-  vim.api.nvim_set_hl(0, "Timber.SummarySeparatorHighlighted", { link = "CursorLineNr" })
+  vim.api.nvim_set_hl(0, "Timber.SummaryEntryBodyHighlighted", { link = "PmenuSel" })
   vim.api.nvim_set_hl(0, "Timber.SummaryJumpToLine", { link = "Search", default = true })
 
   events.on("watcher:new_log_entry", function(entry)
