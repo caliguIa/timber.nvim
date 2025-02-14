@@ -534,7 +534,7 @@ The summary window has the following keymaps:
 | **Timber.LogPlaceholderSnippet** | _DiagnosticVirtualTextInfo_ | Captured log output snippet |
 | **Timber.LogPlaceholderTime** | _none_ | Captured log output time |
 | **Timber.FloatingWindowEntrySeparator** | _FloatBorder_ | Horizontal separator between entries in the floating window |
-| **Timber.SummarySeparator** | _none_ | Horizontal separator between entries in the summary window |
+| **Timber.SummaryEntryHeader** | _none_ | Entry header in the summary window |
 | **Timber.SummaryEntryBodyHighlighted** | _PmenuSel_ | Highlighted entry body in the summary window |
 | **Timber.SummaryJumpToLine** | _Search_ | Flash highlight when jump to line in the summary window |
 

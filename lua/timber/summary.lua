@@ -256,13 +256,13 @@ function M._append_buffer(buf, entries)
   -- Set up highlight for separator lines
   for _, line in ipairs(separator_lines) do
     vim.api.nvim_buf_set_extmark(buf, M.summary_ns, base_line + line - 1, 0, {
-      line_hl_group = "Timber.SummarySeparator",
+      line_hl_group = "Timber.SummaryEntryHeader",
       priority = 100,
     })
 
     vim.api.nvim_buf_set_extmark(buf, M.summary_ns, base_line + line - 1, 0, {
       virt_text_win_col = #lines[line] - 1,
-      virt_text = { { string.rep("-", vim.go.columns), "Timber.SummarySeparator" } },
+      virt_text = { { string.rep("-", vim.go.columns), "Timber.SummaryEntryHeader" } },
       hl_mode = "combine",
       priority = 100,
     })
@@ -477,7 +477,7 @@ function M.setup()
   M.summary_focus_ns = vim.api.nvim_create_namespace("timber.summary_focus")
 
   local hl_info = vim.api.nvim_get_hl(0, { name = "FloatBorder" })
-  vim.api.nvim_set_hl(0, "Timber.SummarySeparator", { fg = hl_info.fg, bg = "none" })
+  vim.api.nvim_set_hl(0, "Timber.SummaryEntryHeader", { fg = hl_info.fg, bg = "none" })
   vim.api.nvim_set_hl(0, "Timber.SummaryEntryBodyHighlighted", { link = "PmenuSel" })
   vim.api.nvim_set_hl(0, "Timber.SummaryJumpToLine", { link = "Search", default = true })
 
