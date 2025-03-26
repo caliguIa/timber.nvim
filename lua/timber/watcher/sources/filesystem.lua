@@ -13,6 +13,17 @@ local M = {}
 local SourceFilesystem = { state = { state = "initial", pending_log_item = nil, buffer = {} } }
 
 function SourceFilesystem:start()
+  -- Create the file if it doesn't exist
+  local file = io.open(self.source, "r")
+  if not file then
+    file = io.open(self.source, "w")
+    if file then
+      file:close()
+    end
+  else
+    file:close()
+  end
+
   local job = Job:new({
     command = "tail",
     args = { "-f", "-n", "0", self.source },
