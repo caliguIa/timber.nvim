@@ -1,4 +1,3 @@
-local _utils = require("custom.utils")
 local assert = require("luassert")
 local spy = require("luassert.spy")
 local events = require("timber.events")

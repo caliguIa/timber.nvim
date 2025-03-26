@@ -142,6 +142,22 @@ function M._on_lines(_, bufnr, _, first_line, last_line, new_last_line, _)
 end
 
 ---@param log_placeholder Timber.Buffers.LogPlaceholder
+---@return integer? line_offset, integer? start_col_offset, integer? end_col_offset
+function M._find_marker_position(log_placeholder)
+  local marker_pattern = watcher.MARKER .. log_placeholder.id
+  local lines = vim.split(log_placeholder.content, "\n")
+
+  for i, line in ipairs(lines) do
+    local marker_index = line:find(marker_pattern)
+    if marker_index then
+      return i - 1, marker_index - 1, marker_index - 1 + #marker_pattern
+    end
+  end
+
+  return nil, nil
+end
+
+---@param log_placeholder Timber.Buffers.LogPlaceholder
 function M._new_log_placeholder(log_placeholder)
   if not log_placeholder.id then
     return
@@ -151,17 +167,17 @@ function M._new_log_placeholder(log_placeholder)
     return
   end
 
-  -- Find the log marker
-  local marker_pattern = watcher.MARKER .. log_placeholder.id
-  local log_marker_index = log_placeholder.content:find(marker_pattern) - 1
-  ---@cast log_marker_index integer
+  local line_offset, start_col_offset, end_col_offset = M._find_marker_position(log_placeholder)
+  if not line_offset or not start_col_offset or not end_col_offset then
+    return
+  end
 
   local extmark_id = vim.api.nvim_buf_set_extmark(
     log_placeholder.bufnr,
     M.log_placeholder_ns,
-    log_placeholder.line,
-    log_marker_index,
-    { end_col = log_marker_index + #marker_pattern }
+    log_placeholder.line + line_offset,
+    start_col_offset,
+    { end_col = end_col_offset }
   )
 
   log_placeholder.extmark_id = extmark_id
