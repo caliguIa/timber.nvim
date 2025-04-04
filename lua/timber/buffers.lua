@@ -298,6 +298,7 @@ end
 ---@field sort? "newest_first" | "oldest_first" The sort order by timestamp. Defaults to `oldest_first`
 
 ---@param opts Timber.Buffers.OpenFloatOpts?
+---@return integer? floating_bufnr
 function M.open_float(opts)
   opts = vim.tbl_extend("force", { silent = false, sort = "oldest_first" }, opts or {})
 
@@ -314,7 +315,7 @@ function M.open_float(opts)
 
   local placeholder = M.log_placeholders:get(placeholder_id)
   if placeholder then
-    require("timber.buffers.win").open(placeholder, opts)
+    return require("timber.buffers.win").open(placeholder, opts)
   else
     error(string.format("Log placeholder %s does not exist", placeholder_id))
   end

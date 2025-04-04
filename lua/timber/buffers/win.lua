@@ -194,6 +194,7 @@ end
 ---Render a floating window showing placeholder content
 ---@param placeholder Timber.Buffers.LogPlaceholder
 ---@param opts Timber.Buffers.OpenFloatOpts
+---@return integer? floating_bufnr
 function M.open(placeholder, opts)
   if not placeholder.entries or #placeholder.entries == 0 then
     if not opts.silent then
@@ -230,6 +231,8 @@ function M.open(placeholder, opts)
       priority = 100,
     })
   end
+
+  return bufnr
 end
 
 function M.setup()
