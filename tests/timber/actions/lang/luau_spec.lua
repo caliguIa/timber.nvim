@@ -15,11 +15,11 @@ describe("luau single log", function()
 
   it("supports variable declaration", function()
     local input = [[
-      local fo|o = "bar"
+      local fo|o: string = "bar"
     ]]
 
     local expected = [[
-      local foo = "bar"
+      local foo: string = "bar"
       print("foo", foo)
     ]]
 
@@ -34,7 +34,7 @@ describe("luau single log", function()
 
     expected = [[
       print("foo", foo)
-      local foo = "bar"
+      local foo: string = "bar"
     ]]
 
     helper.assert_scenario({
@@ -49,12 +49,12 @@ describe("luau single log", function()
 
   it("supports variable assignment", function()
     local input = [[
-      local foo = "bar"
+      local foo: string = "bar"
       fo|o = "baz"
     ]]
 
     local expected = [[
-      local foo = "bar"
+      local foo: string = "bar"
       foo = "baz"
       print("foo", foo)
     ]]
@@ -69,7 +69,7 @@ describe("luau single log", function()
     })
 
     expected = [[
-      local foo = "bar"
+      local foo: string = "bar"
       print("foo", foo)
       foo = "baz"
     ]]
@@ -87,7 +87,7 @@ describe("luau single log", function()
   it("supports return statement", function()
     helper.assert_scenario({
       input = [[
-        function foo()
+        function foo(): string
           return bar + b|az
         end
       ]],
@@ -98,7 +98,7 @@ describe("luau single log", function()
         actions.insert_log({ position = "above" })
       end,
       expected = [[
-        function foo()
+        function foo(): string
           print("bar", bar)
           print("baz", baz)
           return bar + baz
@@ -111,7 +111,7 @@ describe("luau single log", function()
     it("supports function declaration", function()
       helper.assert_scenario({
         input = [[
-          function foo(ba|r)
+          function foo(ba|r: string): number?
             return nil
           end
         ]],
@@ -120,7 +120,7 @@ describe("luau single log", function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-          function foo(bar)
+          function foo(bar: string): number?
             print("bar", bar)
             return nil
           end
@@ -130,9 +130,9 @@ describe("luau single log", function()
       helper.assert_scenario({
         input = [[
           local function foo(
-            ba|r,
-            baz,
-          )
+            ba|r: string,
+            baz: string,
+          ): string?
             return nil
           end
         ]],
@@ -143,9 +143,9 @@ describe("luau single log", function()
         end,
         expected = [[
           local function foo(
-            bar,
-            baz,
-          )
+            bar: string,
+            baz: string,
+          ): string?
             return nil
           end
         ]],
@@ -156,7 +156,7 @@ describe("luau single log", function()
       helper.assert_scenario({
         input = [[
           local foo = {
-            bar = function(ba|z, baf)
+            bar = function(ba|z: string, baf: string)
               return nil
             end,
           }
@@ -168,7 +168,7 @@ describe("luau single log", function()
         end,
         expected = [[
           local foo = {
-            bar = function(baz, baf)
+            bar = function(baz: string, baf: string)
               print("baz", baz)
               print("baf", baf)
               return nil
@@ -181,7 +181,7 @@ describe("luau single log", function()
     it("DOES NOT support ignored parameters", function()
       helper.assert_scenario({
         input = [[
-          function foo(ba|r, _)
+          function foo(ba|r: number, _)
             return nil
           end
         ]],
@@ -191,7 +191,7 @@ describe("luau single log", function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-          function foo(bar, _)
+          function foo(bar: number, _)
             print("bar", bar)
             return nil
           end
@@ -297,7 +297,7 @@ describe("luau single log", function()
     it("supports for loop numeric", function()
       helper.assert_scenario({
         input = [[
-          for fo|o = 1, 10, 1 do
+          for fo|o: number = 1, 10, 1 do
             return nil
           end
         ]],
@@ -306,7 +306,7 @@ describe("luau single log", function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-          for foo = 1, 10, 1 do
+          for foo: number = 1, 10, 1 do
             print("foo", foo)
             return nil
           end
@@ -317,7 +317,7 @@ describe("luau single log", function()
     it("supports for loop pairs", function()
       helper.assert_scenario({
         input = [[
-          for ke|y, value in pairs(t) do
+          for ke|y: string, value: any in pairs(t) do
             return nil
           end
         ]],
@@ -327,7 +327,7 @@ describe("luau single log", function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-          for key, value in pairs(t) do
+          for key: string, value: any in pairs(t) do
             print("key", key)
             print("value", value)
             print("t", t)
@@ -340,7 +340,7 @@ describe("luau single log", function()
     it("supports for loop ipairs", function()
       helper.assert_scenario({
         input = [[
-          for ke|y, value in ipairs(t) do
+          for ke|y: number, value: any in ipairs(t) do
             return nil
           end
         ]],
@@ -350,7 +350,7 @@ describe("luau single log", function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-          for key, value in ipairs(t) do
+          for key: number, value: any in ipairs(t) do
             print("key", key)
             print("value", value)
             print("t", t)
@@ -414,14 +414,14 @@ describe("luau single log", function()
   describe("supports identifier nested in complex expressions", function()
     it("supports ternary operator", function()
       local input = [[
-        local foo =
+        local foo: boolean =
           predicate and
             ba|r or
             baz
       ]]
 
       local expected1 = [[
-        local foo =
+        local foo: boolean =
           predicate and
             bar or
             baz
@@ -430,7 +430,7 @@ describe("luau single log", function()
 
       local expected2 = [[
         print("bar", bar)
-        local foo =
+        local foo: boolean =
           predicate and
             bar or
             baz
@@ -458,28 +458,28 @@ describe("luau single log", function()
     it("supports table constructor", function()
       helper.assert_scenario({
         input = [[
-          local foo = { bar = b|ar }
+          local foo: {[string]: string} = { bar = b|ar }
         ]],
         filetype = "luau",
         action = function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-          local foo = { bar = bar }
+          local foo: {[string]: string} = { bar = bar }
           print("bar", bar)
         ]],
       })
 
       helper.assert_scenario({
         input = [[
-          local foo = { b|ar = bar }
+          local foo: {[string]: string} = { b|ar = bar }
         ]],
         filetype = "luau",
         action = function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-          local foo = { bar = bar }
+          local foo: {[string]: string} = { bar = bar }
         ]],
       })
     end)
@@ -535,35 +535,35 @@ describe("luau single log", function()
     it("supports dot member access", function()
       helper.assert_scenario({
         input = [[
-          local foo = ba|r.bar
+          local foo: any = ba|r.bar
         ]],
         filetype = "luau",
         action = function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-          local foo = bar.bar
+          local foo: any = bar.bar
           print("bar", bar)
         ]],
       })
 
       helper.assert_scenario({
         input = [[
-          local foo = bar.ba|z.baf
+          local foo: any = bar.ba|z.baf
         ]],
         filetype = "luau",
         action = function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-          local foo = bar.baz.baf
+          local foo: any = bar.baz.baf
           print("bar.baz", bar.baz)
         ]],
       })
 
       helper.assert_scenario({
         input = [[
-          local foo = ba|r.bar
+          local foo: any = ba|r.bar
         ]],
         filetype = "luau",
         action = function()
@@ -571,14 +571,14 @@ describe("luau single log", function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-          local foo = bar.bar
+          local foo: any = bar.bar
           print("bar", bar)
         ]],
       })
 
       helper.assert_scenario({
         input = [[
-          local foo = ba|r.bar
+          local foo: any = ba|r.bar
         ]],
         filetype = "luau",
         action = function()
@@ -586,7 +586,7 @@ describe("luau single log", function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-          local foo = bar.bar
+          local foo: any = bar.bar
           print("foo", foo)
           print("bar.bar", bar.bar)
         ]],
@@ -596,35 +596,35 @@ describe("luau single log", function()
     it("supports bracket member access", function()
       helper.assert_scenario({
         input = [[
-          local foo = ba|r["bar"]
+          local foo: string = ba|r["bar"]
         ]],
         filetype = "luau",
         action = function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-          local foo = bar["bar"]
+          local foo: string = bar["bar"]
           print("bar", bar)
         ]],
       })
 
       helper.assert_scenario({
         input = [[
-          local foo = bar["ba|z"]["baf"]
+          local foo: string = bar["ba|z"]["baf"]
         ]],
         filetype = "luau",
         action = function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-          local foo = bar["baz"]["baf"]
+          local foo: string = bar["baz"]["baf"]
           print("bar["baz"]", bar["baz"])
         ]],
       })
 
       helper.assert_scenario({
         input = [[
-          local foo = ba|r["bar"]
+          local foo: string = ba|r["bar"]
         ]],
         filetype = "luau",
         action = function()
@@ -632,14 +632,14 @@ describe("luau single log", function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-          local foo = bar["bar"]
+          local foo: string = bar["bar"]
           print("bar", bar)
         ]],
       })
 
       helper.assert_scenario({
         input = [[
-          local foo = ba|r["bar"]
+          local foo: string = ba|r["bar"]
         ]],
         filetype = "luau",
         action = function()
@@ -647,7 +647,7 @@ describe("luau single log", function()
           actions.insert_log({ position = "below" })
         end,
         expected = [[
-          local foo = bar["bar"]
+          local foo: string = bar["bar"]
           print("foo", foo)
           print("bar["bar"]", bar["bar"])
         ]],
@@ -771,7 +771,7 @@ describe("luau batch log", function()
 
     helper.assert_scenario({
       input = [[
-        local fo|o = bar + baz
+        local fo|o: string = bar + baz
       ]],
       filetype = "luau",
       action = function()
@@ -780,7 +780,7 @@ describe("luau batch log", function()
         actions.insert_batch_log()
       end,
       expected = [[
-        local foo = bar + baz
+        local foo: string = bar + baz
         print(string.format("foo=%s, bar=%s, baz=%s", foo, bar, baz))
       ]],
     })
