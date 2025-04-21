@@ -764,7 +764,7 @@ describe("luau batch log", function()
     timber.setup({
       batch_log_templates = {
         default = {
-          luau = [[print(string.format("%repeat<%log_target=%s><, >", %repeat<%log_target><, >))]],
+          luau = [[print(`%repeat<%log_target={%log_target}><, >`)]],
         },
       },
     })
@@ -781,7 +781,7 @@ describe("luau batch log", function()
       end,
       expected = [[
         local foo: string = bar + baz
-        print(string.format("foo=%s, bar=%s, baz=%s", foo, bar, baz))
+        print(`foo={foo}, bar={bar}, baz={baz}`)
       ]],
     })
   end)
