@@ -352,7 +352,7 @@ or comment all log statements in the current buffers (call this again will uncom
 require("timber.actions").toggle_comment_log_statements({ global = false })
 ```
 
-Use `global = true` to perform the action on all files. `timber.nvim` use grep to find all log statements in your project. For this to work, you need to make sure your `grepprg` is suitable. The search comand will be invoked as: `<grepprg> <log_marker>`. These are some recommendations, ranking from most to least recommended:
+Use `global = true` to perform the action on all files. `timber.nvim` uses grep to find all log statements in your project. For this to work, you need to make sure your `grepprg` is suitable. The search comand will be invoked as: `<grepprg> <log_marker>`. These are some recommendations, ranking from most to least recommended:
 
 ```lua
 vim.o.grepprg = "rg --vimgrep --no-heading --smart-case" -- Use ripgrep
