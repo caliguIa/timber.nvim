@@ -49,12 +49,12 @@ describe("luau single log", function()
 
   it("supports variable assignment", function()
     local input = [[
-      local foo: string = "bar"
+      local foo: Array<string> = {"bar"}
       fo|o = "baz"
     ]]
 
     local expected = [[
-      local foo: string = "bar"
+      local foo: Array<string> = {"bar"}
       foo = "baz"
       print("foo", foo)
     ]]
@@ -69,7 +69,7 @@ describe("luau single log", function()
     })
 
     expected = [[
-      local foo: string = "bar"
+      local foo: Array<string> = {"bar"}
       print("foo", foo)
       foo = "baz"
     ]]
@@ -156,7 +156,7 @@ describe("luau single log", function()
       helper.assert_scenario({
         input = [[
           local foo = {
-            bar = function(ba|z: string, baf: string)
+            bar = function(ba|z: string, baf: Baf)
               return nil
             end,
           }
@@ -168,7 +168,7 @@ describe("luau single log", function()
         end,
         expected = [[
           local foo = {
-            bar = function(baz: string, baf: string)
+            bar = function(baz: string, baf: Baf)
               print("baz", baz)
               print("baf", baf)
               return nil
