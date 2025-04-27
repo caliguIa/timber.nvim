@@ -70,9 +70,9 @@ end)
 describe("astro batch log", function()
   before_each(function()
     timber.setup({
-      log_templates = {
+      batch_log_templates = {
         default = {
-          astro = [[console.log("%log_target", %log_target)]],
+          astro = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
         },
       },
     })

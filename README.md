@@ -118,6 +118,7 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
             -- }
             javascript = [[console.log("%log_target", %log_target)]],
             typescript = [[console.log("%log_target", %log_target)]],
+            astro = [[console.log("%log_target", %log_target)]],
             jsx = [[console.log("%log_target", %log_target)]],
             tsx = [[console.log("%log_target", %log_target)]],
             lua = [[print("%log_target", %log_target)]],
@@ -138,6 +139,7 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
         plain = {
             javascript = [[console.log("%insert_cursor")]],
             typescript = [[console.log("%insert_cursor")]],
+            astro = [[console.log("%insert_cursor")]],
             jsx = [[console.log("%insert_cursor")]],
             tsx = [[console.log("%insert_cursor")]],
             lua = [[print("%insert_cursor")]],
@@ -160,6 +162,7 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
         default = {
             javascript = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
             typescript = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
+            astro = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
             jsx = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
             tsx = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
             lua = [[print(string.format("%repeat<%log_target=%s><, >", %repeat<%log_target><, >))]],
