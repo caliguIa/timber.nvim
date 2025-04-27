@@ -1,5 +1,10 @@
 local M = {}
 
+---@class Timber.Treesitter.Container
+---@field node TSNode The Treesitter node of the container
+---@field logable_ranges logable_range[] The ranges that can be logged
+---@field language string The language of the container
+
 local utils = require("timber.utils")
 
 ---Sort the given nodes in the order that they would appear in a preorder traversal
@@ -19,60 +24,74 @@ function M.sort_ts_nodes_preorder(nodes)
   end)
 end
 
-local function get_language_tree(lang)
+---@param lang string The language to get the trees for
+---@return {ts_tree: TSTree, language: string}[] trees A list of Treesitter trees. Some languages have injected languages, e.g., Astro has Typescript injected, hence producing multiple trees
+local function get_language_trees(lang)
   local bufnr = vim.api.nvim_get_current_buf()
   local parser = vim.treesitter.get_parser(bufnr, lang)
 
   if lang == "astro" then
     -- Astro has injected Typescript syntax
     local child_parser = parser:children()["typescript"]
-    return child_parser:parse()[1]
-  else
-    return parser:parse()[1]
-  end
-end
+    return { { ts_tree = child_parser:parse()[1], language = "typescript" } }
+  elseif lang == "vue" then
+    local js_parser = parser:children()["javascript"]
+    local ts_parser = parser:children()["typescript"]
+    local result = {}
 
--- Some languages have injected languages, e.g. Astro has Typescript injected
-local function get_logable_lang(lang)
-  if lang == "astro" then
-    return "typescript"
+    if js_parser then
+      for _, tree in ipairs(js_parser:parse()) do
+        table.insert(result, { ts_tree = tree, language = "javascript" })
+      end
+    end
+
+    if ts_parser then
+      for _, tree in ipairs(ts_parser:parse()) do
+        table.insert(result, { ts_tree = tree, language = "typescript" })
+      end
+    end
+
+    return result
   else
-    return lang
+    return { { ts_tree = parser:parse()[1], language = lang } }
   end
 end
 
 ---@alias logable_range {[1]: number, [2]: number}
 ---@param lang string
 ---@param range {[1]: number, [2]: number, [3]: number, [4]: number}
----@return {container: TSNode, logable_ranges: logable_range[]}[]
+---@return Timber.Treesitter.Container[]
 function M.query_log_target_containers(lang, range)
   local bufnr = vim.api.nvim_get_current_buf()
-  local tree = get_language_tree(lang)
-  local root = tree:root()
-
-  local logable_lang = get_logable_lang(lang)
-  local query = vim.treesitter.query.get(logable_lang, "timber-log-container")
-  if not query then
-    utils.notify(string.format("timber doesn't support %s language", lang), "error")
-    return {}
-  end
+  local trees = get_language_trees(lang)
 
   local containers = {}
 
-  for _, match, metadata in query:iter_matches(root, bufnr, 0, -1) do
-    ---@type TSNode
-    local log_container = match[utils.get_key_by_value(query.captures, "log_container")]
+  for _, tree in ipairs(trees) do
+    local query = vim.treesitter.query.get(tree.language, "timber-log-container")
 
-    -- Breaking changes: https://github.com/neovim/neovim/pull/30193
-    if vim.fn.has("nvim-0.11") == 1 then
-      log_container = log_container[1]
-    end
+    if query then
+      local root = tree.ts_tree:root()
+      for _, match, metadata in query:iter_matches(root, bufnr, 0, -1) do
+        ---@type TSNode
+        local log_container = match[utils.get_key_by_value(query.captures, "log_container")]
 
-    if log_container and utils.ranges_intersect(utils.get_ts_node_range(log_container), range) then
-      table.insert(containers, {
-        container = log_container,
-        logable_ranges = metadata.logable_ranges or {},
-      })
+        -- Breaking changes: https://github.com/neovim/neovim/pull/30193
+        if vim.fn.has("nvim-0.11") == 1 then
+          log_container = log_container[1]
+        end
+
+        if log_container and utils.ranges_intersect(utils.get_ts_node_range(log_container), range) then
+          table.insert(containers, {
+            node = log_container,
+            logable_ranges = metadata.logable_ranges or {},
+            language = tree.language,
+          })
+        end
+      end
+    else
+      utils.notify(string.format("timber doesn't support %s language", lang), "error")
+      break
     end
   end
 
@@ -81,17 +100,9 @@ end
 
 ---Find all the log target nodes in the given containers
 ---A log target can belong to multiple containers. In this case, we pick the smallest container
----@param containers TSNode[]
----@param lang string
+---@param containers Timber.Treesitter.Container[]
 ---@return {container: TSNode, log_targets: TSNode[]}[]
-function M.query_log_targets(containers, lang)
-  local logable_lang = get_logable_lang(lang)
-  local query = vim.treesitter.query.get(logable_lang, "timber-log-target")
-  if not query then
-    utils.notify(string.format("timber doesn't support %s language", lang), "error")
-    return {}
-  end
-
+function M.query_log_targets(containers)
   local bufnr = vim.api.nvim_get_current_buf()
   local entries = {}
 
@@ -99,9 +110,15 @@ function M.query_log_targets(containers, lang)
   local log_targets_table = {}
 
   for _, container in ipairs(containers) do
-    for _, node in query:iter_captures(container, bufnr, 0, -1) do
-      table.insert(entries, { log_container = container, log_target = node })
-      log_targets_table[node:id()] = node
+    local query = vim.treesitter.query.get(container.language, "timber-log-target")
+    if query then
+      for _, node in query:iter_captures(container.node, bufnr, 0, -1) do
+        table.insert(entries, { log_container = container.node, log_target = node })
+        log_targets_table[node:id()] = node
+      end
+    else
+      utils.notify(string.format("timber doesn't support %s language", container.language), "error")
+      break
     end
   end
 

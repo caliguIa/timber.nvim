@@ -379,12 +379,7 @@ end
 local function capture_log_targets(lang, selection_range)
   local log_containers = treesitter.query_log_target_containers(lang, selection_range)
 
-  local log_target_grouped_by_container = treesitter.query_log_targets(
-    utils.array_map(log_containers, function(i)
-      return i.container
-    end),
-    lang
-  )
+  local log_target_grouped_by_container = treesitter.query_log_targets(log_containers)
 
   local log_targets = {}
 
@@ -395,7 +390,7 @@ local function capture_log_targets(lang, selection_range)
     end)
 
     local log_container = utils.array_find(log_containers, function(i)
-      return i.container == entry.container
+      return i.node == entry.container
     end)
     ---@cast log_container -nil
 
@@ -403,7 +398,7 @@ local function capture_log_targets(lang, selection_range)
       log_targets,
       utils.array_map(_log_targets, function(node)
         return {
-          log_container = log_container.container,
+          log_container = log_container.node,
           logable_ranges = log_container.logable_ranges,
           log_target = node,
         }
