@@ -91,7 +91,7 @@ local default_config = {
       jsx = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
       tsx = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
       lua = [[print(string.format("%repeat<%log_target=%s><, >", %repeat<%log_target><, >))]],
-      luau = [[print(string.format("%repeat<%log_target=%s><, >", %repeat<%log_target><, >))]],
+      luau = [[print(`%repeat<%log_target={%log_target}><, >`)]],
       ruby = [[puts("%repeat<%log_target: #{%log_target}><, >")]],
       elixir = [[IO.inspect({ %repeat<%log_target><, > })]],
       go = [[log.Printf("%repeat<%log_target: %v><, >\n", %repeat<%log_target><, >)]],
