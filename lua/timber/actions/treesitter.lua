@@ -6,6 +6,7 @@ local M = {}
 ---@field language string The language of the container
 
 local utils = require("timber.utils")
+local ts_node_range = require("timber.actions.treesitter.ts_node_range")
 
 ---Sort the given nodes in the order that they would appear in a preorder traversal
 ---@param nodes TSNode[]
@@ -112,9 +113,22 @@ function M.query_log_targets(containers)
   for _, container in ipairs(containers) do
     local query = vim.treesitter.query.get(container.language, "timber-log-target")
     if query then
-      for _, node in query:iter_captures(container.node, bufnr, 0, -1) do
-        table.insert(entries, { log_container = container.node, log_target = node })
-        log_targets_table[node:id()] = node
+      for _, match, metadata in query:iter_matches(container.node, bufnr, 0, -1) do
+        local log_target = match[utils.get_key_by_value(query.captures, "log_target")]
+
+        -- Breaking changes: https://github.com/neovim/neovim/pull/30193
+        if vim.fn.has("nvim-0.11") == 1 then
+          log_target = log_target ~= nil and log_target[1] or nil
+        end
+
+        if log_target then
+          table.insert(entries, { log_container = container.node, log_target = log_target })
+          log_targets_table[log_target:id()] = log_target
+        else
+          local range = ts_node_range.new(metadata.log_target_range[1], metadata.log_target_range[2])
+          table.insert(entries, { log_container = container.node, log_target = range })
+          log_targets_table[range:id()] = range
+        end
       end
     else
       utils.notify(string.format("timber doesn't support %s language", container.language), "error")
@@ -221,6 +235,15 @@ function M.setup()
     end
 
     metadata.logable_ranges = logable_ranges
+  end, { force = true })
+
+  vim.treesitter.query.add_directive("make-log-target-range!", function(match, _, _, predicate, metadata)
+    local start_range_id = predicate[2]
+    local end_range_id = predicate[3]
+
+    local start_node = match[start_range_id]
+    local end_node = match[end_range_id]
+    metadata.log_target_range = { start_node, end_node }
   end, { force = true })
 
   ---@return TSNode

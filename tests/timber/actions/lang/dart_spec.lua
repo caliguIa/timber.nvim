@@ -151,48 +151,6 @@ describe("dart single log", function()
     end)
   end)
 
-  -- it("DOES NOT support single function name", function()
-  --   helper.assert_scenario({
-  --     input = [[
-  --       var foo = ba|r(1);
-  --     ]],
-  --     filetype = "dart",
-  --     action = function()
-  --       actions.insert_log({ position = "below" })
-  --     end,
-  --     expected = [[
-  --       var foo = bar(1);
-  --     ]],
-  --   })
-  --
-  --   helper.assert_scenario({
-  --     input = [[
-  --       var foo = bar.ba|z(1);
-  --     ]],
-  --     filetype = "dart",
-  --     action = function()
-  --       actions.insert_log({ position = "below" })
-  --     end,
-  --     expected = [[
-  --       var foo = bar.baz(1);
-  --     ]],
-  --   })
-  --
-  --   helper.assert_scenario({
-  --     input = [[
-  --       var foo = ba|r.baz(1);
-  --     ]],
-  --     filetype = "dart",
-  --     action = function()
-  --       actions.insert_log({ position = "below" })
-  --     end,
-  --     expected = [[
-  --       var foo = bar.baz(1);
-  --       print("bar: ${bar}");
-  --     ]],
-  --   })
-  -- end)
-  --
   it("supports function return statement", function()
     helper.assert_scenario({
       input = [[
@@ -491,66 +449,82 @@ describe("dart single log", function()
     end)
   end)
 
-  -- it("supports member access expression", function()
-  --   helper.assert_scenario({
-  --     input = [[
-  --       var foo = ba|r.baz;
-  --     ]],
-  --     filetype = "dart",
-  --     action = function()
-  --       actions.insert_log({ position = "below" })
-  --     end,
-  --     expected = [[
-  --       var foo = bar.baz;
-  --       print("bar: ${bar}");
-  --     ]],
-  --   })
-  --
-  --   helper.assert_scenario({
-  --     input = [[
-  --       var foo = bar.ba|z.baf;
-  --     ]],
-  --     filetype = "dart",
-  --     action = function()
-  --       actions.insert_log({ position = "below" })
-  --     end,
-  --     expected = [[
-  --       var foo = bar.baz.baf;
-  --       print("bar.baz: ${bar.baz}");
-  --     ]],
-  --   })
-  --
-  --   helper.assert_scenario({
-  --     input = [[
-  --       var foo = ba|r.bar;
-  --     ]],
-  --     filetype = "dart",
-  --     action = function()
-  --       vim.cmd("normal! v$")
-  --       actions.insert_log({ position = "below" })
-  --     end,
-  --     expected = [[
-  --       var foo = bar.bar;
-  --       print("bar: ${bar}");
-  --     ]],
-  --   })
-  --
-  --   helper.assert_scenario({
-  --     input = [[
-  --       var foo = ba|r.bar;
-  --     ]],
-  --     filetype = "dart",
-  --     action = function()
-  --       vim.cmd("normal! V")
-  --       actions.insert_log({ position = "below" })
-  --     end,
-  --     expected = [[
-  --       var foo = bar.bar;
-  --       print("foo: ${foo}");
-  --       print("bar.bar: ${bar.bar}");
-  --     ]],
-  --   })
-  -- end)
+  it("supports member access expression", function()
+    helper.assert_scenario({
+      input = [[
+        void main() {
+          var foo = bar.ba|z;
+        }
+      ]],
+      filetype = "dart",
+      action = function()
+        actions.insert_log({ position = "below" })
+      end,
+      expected = [[
+        void main() {
+          var foo = bar.baz;
+          print("bar.baz: ${bar.baz}");
+        }
+      ]],
+    })
+
+    helper.assert_scenario({
+      input = [[
+        void main() {
+          var foo = bar.ba|z.baf;
+        }
+      ]],
+      filetype = "dart",
+      action = function()
+        actions.insert_log({ position = "below" })
+      end,
+      expected = [[
+        void main() {
+          var foo = bar.baz.baf;
+          print("bar.baz: ${bar.baz}");
+        }
+      ]],
+    })
+
+    helper.assert_scenario({
+      input = [[
+        void main() {
+          var foo = ba|r.bar;
+        }
+      ]],
+      filetype = "dart",
+      action = function()
+        vim.cmd("normal! v$")
+        actions.insert_log({ position = "below" })
+      end,
+      expected = [[
+        void main() {
+          var foo = bar.bar;
+          print("bar: ${bar}");
+        }
+      ]],
+    })
+
+    helper.assert_scenario({
+      input = [[
+        void main() {
+          var foo = ba|r.bar;
+        }
+      ]],
+      filetype = "dart",
+      action = function()
+        vim.cmd("normal! V")
+        actions.insert_log({ position = "below" })
+      end,
+      expected = [[
+        void main() {
+          var foo = bar.bar;
+          print("foo: ${foo}");
+          print("bar.bar: ${bar.bar}");
+        }
+      ]],
+    })
+  end)
 end)
 
 describe("dart batch log", function()
