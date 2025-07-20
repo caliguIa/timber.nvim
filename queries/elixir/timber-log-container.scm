@@ -53,9 +53,9 @@
   (call
     target: (identifier) @function_name
     (arguments) @log_container
-    (#not-any-of? @function_name "def" "defp" "defmacro" "if" "unless" "for" "case" "cond")
-    (#not-has-ancestor? @log_container call)
+    (#not-any-of? @function_name "def" "defp" "defmacro" "if" "unless" "for" "case" "cond" "with")
   ) @a
+  (#not-has-ancestor? @a call)
   (#make-logable-range! @a "outer")
 )
 
