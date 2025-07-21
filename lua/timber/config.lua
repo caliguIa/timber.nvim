@@ -58,7 +58,7 @@ local default_config = {
       swift = [[print("%log_target:", %log_target)]],
       kotlin = [[println("%log_target: ${%log_target}")]],
       scala = [[println(s"%log_target: ${%log_target}")]],
-      dart = [[print("%log_target: ${%log_target}")]],
+      dart = [[print("%log_target: ${%log_target}");]],
     },
     plain = {
       javascript = [[console.log("%insert_cursor")]],
@@ -83,7 +83,7 @@ local default_config = {
       swift = [[print("%insert_cursor")]],
       kotlin = [[println("%insert_cursor")]],
       scala = [[println("%insert_cursor")]],
-      dart = [[print("%insert_cursor")]],
+      dart = [[print("%insert_cursor");]],
     },
   },
   batch_log_templates = {
@@ -110,7 +110,7 @@ local default_config = {
       swift = [[print("%repeat<%log_target: %log_target><, >")]],
       kotlin = [[println("%repeat<%log_target=${%log_target}><, >")]],
       scala = [[println(s"%repeat<%log_target=${%log_target}><, >")]],
-      dart = [[print(s"%repeat<%log_target=${%log_target}><, >")]],
+      dart = [[print(s"%repeat<%log_target=${%log_target}><, >");]],
     },
   },
   template_placeholders = {
@@ -339,7 +339,7 @@ function M.setup(config)
   local base_config = vim.deepcopy(default_config)
   local user_config = config or {}
   local default_keymaps_enabled = user_config.default_keymaps_enabled == nil and base_config.default_keymaps_enabled
-    or user_config.default_keymaps_enabled
+      or user_config.default_keymaps_enabled
 
   if not default_keymaps_enabled then
     base_config.keymaps = {}
