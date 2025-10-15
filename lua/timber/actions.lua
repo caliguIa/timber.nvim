@@ -379,12 +379,7 @@ end
 local function capture_log_targets(lang, selection_range)
   local log_containers = treesitter.query_log_target_containers(lang, selection_range)
 
-  local log_target_grouped_by_container = treesitter.query_log_targets(
-    utils.array_map(log_containers, function(i)
-      return i.container
-    end),
-    lang
-  )
+  local log_target_grouped_by_container = treesitter.query_log_targets(log_containers)
 
   local log_targets = {}
 
@@ -395,7 +390,7 @@ local function capture_log_targets(lang, selection_range)
     end)
 
     local log_container = utils.array_find(log_containers, function(i)
-      return i.container == entry.container
+      return i.node == entry.container
     end)
     ---@cast log_container -nil
 
@@ -403,7 +398,7 @@ local function capture_log_targets(lang, selection_range)
       log_targets,
       utils.array_map(_log_targets, function(node)
         return {
-          log_container = log_container.container,
+          log_container = log_container.node,
           logable_ranges = log_container.logable_ranges,
           log_target = node,
         }
@@ -676,15 +671,17 @@ function M.__insert_log(motion_type)
     end
   end
 
-  local imported_inserted = insert_auto_import(auto_imports)
-  -- Adjust the row to account for the auto import lines
-  for _, statement in ipairs(to_insert) do
-    statement.row = statement.row + imported_inserted
-  end
+  if #to_insert > 0 then
+    local imported_inserted = insert_auto_import(auto_imports)
+    -- Adjust the row to account for the auto import lines
+    for _, statement in ipairs(to_insert) do
+      statement.row = statement.row + imported_inserted
+    end
 
-  local after_inserted_statements, insert_cursor_pos = insert_log_statements(to_insert)
-  after_insert_log_statements(after_inserted_statements, insert_cursor_pos, original_cursor_position)
-  emit_new_log_events(after_inserted_statements)
+    local after_inserted_statements, insert_cursor_pos = insert_log_statements(to_insert)
+    after_insert_log_statements(after_inserted_statements, insert_cursor_pos, original_cursor_position)
+    emit_new_log_events(after_inserted_statements)
+  end
 
   -- Prepare for dot repeat. We only preserve the opts
   make_dot_repeatable("__insert_log")

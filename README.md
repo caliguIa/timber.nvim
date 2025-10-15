@@ -38,6 +38,8 @@ https://github.com/user-attachments/assets/6bbcb1ab-45a0-45f3-a03a-1d0780219362
   - Bash
   - Swift
   - Kotlin
+  - Scala
+  - Dart
   - [Fallback for others](#fallback-for-non-treesitter-languages)
 
 ## Requirements
@@ -118,6 +120,8 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
             -- }
             javascript = [[console.log("%log_target", %log_target)]],
             typescript = [[console.log("%log_target", %log_target)]],
+            astro = [[console.log("%log_target", %log_target)]],
+            vue = [[console.log("%log_target", %log_target)]],
             jsx = [[console.log("%log_target", %log_target)]],
             tsx = [[console.log("%log_target", %log_target)]],
             lua = [[print("%log_target", %log_target)]],
@@ -134,10 +138,14 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
             odin = [[fmt.printfln("%log_target: %v", %log_target)]],
             swift = [[print("%log_target:", %log_target)]],
             kotlin = [[println("%log_target: ${%log_target}")]],
+            scala = [[println(s"%log_target: ${%log_target}")]],
+            dart = [[print("%log_target: ${%log_target}");]],
         },
         plain = {
             javascript = [[console.log("%insert_cursor")]],
             typescript = [[console.log("%insert_cursor")]],
+            astro = [[console.log("%insert_cursor")]],
+            vue = [[console.log("%insert_cursor")]],
             jsx = [[console.log("%insert_cursor")]],
             tsx = [[console.log("%insert_cursor")]],
             lua = [[print("%insert_cursor")]],
@@ -154,16 +162,20 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
             odin = [[fmt.println("%insert_cursor")]],
             swift = [[print("%insert_cursor")]],
             kotlin = [[println("%insert_cursor")]],
+            scala = [[println("%insert_cursor")]],
+            dart = [[print("%insert_cursor");]],
         },
     },
     batch_log_templates = {
         default = {
             javascript = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
             typescript = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
+            astro = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
+            vue = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
             jsx = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
             tsx = [[console.log({ %repeat<"%log_target": %log_target><, > })]],
             lua = [[print(string.format("%repeat<%log_target=%s><, >", %repeat<%log_target><, >))]],
-            luau = [[print(string.format("%repeat<%log_target=%s><, >", %repeat<%log_target><, >))]],
+            luau = [[print(`%repeat<%log_target={%log_target}><, >`)]],
             ruby = [[puts("%repeat<%log_target: #{%log_target}><, >")]],
             elixir = [[IO.inspect({ %repeat<%log_target><, > })]],
             go = [[log.Printf("%repeat<%log_target: %v><, >\n", %repeat<%log_target><, >)]],
@@ -176,6 +188,8 @@ You will need to call `require("timber").setup()` to intialize the plugin. You c
             odin = [[fmt.printfln("%repeat<%log_target: %v><, >", %repeat<%log_target><, >)]],
             swift = [[print("%repeat<%log_target: %log_target><, >")]],
             kotlin = [[println("%repeat<%log_target=${%log_target}><, >")]],
+            scala = [[println(s"%repeat<%log_target=${%log_target}><, >")]],
+            dart = [[print(s"%repeat<%log_target=${%log_target}><, >");]],
         },
     },
     template_placeholders = {
@@ -352,7 +366,7 @@ or comment all log statements in the current buffers (call this again will uncom
 require("timber.actions").toggle_comment_log_statements({ global = false })
 ```
 
-Use `global = true` to perform the action on all files. `timber.nvim` use grep to find all log statements in your project. For this to work, you need to make sure your `grepprg` is suitable. The search comand will be invoked as: `<grepprg> <log_marker>`. These are some recommendations, ranking from most to least recommended:
+Use `global = true` to perform the action on all files. `timber.nvim` uses grep to find all log statements in your project. For this to work, you need to make sure your `grepprg` is suitable. The search comand will be invoked as: `<grepprg> <log_marker>`. These are some recommendations, ranking from most to least recommended:
 
 ```lua
 vim.o.grepprg = "rg --vimgrep --no-heading --smart-case" -- Use ripgrep

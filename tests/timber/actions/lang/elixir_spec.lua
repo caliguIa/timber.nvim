@@ -478,7 +478,7 @@ describe("elixir single log", function()
   it("supports with expression", function()
     helper.assert_scenario({
       input = [[
-        with (
+        with(
           %{bar: bar} <- fo|o,
           %{baz: baz} <- bar
         ) do
@@ -496,7 +496,7 @@ describe("elixir single log", function()
       end,
       expected = [[
         IO.inspect(foo, label: "foo")
-        with (
+        with(
           %{bar: bar} <- foo,
           %{baz: baz} <- bar
         ) do

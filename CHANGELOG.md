@@ -1,5 +1,28 @@
 # Changelog
 
+## [2.3.0](https://github.com/Goose97/timber.nvim/compare/v2.2.0...v2.3.0) (2025-05-08)
+
+
+### Features
+
+* **actions:** add Astro language support ([0d8046a](https://github.com/Goose97/timber.nvim/commit/0d8046a8653c80727c6efbe6162026e23cc50240))
+* **actions:** add Astro language support ([e6fd925](https://github.com/Goose97/timber.nvim/commit/e6fd9251787a4ca8d3ef90143dfc6216cd76cfc4))
+* add Vue support ([#34](https://github.com/Goose97/timber.nvim/issues/34)) ([98ac7b5](https://github.com/Goose97/timber.nvim/commit/98ac7b575a3d0763bc5f9b78b95daa1ef772e8ac))
+* buffers.open_float return buf number ([202ffb3](https://github.com/Goose97/timber.nvim/commit/202ffb359717bdf3282be045228af4ad11be6fb5))
+* **luau:** add Luau language support ([f5b70f9](https://github.com/Goose97/timber.nvim/commit/f5b70f9f7d3f7691870fa57c86a5201db4e9773b))
+* **luau:** add Luau language support ([7e42026](https://github.com/Goose97/timber.nvim/commit/7e42026833c3200d5478632e180f61e125a48fba))
+* **luau:** use string interpolation for batch logs ([8950d73](https://github.com/Goose97/timber.nvim/commit/8950d73f5fb15c59d0cd600d4e3767aaff143212))
+* **luau:** use string interpolation for batch logs ([dcffbe1](https://github.com/Goose97/timber.nvim/commit/dcffbe1712b610d9f25c9e96e7c31760d51c5120))
+* **watcher:** auto create file if doesn't exist ([84e2913](https://github.com/Goose97/timber.nvim/commit/84e291322e94015b19011a3bdf4b2b59001a771a))
+
+
+### Bug Fixes
+
+* **actions:** update cpp syntax ([9874538](https://github.com/Goose97/timber.nvim/commit/98745380c27b8fffbc7861b7a7d3fce325d8139d))
+* **luau:** Various types being matched as log targets ([93f497a](https://github.com/Goose97/timber.nvim/commit/93f497aa4af3dae6d8c3ecca28e95089a9948bce))
+* **luau:** Various types being matched as log targets ([af6cfdf](https://github.com/Goose97/timber.nvim/commit/af6cfdfeafa643e97ae2eb263d1028d4523c29e0))
+* **watcher:** can't capture log statement for multi-line template ([f75eb66](https://github.com/Goose97/timber.nvim/commit/f75eb668e8246b403d7f4861bdd2ca156f090adb))
+
 ## [2.2.0](https://github.com/Goose97/timber.nvim/compare/v2.1.0...v2.2.0) (2025-01-15)
 
 
