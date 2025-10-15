@@ -38,6 +38,7 @@ require("nvim-treesitter.configs").setup({
     "bash",
     "swift",
     "kotlin",
+    "php",
   },
   sync_install = true,
   auto_install = false,
